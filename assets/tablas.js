@@ -1,4 +1,4 @@
-/* Forja Póker — interactive preflop charts: pick format, stack (slider, animatable), seat and situation; solid cells by
+/* PokerEFX — interactive preflop charts: pick format, stack (slider, animatable), seat and situation; solid cells by
    main action, tap/hover detail, action filter, range text, and a quiz mode to learn the chart. */
 (function () {
   'use strict';

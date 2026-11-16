@@ -1,4 +1,4 @@
-/* Forja Póker — shared styles. Tokens first (light), dark redefinitions, then components. */
+/* PokerEFX — shared styles. Tokens first (light), dark redefinitions, then components. */
 :root {
   --bg: #f6f3ec; --bg2: #ede8dd; --card: #fffdf8; --ink: #1d211f; --ink2: #4a514d; --muted: #7a807b; --line: #ddd6c7;
   --felt: #17584c; --felt2: #0f3f37; --on-felt: #eef6f2; --brass: #b8862f; --brass-ink: #2a1d05; --accent: #17584c;

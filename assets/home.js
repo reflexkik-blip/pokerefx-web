@@ -1,4 +1,4 @@
-/* Forja Póker — home page demo: a real chart spot, a random hand, your decision and the solver's answer. */
+/* PokerEFX — home page demo: a real chart spot, a random hand, your decision and the solver's answer. */
 (function () {
   'use strict';
   const RK = 'AKQJT98765432', SUITS = [['♠', 's'], ['♥', 'h'], ['♦', 'd'], ['♣', 'c']];

@@ -1,4 +1,4 @@
-/* Forja Póker — calculators page: equity (hands/ranges), ICM, pot odds / MDF. */
+/* PokerEFX — calculators page: equity (hands/ranges), ICM, pot odds / MDF. */
 (function () {
   'use strict';
   const E = window.FPE, $ = id => document.getElementById(id);

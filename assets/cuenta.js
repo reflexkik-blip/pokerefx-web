@@ -1,4 +1,4 @@
-/* Forja Póker — local account page: progress from the simulator's stored decisions, export / import / delete. */
+/* PokerEFX — local account page: progress from the simulator's stored decisions, export / import / delete. */
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -18,12 +18,12 @@
   $('acc-name').addEventListener('change', e => { set('fp.name', e.target.value.trim()); $('acc-msg').textContent = 'Guardado.'; });
   $('acc-exp').addEventListener('click', () => {
     const data = {}; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^(sim|fp)\./.test(k)) data[k] = localStorage.getItem(k); } } catch (e) { /* none */ }
-    const blob = new Blob([JSON.stringify({ forjapoker: 1, saved: new Date().toISOString(), data })], { type: 'application/json' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'forjapoker-progreso.json'; document.body.appendChild(a); a.click(); a.remove();
+    const blob = new Blob([JSON.stringify({ pokerefx: 1, saved: new Date().toISOString(), data })], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'pokerefx-progreso.json'; document.body.appendChild(a); a.click(); a.remove();
     $('acc-msg').textContent = 'Archivo descargado. Impórtalo en otro dispositivo desde esta página.';
   });
   $('acc-imp').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader();
-    r.onload = () => { try { const j = JSON.parse(r.result); if (!j.forjapoker) throw 0; Object.entries(j.data).forEach(([k, v]) => localStorage.setItem(k, v)); $('acc-msg').textContent = 'Progreso importado.'; render(); } catch (err) { $('acc-msg').textContent = 'Ese archivo no es una copia de Forja Póker.'; } };
+    r.onload = () => { try { const j = JSON.parse(r.result); if (!(j.forjapoker||j.pokerefx)) throw 0; Object.entries(j.data).forEach(([k, v]) => localStorage.setItem(k, v)); $('acc-msg').textContent = 'Progreso importado.'; render(); } catch (err) { $('acc-msg').textContent = 'Ese archivo no es una copia de PokerEFX.'; } };
     r.readAsText(f); });
   let armed = false;
   $('acc-del').addEventListener('click', () => {

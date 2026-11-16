@@ -1,4 +1,4 @@
-/* Forja Póker — calculation engine: 7-card evaluator, ranges, exact/Monte Carlo equity, ICM. No dependencies. */
+/* PokerEFX — calculation engine: 7-card evaluator, ranges, exact/Monte Carlo equity, ICM. No dependencies. */
 (function (G) {
   'use strict';
   const RK = '23456789TJQKA', SU = 'shdc';

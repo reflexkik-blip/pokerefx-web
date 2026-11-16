@@ -1,4 +1,4 @@
-/* Forja Póker — "Laboratorio": what real tournament tables do (anonymous aggregates). Interactive explorers:
+/* PokerEFX — "Laboratorio": what real tournament tables do (anonymous aggregates). Interactive explorers:
    rival map (VPIP/PFR), bluff checker by street/size/role, c-bet by flop texture, river call-or-fold. */
 (function () {
   'use strict';

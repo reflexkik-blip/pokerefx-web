@@ -1,4 +1,4 @@
-/* Forja Póker — cloud accounts (Supabase): Google sign-in, progress sync and plan (free / plus / premium).
+/* PokerEFX — cloud accounts (Supabase): Google sign-in, progress sync and plan (free / plus / premium).
    Inactive until FP_CFG.supabaseUrl and FP_CFG.supabaseKey are filled in; the anon key is public by design and every
    table is protected by row-level security (see supabase.sql). */
 (function () {

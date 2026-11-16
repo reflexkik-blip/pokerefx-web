@@ -1,4 +1,4 @@
-/* Forja Póker — shared page chrome: header, footer, theme, cookie consent and ads (only after consent). */
+/* PokerEFX — shared page chrome: header, footer, theme, cookie consent and ads (only after consent). */
 (function () {
   'use strict';
   // Fill in when the accounts exist (see /WEB_PLAN.md): Google AdSense publisher id, e.g. 'ca-pub-0000000000000000'.
@@ -16,7 +16,7 @@
 
   function chrome(active) {
     const h = document.createElement('div'); h.setAttribute('role', 'banner'); h.className = 'fp-top';
-    h.innerHTML = '<div class="fp-wrap"><a class="brand" href="' + root + 'index.html">' + LOGO + 'Forja Póker</a>' +
+    h.innerHTML = '<div class="fp-wrap"><a class="brand" href="' + root + 'index.html">' + LOGO + 'PokerEFX</a>' +
       '<button class="navbtn" type="button" aria-expanded="false" aria-controls="nav">Menú</button>' +
       '<nav class="nav" id="nav">' + NAV.map(([p, l]) => '<a href="' + root + p + '/index.html"' + (p === active ? ' aria-current="page"' : '') + '>' + l + '</a>').join('') +
       '<button class="theme" type="button" title="Tema claro u oscuro" aria-label="Cambiar tema"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></nav></div>';
@@ -28,7 +28,7 @@
       const next = cur === 'dark' ? 'light' : 'dark'; theme(next); store.set('theme', next);
     });
     const f = document.createElement('div'); f.setAttribute('role', 'contentinfo'); f.className = 'fp-foot';
-    f.innerHTML = '<div class="fp-wrap"><div><b>Forja Póker</b> · entrenamiento de torneos con teoría GTO y rivales reales.<br>Solo para mayores de 18 años. Esto es formación: no se juega dinero aquí. Juega con responsabilidad (<a href="https://www.jugarbien.es" rel="noopener">jugarbien.es</a>).</div>' +
+    f.innerHTML = '<div class="fp-wrap"><div><b>PokerEFX</b> · entrenamiento de torneos con teoría GTO y rivales reales.<br>Solo para mayores de 18 años. Esto es formación: no se juega dinero aquí. Juega con responsabilidad (<a href="https://www.jugarbien.es" rel="noopener">jugarbien.es</a>).</div>' +
       '<div><a href="' + root + 'rangos/">Todos los rangos</a> · <a href="' + root + 'metodologia/">Cómo calculamos</a> · <a href="' + root + 'legal/privacidad.html">Privacidad</a> · <a href="' + root + 'legal/cookies.html">Cookies</a> · <a href="' + root + 'legal/aviso-legal.html">Aviso legal</a> · <a href="#" id="fp-cookies">Preferencias de cookies</a></div></div>';
     document.body.appendChild(f);
     f.querySelector('#fp-cookies').addEventListener('click', e => { e.preventDefault(); consentBanner(true); });
