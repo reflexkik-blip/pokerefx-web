@@ -4,6 +4,7 @@
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
+  const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const RK = 'AKQJT98765432';
   const N = []; for (let i = 0; i < 13; i++) for (let j = 0; j < 13; j++) N.push(i === j ? RK[i] + RK[j] : i < j ? RK[i] + RK[j] + 's' : RK[j] + RK[i] + 'o');
   const CMB = N.map(h => h.length === 2 ? 6 : h[2] === 's' ? 4 : 12);
@@ -35,6 +36,57 @@
     return ['enfriado', '#4f8fc0'];
   }
   function streak() { let s = 0, d = today(); const set = new Set(st.days); if (!set.has(d)) d--; while (set.has(d)) { s++; d--; } return s; }
+
+  // ---------------------------------------------------------------- own ranges (editor / import)
+  const SETS = [['F', 'R'], ['F', 'A'], ['F', 'C', 'R'], ['F', 'R', 'A'], ['F', 'C', 'A'], ['F', 'L', 'R', 'A']];
+  const SETN = c => ({ F: 'Fold', C: 'Pagar', L: 'Limp', A: 'All-in', R: 'Subir' })[c];
+  function mine() { return (st.mine || []).map(m => ({ id: 'mine:' + m.id, g: 'Mis rangos', t: m.t, S: m.S || '', slug: '', ac: m.ac, F: m.p.map(a => m.ac.map((_, j) => j === a ? 1 : 0)), own: m.id })); }
+  function parseRange(txt) {
+    const out = new Set(), ri = c => RK.indexOf(c.toUpperCase());
+    txt.split(/[,;\s]+/).filter(Boolean).forEach(tok => {
+      let m;
+      if ((m = tok.match(/^([2-9TJQKA])\1\+$/i))) { for (let i = ri(m[1]); i >= 0; i--) out.add(RK[i] + RK[i]); return; }
+      if ((m = tok.match(/^([2-9TJQKA])\1-([2-9TJQKA])\2$/i))) { const a = ri(m[1]), b = ri(m[2]); for (let i = Math.min(a, b); i <= Math.max(a, b); i++) out.add(RK[i] + RK[i]); return; }
+      if ((m = tok.match(/^([2-9TJQKA])\1$/i))) { out.add(m[1].toUpperCase() + m[1].toUpperCase()); return; }
+      const sfx = t => t ? [t.toLowerCase()] : ['s', 'o'];
+      if ((m = tok.match(/^([2-9TJQKA])([2-9TJQKA])([so]?)\+$/i))) { const h = ri(m[1]), k = ri(m[2]); for (let j = k; j > h; j--) sfx(m[3]).forEach(x => out.add(RK[h] + RK[j] + x)); return; }
+      if ((m = tok.match(/^([2-9TJQKA])([2-9TJQKA])([so]?)-\1([2-9TJQKA])\3$/i))) { const h = ri(m[1]), a = ri(m[2]), b = ri(m[4]); for (let j = Math.min(a, b); j <= Math.max(a, b); j++) sfx(m[3]).forEach(x => out.add(RK[h] + RK[j] + x)); return; }
+      if ((m = tok.match(/^([2-9TJQKA])([2-9TJQKA])([so]?)$/i))) { let h = ri(m[1]), k = ri(m[2]); if (h > k) [h, k] = [k, h]; if (h !== k) sfx(m[3]).forEach(x => out.add(RK[h] + RK[k] + x)); }
+    });
+    return [...out].map(h => N.indexOf(h)).filter(k => k >= 0);
+  }
+  function editor(m) {
+    cur = null; step = 0; renderDeck();
+    const e = m ? JSON.parse(JSON.stringify(m)) : { id: Date.now().toString(36), t: '', S: '', ac: ['F', 'R'], p: N.map(() => 0) };
+    let br = 1;
+    const draw = () => {
+      $('e-work').innerHTML = '<div class="eyebrow">Mis rangos</div><h2>' + (m ? 'Editar rango' : 'Crear o importar un rango') + '</h2>' +
+        '<div class="row" style="margin:10px 0"><label class="f" style="flex:1 1 240px">Nombre<input type="text" id="m-t" maxlength="40" placeholder="Ej.: Mi open CO 25 bb"></label><label class="f" style="width:110px">Stack (bb)<input type="number" id="m-s" min="1" max="300"></label>' +
+        '<label class="f">Acciones<select id="m-ac">' + SETS.map((x, i) => '<option value="' + i + '"' + (x.join() === e.ac.join() ? ' selected' : '') + '>' + x.map(SETN).join(' / ') + '</option>').join('') + '</select></label></div>' +
+        '<div class="pal">' + e.ac.map((c, a) => '<button type="button" data-b="' + a + '" class="' + (a === br ? 'on' : '') + '" style="--c:' + COL[c] + '"><i></i>' + SETN(c) + '</button>').join('') + '</div>' +
+        '<div class="eg" id="e-grid">' + N.map((h, k) => '<span data-k="' + k + '" style="background:' + COL[e.ac[e.p[k]]] + '">' + h + '</span>').join('') + '</div>' +
+        '<label class="f" style="margin-top:6px">Pegar un rango para la acción seleccionada (p. ej. «22+, A2s+, KTo+, QJs-Q9s»)<textarea id="m-txt" rows="2" style="font:14px ui-monospace,monospace;border:1px solid var(--line);border-radius:9px;padding:8px;background:var(--card);color:var(--ink)"></textarea></label>' +
+        '<div class="row" style="gap:8px;margin-top:10px"><button class="btn" type="button" id="m-apply">Aplicar texto</button><button class="btn pri" type="button" id="m-save">Guardar y entrenar</button>' + (m ? '<button class="btn" type="button" id="m-del">Borrar</button>' : '') + '</div><p class="small" id="m-msg"></p>';
+      $('m-t').value = e.t; $('m-s').value = e.S;
+      $('m-ac').addEventListener('change', ev => { const old = e.ac; e.ac = SETS[+ev.target.value]; e.p = e.p.map(a => Math.max(0, e.ac.indexOf(old[a]))); br = Math.min(br, e.ac.length - 1); draw(); });
+      document.querySelectorAll('.pal [data-b]').forEach(b => b.addEventListener('click', () => { br = +b.dataset.b; document.querySelectorAll('.pal [data-b]').forEach(x => x.classList.toggle('on', x === b)); }));
+      const g = $('e-grid'); let dr = false;
+      const hit = ev => { const t = document.elementFromPoint(ev.clientX, ev.clientY); return t && t.dataset && t.dataset.k != null && g.contains(t) ? t : null; };
+      const set = t => { e.p[+t.dataset.k] = br; t.style.background = COL[e.ac[br]]; };
+      g.addEventListener('pointerdown', ev => { const t = hit(ev); if (!t) return; dr = true; g.setPointerCapture(ev.pointerId); set(t); ev.preventDefault(); });
+      g.addEventListener('pointermove', ev => { if (dr) { const t = hit(ev); if (t) set(t); } });
+      g.addEventListener('pointerup', () => { dr = false; });
+      $('m-apply').addEventListener('click', () => { const ks = parseRange($('m-txt').value); ks.forEach(k => { e.p[k] = br; }); e.t = $('m-t').value; e.S = $('m-s').value; draw(); $('m-msg').textContent = ks.length + ' manos marcadas como ' + SETN(e.ac[br]).toLowerCase() + '.'; });
+      $('m-save').addEventListener('click', () => {
+        e.t = $('m-t').value.trim() || 'Mi rango'; e.S = +$('m-s').value || '';
+        st.mine = (st.mine || []).filter(x => x.id !== e.id).concat([e]); save();
+        D = D.filter(x => !x.own).concat(mine()); open(D.find(x => x.own === e.id));
+      });
+      if (m) $('m-del').addEventListener('click', ev => { if (ev.target.dataset.arm) { st.mine = st.mine.filter(x => x.id !== e.id); delete st.cards['mine:' + e.id]; save(); D = D.filter(x => x.own !== e.id); cur = null; renderDeck(); renderWork(); } else { ev.target.dataset.arm = 1; ev.target.textContent = 'Pulsa otra vez para borrar'; } });
+    };
+    draw();
+  }
+  const newBtn = $('e-new'); if (newBtn) newBtn.addEventListener('click', () => editor(null));
 
   // ---------------------------------------------------------------- deck panel
   function due() { return D.filter(x => st.cards[x.id] && card(x.id).due <= today()).sort((a, b) => card(a.id).due - card(b.id).due); }
@@ -75,7 +127,7 @@
     const r = cur, w = $('e-work');
     if (!r) { w.innerHTML = '<div class="empty"><h2>Elige un rango</h2><p>Empieza por los de «Para repasar hoy». Cada rango se fija en tres pasos: lo estudias, lo calcas encima y lo redibujas de memoria. La app te lo vuelve a pedir justo antes de que lo olvides.</p></div>'; return; }
     const tabs = '<div class="steps">' + STEPS.map((s, i) => '<button type="button" data-s="' + i + '" class="' + (i === step ? 'on' : '') + '"><b>' + (i + 1) + '</b>' + s + '</button>').join('') + '</div>';
-    const head = '<div class="wh"><div><div class="eyebrow">' + r.g + ' · ChipEV · ' + r.S + ' bb</div><h2>' + r.t + '</h2></div><a class="small" href="../rangos/' + r.slug + '/">Ver la página del rango →</a></div>';
+    const head = '<div class="wh"><div><div class="eyebrow">' + r.g + (r.own ? '' : ' · ChipEV') + (r.S ? ' · ' + r.S + ' bb' : '') + '</div><h2>' + esc(r.t) + '</h2></div>' + (r.own ? '<button class="btn" type="button" id="e-edit">Editar</button>' : '<a class="small" href="../rangos/' + r.slug + '/">Ver la página del rango →</a>') + '</div>';
     let body = '';
     if (step === 0) body = '<p class="small">Mira dónde va cada acción. Fíjate en las fronteras: la última mano que se juega en cada fila.</p>' + grid('study') + legend() + '<button class="btn pri" type="button" id="e-go">Ya lo tengo: a calcar</button>';
     else if (step === 1 || step === 2) body = '<p class="small">' + (step === 1 ? 'El rango aparece atenuado: pinta encima con el color de cada acción.' : 'Sin ayuda: redibuja el rango de memoria.') + ' Elige acción y pulsa o arrastra sobre las casillas.</p>' + palette() + grid(step === 1 ? 'trace' : 'blank') +
@@ -83,6 +135,7 @@
     else body = '<div id="e-quiz"></div>';
     w.innerHTML = head + tabs + body;
     w.querySelectorAll('[data-s]').forEach(b => b.addEventListener('click', () => { step = +b.dataset.s; renderWork(); }));
+    if (r.own) $('e-edit').addEventListener('click', () => editor((st.mine || []).find(x => x.id === r.own)));
     if (step === 0) $('e-go').addEventListener('click', () => { step = 1; renderWork(); });
     if (step === 1 || step === 2) bindPaint();
     if (step === 3) nextHand();
@@ -132,6 +185,6 @@
       setTimeout(nextHand, ok ? 900 : 2200);
     }));
   }
-  fetch('../data/srs.json').then(r => r.json()).then(d => { D = d; renderDeck(); const first = due()[0]; renderWork(); if (first && innerWidth >= 900) open(first); })
+  fetch('../data/srs.json').then(r => r.json()).then(d => { D = d.concat(mine()); renderDeck(); const first = due()[0]; renderWork(); if (first && innerWidth >= 900) open(first); })
     .catch(() => { $('e-work').innerHTML = '<p>No se pudo cargar el entrenador. Recarga la página.</p>'; });
 })();
