@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laboratorio: cómo juegan de verdad los rivales de torneo — Forja Póker</title>
+<meta name="description" content="Datos de miles de manos reales de torneo: tipos de rivales, cuánto foldean a cada apuesta, c-bet según el flop y cuándo pagar en el river. Interactivo y gratis.">
+<link rel="canonical" href="https://pokerefx.netlify.app/laboratorio/">
+<script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+
+<meta property="og:title" content="Laboratorio: cómo juegan de verdad los rivales de torneo — Forja Póker"><meta property="og:description" content="Datos de miles de manos reales de torneo: tipos de rivales, cuánto foldean a cada apuesta, c-bet según el flop y cuándo pagar en el river. Interactivo y gratis."><meta property="og:type" content="website">
+<meta name="theme-color" content="#17584c">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+
+<style>.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1px solid var(--line);background:var(--card);color:var(--ink2);border-radius:999px;padding:6px 12px;font:500 14px var(--body);cursor:pointer}.chip.on{background:var(--felt);border-color:var(--felt);color:var(--on-felt)}.chip i,.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.mapgrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-top:12px}@media(max-width:860px){.mapgrid{grid-template-columns:1fr}}svg{width:100%;height:auto;display:block}svg .grid{stroke:var(--line);stroke-width:1}svg .tick{fill:var(--muted);font:11px var(--body);text-anchor:middle}svg .axl{fill:var(--ink2);font:600 12px var(--body);text-anchor:middle}.kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14.5px}.kv span{color:var(--ink2)}.lab{font:600 12px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}.gauge{margin-top:14px}.gtrack{position:relative;height:16px;border-radius:8px;background:var(--bg2);margin-top:26px}.gfill{position:absolute;left:0;top:0;bottom:0;border-radius:8px;transition:width .35s}.gneed{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--ink);transition:left .35s}.gneed em{position:absolute;bottom:100%;transform:translateX(-50%);white-space:nowrap;font:600 12px var(--body);font-style:normal;color:var(--ink);padding-bottom:3px}.gv{margin-top:8px;font-size:15px}.gv b{font:700 26px var(--display);margin-right:4px}.verd{margin:8px 0 0;padding:10px 12px;border-radius:10px;font-size:15px}.verd.ok{background:color-mix(in srgb,var(--good) 14%,transparent)}.verd.no{background:color-mix(in srgb,var(--bad) 12%,transparent)}.hb{display:grid;grid-template-columns:130px 1fr 48px;gap:10px;align-items:center;font-size:14px;margin:6px 0}.hb .bar{height:10px;border-radius:5px;background:var(--bg2);overflow:hidden}.hb .bar span{display:block;height:100%}.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:640px){.two{grid-template-columns:1fr}}.flop{display:flex;gap:6px;align-items:center;margin:14px 0 4px}.stack{display:flex;height:34px;border-radius:9px;overflow:hidden}.stack span{display:grid;place-items:center;color:#111;font:700 13px var(--body);transition:flex .35s}.legend2{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;font-size:13.5px}.legend2 i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}</style>
+</head>
+<body>
+<main>
+<section style="padding-bottom:10px"><div class="wrap"><div class="eyebrow">Laboratorio</div><h1>Cómo juegan de verdad tus rivales</h1>
+<p>Más de 14.000 manos reales de torneos online, convertidas en respuestas prácticas: a quién farolear, con qué tamaño, en qué flops y cuándo pagar en el river. Datos agregados y anónimos.</p></div></section>
+<section style="padding-top:10px"><div class="wrap"><h2>1 · El mapa de rivales</h2><p>Cada punto es un jugador real (más manos, punto más grande). Toca un tipo para ver cómo juega y cómo ganarle.</p>
+<div class="chips" id="lab-types"></div><div class="mapgrid"><div class="box" id="lab-map"></div><div class="box" id="lab-type"></div></div></div></section>
+<div class="wrap"><div class="ad" data-slot="lab-1">Publicidad</div></div>
+<section><div class="wrap"><h2>2 · ¿Funciona mi farol?</h2><p>Elige la calle, si eras el agresor y el tamaño. Verás cuánto foldean de verdad y cuánto necesita tu farol para ganar.</p>
+<div class="box"><div class="chips" id="lab-bst"></div><div class="chips" id="lab-brole" style="margin-top:8px"></div><div class="chips" id="lab-bsz" style="margin-top:8px"></div>
+<div id="lab-bout" class="labout"></div><div id="lab-bkinds" style="margin-top:14px"></div><p class="small" id="lab-bcr" style="margin-top:10px"></p></div></div></section>
+<section><div class="wrap"><h2>3 · La c-bet según el flop</h2><p>No todos los flops son iguales: en algunos la c-bet pequeña imprime dinero y en otros es un regalo.</p>
+<div class="box"><div class="chips" id="lab-tex"></div><div id="lab-tout" class="labout"></div></div></div></section>
+<section><div class="wrap"><h2>4 · River: ¿pagar o foldear?</h2><p>Lo que de verdad tenían los rivales cuando apostaban en el river, según el tamaño y su tipo.</p>
+<div class="box"><div class="chips" id="lab-rsz"></div><div class="chips" id="lab-rwho" style="margin-top:8px"></div><div id="lab-rout" class="labout" style="margin-top:12px"></div></div></div></section>
+<div class="wrap"><div class="ad" data-slot="lab-2">Publicidad</div></div>
+</main>
+<script src="../assets/site.js" data-root="../"></script>
+<script>FP.chrome('laboratorio');</script>
+<script src="../assets/lab.js"></script>
+</body>
+</html>

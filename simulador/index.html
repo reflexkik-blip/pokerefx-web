@@ -1,0 +1,2220 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Simulador de torneos de póker gratis: juega manos 6-max contra rivales realistas y recibe la corrección GTO de un solver en cada decisión, preflop y postflop.">
+<link rel="canonical" href="https://pokerefx.netlify.app/simulador/"><script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+<meta name="theme-color" content="#17584c"><link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>.fp-top,.fp-foot{font-size:16px}.fp-top .fp-wrap,.fp-foot .fp-wrap{max-width:1180px}.fp-top .nav.open{background:var(--panel)}</style>
+<title>Simulador de póker GTO para torneos — Forja Póker</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: a 6-max table on felt on the left, the coach (verdicts, EV of each option, theory) on the right; stacked on phones. */
+:root {
+  --bg: #eef1ef; --panel: #ffffff; --ink: #18211e; --ink2: #4b5853; --muted: #7b8782; --line: #d6ddd9;
+  --felt: #17584c; --felt2: #0f3f37; --rail: #263330; --on-felt: #e9f3ef; --on-felt2: #a9c7bd;
+  --chip: #d79a2b; --accent: #1f6f5f; --accent-ink: #ffffff;
+  --good: #23855b; --warn: #b77a10; --bad: #c2412f; --good-bg: #e3f3ea; --warn-bg: #fbf0d9; --bad-bg: #fbe4df;
+  --card: #fbfbf8; --card-line: #cfd3cf; --s-s: #1d1f1e; --s-h: #cf3626; --s-d: #2463c9; --s-c: #23864a;
+  --t-fish: #1f8fa8; --t-reg: #5b6b86; --t-lag: #c76a1c; --t-maniac: #b8325a; --t-nit: #7a62a8;
+  --display: 'Barlow Semi Condensed', 'Arial Narrow', system-ui, sans-serif; --body: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1513; --panel: #17201d; --ink: #e5ece9; --ink2: #b3c0bb; --muted: #84928c; --line: #2a3632;
+  --felt: #135045; --felt2: #0b3029; --rail: #1c2523; --accent: #3aa58c; --accent-ink: #06130f;
+  --good: #4cc08b; --warn: #e3a93a; --bad: #ef6d58; --good-bg: #173327; --warn-bg: #3a2e14; --bad-bg: #3d1d18; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1513; --panel: #17201d; --ink: #e5ece9; --ink2: #b3c0bb; --muted: #84928c; --line: #2a3632;
+  --felt: #135045; --felt2: #0b3029; --rail: #1c2523; --accent: #3aa58c; --accent-ink: #06130f;
+  --good: #4cc08b; --warn: #e3a93a; --bad: #ef6d58; --good-bg: #173327; --warn-bg: #3a2e14; --bad-bg: #3d1d18; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.45; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 14px 40px }
+.wrap { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px }
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px }
+h1 { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: .01em; margin: 0 }
+h1 small a { color: var(--accent) }
+h1 small { font-family: var(--body); font-weight: 400; font-size: 13px; color: var(--muted); margin-left: 8px }
+h2 { font-family: var(--display); font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink2); margin: 0 0 8px }
+.stats { display: flex; flex-wrap: wrap; gap: 6px }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; font-size: 12px; color: var(--ink2) }
+.stat b { font-family: var(--display); font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; margin-right: 3px }
+details.settings { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px }
+details.settings summary { cursor: pointer; font-weight: 600; color: var(--ink2) }
+.setgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px 14px; margin-top: 10px }
+.setgrid label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted) }
+select, button { font: inherit }
+select { background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px }
+.check { flex-direction: row !important; align-items: center; gap: 8px !important; color: var(--ink2) !important; font-size: 13px !important }
+.main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 14px; align-items: start }
+@media (max-width: 920px) { .main { grid-template-columns: minmax(0, 1fr) } }
+.tablebox { display: flex; flex-direction: column; gap: 10px; min-width: 0 }
+.table { position: relative; width: 100%; aspect-ratio: 1.7; max-width: 100%; margin-bottom: 18px }
+@media (max-width: 560px) { .table { aspect-ratio: 1; margin-block: 14px 40px } }
+.focus { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--warn-bg); color: var(--ink); border-radius: 9px; padding: 6px 10px; font-size: 13px }
+.stake { font-size: 12.5px; color: var(--ink2); font-variant-numeric: tabular-nums }
+input[type=text] { background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; font: inherit }
+.felt { position: absolute; inset: 14% 8% 17% 8%; border-radius: 999px; background: radial-gradient(ellipse at 50% 40%, var(--felt), var(--felt2) 78%); border: 10px solid var(--rail); box-shadow: inset 0 0 0 2px rgba(255,255,255,.05), 0 6px 18px rgba(0,0,0,.18) }
+.center { position: absolute; left: 50%; top: 47%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 2 }
+.pot { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--on-felt); background: rgba(0,0,0,.25); padding: 1px 10px; border-radius: 99px; font-variant-numeric: tabular-nums }
+.board { display: flex; gap: 4px; min-height: 52px }
+.realbox { display: flex; flex-direction: column; gap: 10px; background: radial-gradient(ellipse at 50% 30%, var(--felt), var(--felt2) 90%); border: 8px solid var(--rail); color: var(--on-felt); border-radius: 22px; padding: 16px 18px }
+.rb-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap }
+.rb-lab { min-width: 64px; font-size: 13px; color: var(--on-felt2) }
+.realbox .small { color: var(--on-felt2) }
+.rb-pot { font-family: var(--display); font-weight: 700; font-size: 18px }
+[hidden] { display: none !important }
+.realbox select { max-width: 100%; min-width: 0; font: inherit; padding: 4px 8px; border-radius: 8px }
+.seat { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; z-index: 3; width: 132px }
+.stk { white-space: nowrap }
+@media (max-width: 560px) { .seat { width: 112px } .prow { font-size: 11px } .pos { font-size: 12.5px } .tbadge { font-size: 10px; padding: 0 3px } .hud { font-size: 9.5px }
+  .seat .cards .card { width: 25px; height: 34px } .seat .cards .card .r { font-size: 13px } .seat .cards .card .s { font-size: 11px }
+  .card { width: 33px; height: 46px } .card .r { font-size: 18px } .card .s { font-size: 15px } h1 small { display: block; margin: 2px 0 0 } }
+.plate { width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 4px 7px; display: flex; flex-direction: column; gap: 1px; box-shadow: 0 2px 6px rgba(0,0,0,.12) }
+.seat.folded .plate { opacity: .5 }
+.seat.hero .plate { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) }
+.seat.act .plate { outline: 2px dashed var(--chip); outline-offset: 2px }
+.prow { display: flex; justify-content: space-between; align-items: center; gap: 4px; font-size: 12px }
+.pos { font-family: var(--display); font-weight: 700; font-size: 14px }
+.stk { font-variant-numeric: tabular-nums; color: var(--ink2) }
+.tbadge { font-family: var(--display); font-weight: 600; font-size: 11px; letter-spacing: .04em; color: #fff; border-radius: 4px; padding: 0 5px; }
+.tb-fish { background: var(--t-fish) } .tb-reg { background: var(--t-reg) } .tb-lag { background: var(--t-lag) } .tb-maniac { background: var(--t-maniac) } .tb-nit { background: var(--t-nit) } .tb-hero { background: var(--accent); color: var(--accent-ink) }
+.hud { font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.bubble { font-size: 11.5px; font-weight: 600; color: var(--on-felt); background: rgba(0,0,0,.45); padding: 0 7px; border-radius: 99px; min-height: 17px; white-space: nowrap }
+.bubble:empty { visibility: hidden }
+.dealer { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #f5f2e8; color: #222; font: 700 10px/18px var(--display); text-align: center; z-index: 4; transform: translate(-50%, -50%); box-shadow: 0 1px 3px rgba(0,0,0,.4) }
+.cards { display: flex; gap: 3px }
+.card { width: 38px; height: 52px; border-radius: 6px; background: var(--card); border: 1px solid var(--card-line); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; line-height: 1; box-shadow: 0 1px 2px rgba(0,0,0,.25); color: #1d1f1e }
+.card .r { font-size: 21px } .card .s { font-size: 17px }
+.card.sm { width: 28px; height: 38px } .card.sm .r { font-size: 15px } .card.sm .s { font-size: 12px }
+.card.back { background: repeating-linear-gradient(45deg, #23655a 0 4px, #1b5047 4px 8px); border-color: #12362f }
+.c-s { color: var(--s-s) } .c-h { color: var(--s-h) } .c-d { color: var(--s-d) } .c-c { color: var(--s-c) }
+.seat .cards .card { width: 30px; height: 41px } .seat .cards .card .r { font-size: 16px } .seat .cards .card .s { font-size: 13px }
+.seat.hero .cards .card { width: 42px; height: 58px } .seat.hero .cards .card .r { font-size: 23px } .seat.hero .cards .card .s { font-size: 19px }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; min-height: 44px; align-items: center }
+.btn { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 9px; padding: 9px 14px; font-weight: 600; cursor: pointer; font-variant-numeric: tabular-nums }
+.btn:hover { border-color: var(--accent) }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.btn.pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.btn.fold { color: var(--ink2) }
+.btn:disabled { opacity: .5; cursor: default }
+.prompt { font-size: 13px; color: var(--ink2) }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-width: 0 }
+.coach { display: flex; flex-direction: column; gap: 12px }
+.verdict { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
+.vchip { font-family: var(--display); font-weight: 700; font-size: 15px; padding: 2px 10px; border-radius: 6px; letter-spacing: .03em }
+.v-ok { background: var(--good-bg); color: var(--good) } .v-meh { background: var(--warn-bg); color: var(--warn) } .v-bad { background: var(--bad-bg); color: var(--bad) }
+.sit { font-size: 13px; color: var(--ink2) }
+table.ev { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums }
+table.ev td, table.ev th { padding: 4px 6px; border-bottom: 1px solid var(--line); text-align: right }
+table.ev td:first-child, table.ev th:first-child { text-align: left }
+table.ev th { font-weight: 500; color: var(--muted); font-size: 12px }
+table.ev tr.best td { font-weight: 700 }
+table.ev tr.mine td:first-child::after { content: '  ← tú'; color: var(--muted); font-weight: 400 }
+.pos-n { color: var(--good) } .neg-n { color: var(--bad) }
+ul.why { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px }
+ul.why li::marker { color: var(--chip) }
+.log { font-size: 12.5px; color: var(--ink2); max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; font-variant-numeric: tabular-nums }
+.log .st { color: var(--ink); font-weight: 600; margin-top: 4px }
+.small { font-size: 12px; color: var(--muted) }
+.rng { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 1px; max-width: 330px; font-size: 9px; font-family: var(--display) }
+.rng div { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 2px; color: var(--ink2); background: var(--bg) }
+.sumrow { display: flex; flex-wrap: wrap; gap: 6px }
+.dec { border-left: 3px solid var(--line); padding: 2px 8px; font-size: 12.5px }
+.dec.ok { border-color: var(--good) } .dec.meh { border-color: var(--warn) } .dec.bad { border-color: var(--bad) }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px }
+.bars td:nth-child(2) { width: 50% }
+.bar { height: 8px; background: var(--accent); border-radius: 3px; display: block }
+.loading { padding: 30px; text-align: center; color: var(--muted) }
+@media (prefers-reduced-motion: no-preference) { .bubble, .board .card { transition: opacity .2s } }
+</style>
+</head><body>
+
+
+<div class="wrap">
+  <header class="top">
+    <h1>Simulador de póker <small>MTT 6-max · rivales como los de las mesas reales · <a href="../tablas/index.html">tablas preflop</a></small></h1>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <details class="settings" id="settings">
+    <summary>Ajustes de la práctica</summary>
+    <div class="setgrid">
+      <label>Contexto
+        <select id="s-ctx">
+          <option value="pko-cubierto">PKO · te cubren</option>
+          <option value="pko-cubre">PKO · cubres</option>
+          <option value="chipev-eq">ChipEV</option>
+          <option value="icm_medio-cubierto">ICM medio · te cubren</option>
+          <option value="icm_medio-cubre">ICM medio · cubres</option>
+          <option value="burbuja-cubierto">Burbuja · te cubren</option>
+          <option value="burbuja-cubre">Burbuja · cubres</option>
+          <option value="itm-cubierto">ITM · te cubren</option>
+          <option value="itm-cubre">ITM · cubres</option>
+          <option value="mesa_final-cubierto">Mesa final · te cubren</option>
+          <option value="mesa_final-cubre">Mesa final · cubres</option>
+        </select></label>
+      <label>Stack efectivo
+        <select id="s-stack">
+          <option value="all">De 10 a 100 bb</option>
+          <option value="short">Corto (10–20 bb)</option>
+          <option value="mid">Medio (22–40 bb)</option>
+          <option value="deep">Profundo (50–100 bb)</option>
+        </select></label>
+      <label>Stack exacto
+        <select id="s-stackx"><option value="auto">Al azar dentro del rango</option></select></label>
+      <label>Tu posición
+        <select id="s-pos"><option value="-1">Al azar</option><option value="0">UTG</option><option value="1">HJ</option><option value="2">CO</option><option value="3">BTN</option><option value="4">SB</option><option value="5">BB</option></select></label>
+      <label>Tus manos (vacío: al azar)
+        <input id="s-hands" type="text" placeholder="AKs, QQ, T9s, AJ" autocomplete="off"><span class="small" id="s-hands-msg"></span></label>
+      <label>Mesa
+        <select id="s-table"><option value="new">Rivales nuevos en cada mano</option><option value="fixed">Mesa fija: los mismos 5 rivales</option></select></label>
+      <label>HUD
+        <select id="s-hud"><option value="real">Estadísticas reales del rival</option><option value="obs">Solo lo que has visto en esta mesa</option></select></label>
+      <label>Mesa fija<button class="btn" type="button" id="s-newtable" style="padding:5px 10px">Sentarme en otra mesa</button></label>
+      <label>Rivales
+        <select id="s-mix">
+          <option value="real">Como en las mesas reales (variados)</option>
+          <option value="fish">Muchos recreativos</option>
+          <option value="reg">Regulares</option>
+          <option value="aggro">Agresivos y maníacos</option>
+          <option value="nit">Nits</option>
+        </select></label>
+      <label>Qué practicar
+        <select id="s-mode">
+          <option value="full">Manos completas</option>
+          <option value="pre">Solo preflop (rápido, con teclas 1–4 y Enter)</option>
+          <option value="post">Solo después del flop</option>
+          <option value="leaks">Mis fugas (más de lo que fallo)</option>
+        </select></label>
+      <label class="check"><input type="checkbox" id="s-easy"> Incluir folds fáciles</label>
+      <label class="check"><input type="checkbox" id="s-range" checked> Enseñar el rango del rival al corregir</label>
+    </div>
+  </details>
+
+  <div class="main">
+    <div class="tablebox">
+      <div class="focus" id="focus" hidden></div>
+      <div class="stake" id="stake"></div>
+      <div class="table" id="table" aria-label="Mesa de póker">
+        <div class="felt"></div>
+        <div class="center"><div class="pot" id="pot">Bote 0 bb</div><div class="board" id="board"></div></div>
+      </div>
+      <div class="realbox" id="realbox" hidden>
+        <div class="rb-row"><label class="rb-lab" for="rb-filter">Practicar</label><select id="rb-filter">
+          <option value="">Todas tus decisiones</option><option value="flop|first">Flop: eres el primero o te pasan</option><option value="flop|facing">Flop: te apuestan</option>
+          <option value="turn|first">Turn: eres el primero o te pasan</option><option value="turn|facing">Turn: te apuestan</option>
+          <option value="river|first">River: eres el primero o te pasan</option><option value="river|facing">River: te apuestan</option></select><span id="rb-count" class="small"></span></div>
+        <div class="rb-row"><span class="rb-lab">Mesa</span><span id="rb-board" class="board"></span></div>
+        <div class="rb-row"><span class="rb-lab">Tu mano</span><span id="rb-hand" class="board"></span><span id="rb-info" class="small"></span></div>
+        <div class="rb-pot" id="rb-pot"></div>
+      </div>
+      <div class="prompt" id="prompt">Cargando…</div>
+      <div class="actions" id="actions"></div>
+      <div class="panel"><h2>Historial de la mano</h2><div class="log" id="log"></div></div>
+    </div>
+    <div class="coach">
+      <div class="panel" id="coach"><div class="loading">Cargando la librería y los modelos de rivales…</div></div>
+      <div class="panel" id="rangebox" hidden><h2 id="rangetitle">Rango del rival</h2><div class="rng" id="rng"></div><p class="small" id="rangecap"></p></div>
+      <div class="panel" id="readbox" hidden><h2>Lee a tus rivales</h2><p class="small">Con la mesa fija, mira lo que hace cada uno y decide qué tipo es. Luego compruébalo: te enseño su perfil real y cómo jugarle.</p><div id="read"></div></div>
+      <div class="panel" id="sessbox"><h2>Tu práctica</h2><div id="sess"></div></div>
+      <details class="panel" id="princ"><summary><b>Principios que practicas</b> <span class="small">(el sistema, con los números de mesas reales)</span></summary><div id="princ-body"></div></details>
+      <details class="panel"><summary><b>Cómo te corrige</b></summary>
+        <ul class="why" style="margin-top:8px">
+          <li><b>Preflop</b>: la librería de tablas (la misma de la página de tablas) con la pérdida en bb de cada acción para tu mano. Si en la tabla una acción no pierde nada, es correcta aunque la tabla la mezcle. Debajo, el ajuste contra ese tipo de rival que salió de los laboratorios (robos, aislar limps, opens de recreativos, all-ins).</li>
+          <li><b>Rivales</b>: cada tipo juega con las frecuencias medidas en más de 14.000 manos reales de torneo: cuánto abre, hace limp, defiende o resube; cuánto hace c-bet, segundo barril y apuesta el river; cuánto foldea según el tamaño; cuánto sube y con qué proporción de faroles. Elige qué manos juega por fuerza: las mejores para valor y proyectos o basura para farolear.</li>
+          <li><b>Flop, turn y river (la nota)</b>: un solver GTO (CFR descontado en flop y turn, CFR+ en el river) calcula el equilibrio de cada calle entre tu rango y el suyo en teoría: la librería preflop para los dos y, después, el propio equilibrio en las calles anteriores. La nota es lo que pierde tu jugada frente a la mejor acción con tu mano exacta (el EV de cada acción supone que después sigues jugando lo mejor posible contra su estrategia de equilibrio). En el river es exacto para su árbol (apuestas de 33, 75 y 125 %, una subida de 3 veces y la resubida all-in); en el turn usa 5 rivers de muestra; en el flop es una aproximación (4 turns de muestra con una apuesta en el turn, y el river como showdown).</li>
+          <li><b>Contra este rival (la explotación)</b>: debajo, tu equity contra el rango que le queda a ese rival según cómo juega, cuánto va a foldear y el EV de cada opción. Si no coincide con el GTO, la diferencia es lo que ganas aprovechando su estilo.</li>
+          <li><b>Botes a tres</b>: si el preflop acaba con tres jugadores (un open, un call y tú pagas; o haces limp detrás de un limper y la BB pasa), se juega el flop, el turn y el river a tres. El solver GTO es a dos, así que ahí la nota es la de la explotación: EV contra cómo juegan esos dos rivales (con menos apuestas y más folds que a dos), con muestras de sus rangos y de las cartas que faltan.</li>
+          <li><b>Veredicto</b>: Correcto si pierdes muy poco frente a la mejor opción (con algo más de margen si el equilibrio usa tu acción a menudo con tu mano); Imprecisión si pierdes algo; Error si pierdes mucho para el tamaño del bote.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+// ------------------------------------------------------------------ constants
+const RANKS = 'AKQJT98765432', POS = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
+const RCH = '23456789TJQKA', SUITS = 'shdc', SYM = ['♠', '♥', '♦', '♣'];
+const CH = '0123456789abcdefghijk', B36 = '0123456789abcdefghijklmnopqrstuvwxyz';
+const N = []; for (let i = 0; i < 13; i++) for (let j = 0; j < 13; j++) N.push(i === j ? RANKS[i] + RANKS[j] : i < j ? RANKS[i] + RANKS[j] + 's' : RANKS[j] + RANKS[i] + 'o');
+const CMB = N.map(h => h.length === 2 ? 6 : (h[2] === 's' ? 4 : 12));
+const TYPES = { fish: ['Recreativo', 'REC'], reg: ['Regular', 'REG'], lag: ['Agresivo (LAG)', 'LAG'], maniac: ['Maníaco', 'MAN'], nit: ['Nit', 'NIT'] };
+const TNAME = t => TYPES[t] ? TYPES[t][0].toLowerCase().replace(' (lag)', '') : t;
+const ANTE = 1, SBB = 0.5;
+const $ = id => document.getElementById(id);
+const f1 = x => (Math.round(x * 10) / 10).toFixed(1).replace('.', ',').replace(',0', '');
+const f1s = x => (x > 0.04 ? '+' : x < -0.04 ? '−' : '') + f1(Math.abs(x));
+const pc = x => Math.round(100 * x) + ' %';
+const fst = x => x >= 20 ? String(Math.round(x)) : f1(x);
+// every hand comes from a seed, so a mistake can be played again exactly (same seats, cards and board)
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let RNG = Math.random;
+const rnd = () => RNG();
+const mpick = arr => arr[Math.floor(Math.random() * arr.length)];
+const pick = arr => arr[Math.floor(rnd() * arr.length)];
+function wpick(obj) { let t = 0; for (const k in obj) t += obj[k]; let x = rnd() * t; for (const k in obj) { x -= obj[k]; if (x <= 0) return k; } return Object.keys(obj)[0]; }
+
+// ------------------------------------------------------------------ cards, classes, combos
+const cardHTML = (c, sm) => '<div class="card' + (sm ? ' sm' : '') + '"><span class="r c-' + SUITS[c & 3] + '">' + RCH[c >> 2] + '</span><span class="s c-' + SUITS[c & 3] + '">' + SYM[c & 3] + '</span></div>';
+const backHTML = () => '<div class="card back"></div>';
+const ctext = c => RCH[c >> 2] + SYM[c & 3];
+function classOf(a, b) {
+  const ra = 12 - (a >> 2), rb = 12 - (b >> 2);
+  if (ra === rb) return ra * 13 + ra;
+  const i = Math.min(ra, rb), j = Math.max(ra, rb);
+  return (a & 3) === (b & 3) ? i * 13 + j : j * 13 + i;
+}
+const COMBOS = []; for (let a = 0; a < 52; a++) for (let b = a + 1; b < 52; b++) COMBOS.push([a, b, classOf(a, b)]);
+const NC = COMBOS.length;
+const CA = new Int32Array(COMBOS.map(c => c[0])), CB = new Int32Array(COMBOS.map(c => c[1]));
+const CLASS_COMBOS = Array.from({ length: 169 }, () => []); COMBOS.forEach((c, i) => CLASS_COMBOS[c[2]].push(i));
+
+// ------------------------------------------------------------------ evaluator (5 to 7 cards → comparable integer)
+const CNT = new Int8Array(13), SM = new Int32Array(4);
+function straightHigh(m) {
+  for (let h = 12; h >= 4; h--) if (((m >> (h - 4)) & 31) === 31) return h;
+  return (m & 0x100F) === 0x100F ? 3 : -1;
+}
+function pop(m) { let n = 0; while (m) { m &= m - 1; n++; } return n; }
+function topK(m, k, excl) { let v = 0, n = 0; for (let r = 12; r >= 0 && n < k; r--) if ((m >> r) & 1 && r !== excl[0] && r !== excl[1]) { v = (v << 4) | r; n++; } while (n < k) { v <<= 4; n++; } return v; }
+function evalCards(cs, n) {
+  CNT.fill(0); SM.fill(0); let rm = 0;
+  for (let i = 0; i < n; i++) { const c = cs[i], r = c >> 2; CNT[r]++; SM[c & 3] |= 1 << r; rm |= 1 << r; }
+  let fl = 0; for (let s = 0; s < 4; s++) if (pop(SM[s]) >= 5) fl = SM[s];
+  if (fl) { const sh = straightHigh(fl); if (sh >= 0) return (8 << 20) | sh; }
+  let quad = -1, t1 = -1, t2 = -1, p1 = -1, p2 = -1, p3 = -1;
+  for (let r = 12; r >= 0; r--) { const k = CNT[r]; if (k === 4) quad = r; else if (k === 3) { if (t1 < 0) t1 = r; else if (t2 < 0) t2 = r; } else if (k === 2) { if (p1 < 0) p1 = r; else if (p2 < 0) p2 = r; else if (p3 < 0) p3 = r; } }
+  if (quad >= 0) return (7 << 20) | (quad << 4) | (topK(rm, 1, [quad, -1]) >> 0);
+  if (t1 >= 0 && (t2 >= 0 || p1 >= 0)) return (6 << 20) | (t1 << 4) | Math.max(t2, p1);
+  if (fl) return (5 << 20) | topK(fl, 5, [-1, -1]);
+  const st = straightHigh(rm); if (st >= 0) return (4 << 20) | st;
+  if (t1 >= 0) return (3 << 20) | (t1 << 8) | topK(rm, 2, [t1, -1]);
+  if (p2 >= 0) return (2 << 20) | (p1 << 8) | (p2 << 4) | topK(rm, 1, [p1, p2]);
+  if (p1 >= 0) return (1 << 20) | (p1 << 12) | topK(rm, 3, [p1, -1]);
+  return topK(rm, 5, [-1, -1]);
+}
+const BUF = new Int32Array(7);
+function ev2(a, b, board) { BUF[0] = a; BUF[1] = b; for (let i = 0; i < board.length; i++) BUF[2 + i] = board[i]; return evalCards(BUF, 2 + board.length); }
+const cat = s => s >> 20;
+
+// ------------------------------------------------------------------ data
+let M = null, LIB = {}, LIBKEY = null;
+const EQR = () => M.eqr;
+let ORD_EQ = null, ORD_PLAY = null;
+function prepModel() {
+  ORD_EQ = [...Array(169).keys()].sort((a, b) => M.eqr[b] - M.eqr[a]);
+  const play = N.map((h, k) => M.eqr[k] + (h[2] === 's' ? 0.035 : 0) + (h.length === 2 ? 0.02 : 0) + (h.length === 3 && Math.abs(RANKS.indexOf(h[0]) - RANKS.indexOf(h[1])) <= 2 ? 0.02 : 0));
+  ORD_PLAY = [...Array(169).keys()].sort((a, b) => play[b] - play[a]);
+}
+function decode(sp) {
+  if (sp.F) return sp;
+  const A = sp.ac.length, q = sp.q, s = sp.f;
+  const val = q === 20 ? (i => CH.indexOf(s[i])) : (i => B36.indexOf(s[2 * i]) * 36 + B36.indexOf(s[2 * i + 1]));
+  sp.F = []; sp.W = []; sp.L = [];
+  for (let k = 0; k < 169; k++) {
+    const r = []; for (let a = 0; a < A; a++) r.push(val(k * A + a) / q); sp.F.push(r);
+    sp.W.push(sp.w ? CH.indexOf(sp.w[k]) / 20 : 1);
+    if (sp.ev) { const l = []; for (let a = 0; a < A; a++) l.push((B36.indexOf(sp.ev[2 * (k * A + a)]) * 36 + B36.indexOf(sp.ev[2 * (k * A + a) + 1])) / 10); sp.L.push(l); }
+  }
+  return sp;
+}
+function lib(S, key) { const d = LIB[LIBKEY] && LIB[LIBKEY][S]; const sp = d && d[key]; return sp ? decode(sp) : null; }
+const STACKS = () => Object.keys(LIB[LIBKEY] || {}).map(Number).sort((a, b) => a - b);
+
+// ------------------------------------------------------------------ settings and stored practice
+const store = { get(k, d) { try { const v = localStorage.getItem('sim.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem('sim.' + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } } };
+const SET = Object.assign({ ctx: 'pko-cubierto', stack: 'all', stackx: 'auto', pos: -1, hands: '', mix: 'real', mode: 'full', easy: false, range: true, focus: '', table: 'new', hud: 'real' }, store.get('set', {}));
+let HIST = store.get('hist', []);
+
+// ------------------------------------------------------------------ opponent models: rates from the hero's tables, shrunk to the population when few hands
+function rate(t, num, den, m = 25) {
+  const c = M.pool[t] || {}, a = M.pool.all; const p = (a[num] || 0) / Math.max(1, a[den] || 0);
+  let v = ((c[num] || 0) + m * p) / ((c[den] || 0) + m);
+  if (t === 'nit' && !(c[den] > 40)) v = num.endsWith('_r') || num.endsWith('_l') || num.endsWith('_c') ? v * 0.6 : v;
+  return v;
+}
+function mixWeights() {
+  const real = Object.assign({}, M.mix);
+  if (SET.mix === 'fish') return { fish: 5, lag: 2, reg: 2, maniac: 1, nit: 0.3 };
+  if (SET.mix === 'reg') return { reg: 6, lag: 2, fish: 0.5, maniac: 0.5, nit: 0.5 };
+  if (SET.mix === 'aggro') return { lag: 4, maniac: 4, reg: 1, fish: 0.5, nit: 0.2 };
+  if (SET.mix === 'nit') return { nit: 5, reg: 3, lag: 1, fish: 0.5, maniac: 0.3 };
+  return real;
+}
+const ONE = { open: 1, limp: 1, call: 1, three: 1, cb: 1, fc: 1, agg: 1, sd: 1 };
+const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+const SKEYS = ['vpip', 'pfr', 'limp', 'three', 'f3', 'cb', 'fc', 'wtsd', 'af'];
+let ALLP = null, TM = null, MCAL = null, GENMIX = null, NODECAL = null;
+function prepProfiles() {
+  ALLP = []; for (const t in M.prof) M.prof[t].forEach(p => ALLP.push(Object.assign({ k: t }, p)));
+  const mean = xs => { const v = xs.filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  TM = { all: {} }; SKEYS.forEach(k => { TM.all[k] = mean(ALLP.map(p => p[k])); });
+  for (const t in M.prof) { TM[t] = {}; SKEYS.forEach(k => { const v = mean(M.prof[t].map(p => p[k])); TM[t][k] = v != null ? v : TM.all[k]; }); }
+  // calibration (calpre.js): generated players are blends of two real ones, so within a type their tendencies do not average
+  // the type's measured rates (blended "recreativos" limped 10-20 points less and raised more than the real ones) and the
+  // type mix drifted (maníacos 9 % instead of 14 %). Measure both once with a fixed seed and correct them in genPlayer.
+  MCAL = null; GENMIX = null; const keep = RNG; RNG = mulberry32(20261112); const sums = {}, cnt = {};
+  for (let i = 0; i < 6000; i++) { const g = genPlayer(true); const s = sums[g.type] || (sums[g.type] = {}); cnt[g.type] = (cnt[g.type] || 0) + 1; for (const k in g.m) s[k] = (s[k] || 0) + g.m[k]; }
+  RNG = keep; MCAL = {}; GENMIX = {};
+  for (const t in cnt) { MCAL[t] = {}; for (const k in sums[t]) MCAL[t][k] = sums[t][k] / cnt[t]; GENMIX[t] = cnt[t] / 6000; }
+  // second step: what the generated players of each type actually do at each preflop node (caps, the 100 % limit and the
+  // mix of tendencies move it away from the measured rate); a factor per type and node brings the average back to it
+  NODECAL = null; const keep2 = RNG; RNG = mulberry32(777); const acc = {}, mass = a => a ? a.reduce((s, x, k) => s + x * CMB[k] / 1326, 0) : 0;
+  const add = (t, k, v) => { const a = (acc[t] = acc[t] || {}); (a[k] = a[k] || [0, 0]); a[k][0]++; a[k][1] += v; };
+  const VS = [['op', 2, 0], ['op', 3, 1], ['st', 5, 3], ['ss', 5, 4], ['sb', 4, 3]];
+  for (let i = 0; i < 1500; i++) { const pl = genPlayer(), t = pl.type;
+    for (let p = 0; p < 5; p++) { const o = prePolicy(pl, 'open', { p }); add(t, 'fi' + p + '_r', mass(o.raise)); add(t, 'fi' + p + '_l', mass(o.limp)); }
+    VS.forEach(([pre, j, o]) => { const v = prePolicy(pl, 'vsopen', { j, o }); add(t, pre + '_r', mass(v.raise)); add(t, pre + '_c', mass(v.call)); }); }
+  RNG = keep2; NODECAL = {};
+  for (const t in acc) { NODECAL[t] = {}; for (const k in acc[t]) { const [n, s] = acc[t][k], sim = s / n, pre = k.split('_')[0], real = rate(t, k, pre + '_n');
+    NODECAL[t][k] = sim > 0.005 && real > 0.005 ? clamp(real / sim, 0.7, 1.5) : 1; } }
+}
+const ncal = (t, k) => NODECAL && NODECAL[t] && NODECAL[t][k] || 1;
+const kindOf = (v, p) => v < 14 ? 'nit' : v >= 40 && p >= 25 ? 'maniac' : v >= 32 && p < 0.45 * v ? 'fish' : v >= 28 ? 'lag' : 'reg';
+function gauss() { return Math.sqrt(-2 * Math.log(1 - rnd())) * Math.cos(2 * Math.PI * rnd()); }
+// a new opponent: a real player of the hero's tables, blended with another one and with some noise, so no two are
+// the same; his type comes out of his numbers (same rule as the rivals analysis), and every tendency is scaled by
+// how far his numbers are from the average of his type
+function genPlayer(raw) {
+  if (!raw && GENMIX && SET.mix === 'real' && M.mix) {     // the real type mix: keep a generated player with the probability that corrects it
+    const tot = Object.values(M.mix).reduce((a, b) => a + b, 0), ratio = t => (M.mix[t] || 0) / tot / Math.max(1e-6, GENMIX[t] || 0), mx = Math.max(...Object.keys(GENMIX).map(ratio));
+    for (let tries = 0; tries < 50; tries++) { const g = genPlayer(true); if (rnd() * mx < ratio(g.type) || tries === 49) return calibrated(g); }
+  }
+  if (!raw) return calibrated(genPlayer(true));
+  const t0 = SET.mix === 'real' ? null : wpick(mixWeights());
+  const pool = t0 ? ALLP.filter(p => p.k === t0) : ALLP;
+  const A = pick(pool), B = rnd() < 0.55 ? pick(pool) : pick(ALLP), a = rnd() < 0.7 ? rnd() * 0.45 : 0;
+  const val = (P, k) => P[k] != null ? P[k] : TM[P.k][k];
+  const st = {}; SKEYS.forEach(k => { st[k] = ((1 - a) * val(A, k) + a * val(B, k)) * Math.exp(0.12 * gauss()); });
+  st.vpip = clamp(st.vpip, 9, 80); st.pfr = clamp(st.pfr, 3, st.vpip * 0.95); st.limp = clamp(st.limp, 0, Math.max(0, st.vpip - st.pfr));
+  st.three = clamp(st.three, 1, 30); st.f3 = clamp(st.f3, 15, 90); st.cb = clamp(st.cb, 20, 95); st.fc = clamp(st.fc, 15, 80); st.wtsd = clamp(st.wtsd, 15, 50); st.af = clamp(st.af, 0.5, 8);
+  st.n = Math.round(60 + rnd() * 900);
+  const type = kindOf(st.vpip, st.pfr), T = TM[type] || TM.all;
+  const r = (x, y, lo = 0.35, hi = 2.8) => clamp(x / Math.max(1e-6, y), lo, hi);
+  const m = { open: r(st.pfr, T.pfr), call: r(st.vpip - st.pfr, Math.max(1, T.vpip - T.pfr)), limp: r(st.limp + 1, (T.limp || 0) + 1), three: r(st.three, T.three),
+    cb: r(st.cb, T.cb, 0.6, 1.4), fc: r(st.fc, T.fc, 0.7, 1.4), agg: r(st.af, T.af, 0.5, 2), sd: r(st.wtsd, T.wtsd, 0.75, 1.35) };
+  return { type, st, m };
+}
+// tendencies relative to the average generated player of his type, so a type's average plays at the measured rates
+function calibrated(g) {
+  const c = MCAL && MCAL[g.type]; if (!c) return g;
+  const lim = { open: [0.35, 2.8], call: [0.35, 2.8], limp: [0.35, 2.8], three: [0.35, 2.8], cb: [0.6, 1.4], fc: [0.7, 1.4], agg: [0.5, 2], sd: [0.75, 1.35] };
+  for (const k in g.m) if (c[k]) g.m[k] = clamp(g.m[k] / c[k], ...(lim[k] || [0.3, 3]));
+  return g;
+}
+// fixed table: the same five opponents hand after hand, the button moves, and the HUD can show only what you have seen
+let TABLE = store.get('table', null);
+function newTable() {
+  const keep = RNG; RNG = Math.random;
+  const t = { players: [...'ABCDE'].map(id => Object.assign({ id, obs: { n: 0, v: 0, p: 0 } }, genPlayer())), hp: Math.floor(Math.random() * 6), hands: 0 };
+  RNG = keep; return t;
+}
+function saveTable() { store.set('table', TABLE); }
+function fixedPlayers() {
+  if (REPLAY && REPLAY.cfg && REPLAY.cfg.tp) return REPLAY.cfg.tp;
+  if (SET.table !== 'fixed') return null;
+  if (!TABLE) { TABLE = newTable(); saveTable(); }
+  return TABLE.players;
+}
+const READ_TIP = { fish: 'Recreativo: aísla sus limps grande, apuesta por valor fino y no le farolees; en el river paga más sus apuestas pequeñas.',
+  reg: 'Regular: juega la tabla; farolea donde foldea (flop y turn) y créete sus apuestas grandes de river.',
+  lag: 'Agresivo: defiende y resube algo más ancho, apuesta por valor y paga más con manos medias.',
+  maniac: 'Maníaco: resube por valor muy ancho, deja que farolee y paga más; no le farolees.',
+  nit: 'Nit: róbale las ciegas y no pagues sus subidas sin mano.' };
+let READS = store.get('reads', { ok: 0, n: 0 });
+function renderReads() {
+  const box = $('readbox'); if (!box) return;
+  box.hidden = !(SET.table === 'fixed' && TABLE);
+  if (box.hidden) return;
+  const opts = Object.keys(TYPES).map(k => '<option value="' + k + '">' + TYPES[k][0] + '</option>').join('');
+  $('read').innerHTML = '<div class="tablewrap" style="overflow-x:auto"><table class="ev"><tr><th>Jugador</th><th>Manos vistas</th><th>VPIP/PFR vistos</th><th>Tu lectura</th></tr>' +
+    TABLE.players.map(p => '<tr><td>' + p.id + '</td><td>' + p.obs.n + '</td><td>' + (p.obs.n ? Math.round(100 * p.obs.v / p.obs.n) + ' / ' + Math.round(100 * p.obs.p / p.obs.n) : '–') + '</td><td><select data-read="' + p.id + '"><option value="">?</option>' + opts + '</select></td></tr>').join('') + '</table></div>' +
+    '<p style="margin-top:8px"><button class="btn" type="button" id="read-go">Comprobar mis lecturas</button> <span class="small">' + (READS.n ? 'Aciertas el ' + pc(READS.ok / READS.n) + ' (' + READS.n + ' lecturas)' : '') + '</span></p><div id="read-res"></div>';
+  $('read-go').addEventListener('click', () => {
+    const res = [];
+    TABLE.players.forEach(p => { const g = document.querySelector('[data-read="' + p.id + '"]').value; if (!g) return; const ok = g === p.type; READS.n++; READS.ok += ok ? 1 : 0;
+      res.push('<div class="dec ' + (ok ? 'ok' : 'bad') + '"><b>' + p.id + '</b>: ' + (ok ? 'bien, es ' : 'es ') + TYPES[p.type][0].toLowerCase() + (ok ? '' : ' (dijiste ' + TYPES[g][0].toLowerCase() + ')') + ' · VPIP ' + Math.round(p.st.vpip) + ' · PFR ' + Math.round(p.st.pfr) + ' · 3-bet ' + Math.round(p.st.three) + ' · AF ' + p.st.af.toFixed(1) + '. ' + READ_TIP[p.type] + '</div>'); });
+    store.set('reads', READS);
+    $('read-res').innerHTML = res.length ? res.join('') + '<p class="small" style="margin-top:6px">Con pocas manos el VPIP y el PFR vistos bailan mucho: con 20 manos el VPIP puede estar 15 puntos por encima o por debajo del real.</p>' : '<p class="small">Elige al menos una lectura.</p>';
+  });
+}
+function obsOf(id) { const p = TABLE && TABLE.players.find(x => x.id === id); return p ? p.obs : { n: 0, v: 0, p: 0 }; }
+function hudTitle(s) { const x = s.st; const f = v => v == null ? '–' : Math.round(v); return 'Tipo: ' + TYPES[s.type][0] + ' · ' + x.n + ' manos\nVPIP ' + f(x.vpip) + ' · PFR ' + f(x.pfr) + ' · limp ' + f(x.limp) + ' · 3-bet ' + f(x.three) + '\nfold al 3-bet ' + f(x.f3) + ' · c-bet ' + f(x.cb) + ' · fold a c-bet ' + f(x.fc) + '\nshowdown ' + f(x.wtsd) + ' · agresión ' + (x.af == null ? '–' : x.af.toFixed(1)); }
+// class-level region of a node: mass (share of all 1326 combos) taken in a given order, skipping what is already used
+function region(order, mass, used) {
+  const p = new Float32Array(169); let acc = 0;
+  for (const k of order) {
+    if (acc >= mass - 1e-9) break;
+    const free = (1 - (used ? used[k] : 0)) * CMB[k] / 1326; if (free <= 0) continue;
+    const take = Math.min(free, mass - acc); p[k] = take / (CMB[k] / 1326); acc += take;
+  }
+  return p;
+}
+const addP = (a, b) => a.map((x, i) => x + b[i]);
+// preflop policy of a villain at a node: returns {acts: {name: Float32Array(169)}}
+function prePolicy(pl, node, ctx) {
+  const t = pl.type, mm = pl.m || ONE;
+  const used = new Float32Array(169);
+  const out = {};
+  const put = (name, order, mass) => { const r = region(order, mass, used); for (let k = 0; k < 169; k++) used[k] += r[k]; out[name] = r; };
+  if (node === 'open') {                       // first in from position p
+    const p = ctx.p; let r = rate(t, 'fi' + p + '_r', 'fi' + p + '_n'), l = rate(t, 'fi' + p + '_l', 'fi' + p + '_n');
+    if (t === 'nit') { r = Math.min(r, 0.12); l = Math.min(l, 0.02); }
+    // the SB limp (40-50 % for loose players) is much less tied to a player's overall limp % than the limps from other
+    // seats: his multiplier there is dampened, otherwise the 0.85 cap cut the loose ones and the average fell 6 points
+    r = clamp(r * mm.open, 0.01, 0.8); l = clamp(l * (p === 4 ? Math.sqrt(mm.limp) : mm.limp), 0, 0.85);
+    // a player who both opens and limps a lot cannot play more than all his hands: scale both down together (before, the
+    // limp was the one cut, and LAG/maníacos limped 5-6 points less than at your tables from the SB)
+    r *= ncal(t, 'fi' + p + '_r'); l *= ncal(t, 'fi' + p + '_l');
+    if (r + l > 0.92) { const f = 0.92 / (r + l); r *= f; l *= f; }
+    put('raise', ctx.S ? libOrder(ctx.S, '|' + p + '|', 'raise') : ORD_EQ, r); put('limp', ORD_PLAY, l);
+  } else if (node === 'vsopen') {              // facing an open from position o, villain at j
+    const j = ctx.j, o = ctx.o; let pre = 'op';
+    if (j === 5) pre = o === 4 ? 'ss' : (o >= 2 ? 'st' : 'op'); else if (j === 4 && o >= 2) pre = 'sb';
+    let rr = rate(t, pre + '_r', pre + '_n'), cc = rate(t, pre + '_c', pre + '_n');
+    // blind defence (50-60 % calls) follows a player's overall calling only partly: dampened multiplier, as for the SB limp
+    rr = clamp(rr * mm.three, 0, 0.45); cc = clamp(cc * (pre === 'op' ? mm.call : Math.sqrt(mm.call)), 0, 0.85);
+    rr *= ncal(t, pre + '_r'); cc *= ncal(t, pre + '_c');
+    if (rr + cc > 0.95) { const f = 0.95 / (rr + cc); rr *= f; cc *= f; }
+    if (ctx.S <= 15) { cc *= 0.35; }
+    const key = 'R|' + j + '|' + o;
+    put('raise', ctx.S ? libOrder(ctx.S, key, 'raise') : ORD_EQ, rr); put('call', ctx.S ? libOrder(ctx.S, key, 'call') : ORD_PLAY, cc);
+  } else if (node === 'vs3bet') {              // villain opened, faces a 3-bet: continue with the top of his open range
+    let f = rate(t, 'f3_f', 'f3_n'); if (pl.st && pl.st.f3 != null) f = 0.5 * f + 0.5 * pl.st.f3 / 100; const open = ctx.range; let m = 0; for (let k = 0; k < 169; k++) m += open[k] * CMB[k] / 1326;
+    const cont = (1 - f) * m; const four = cont * (t === 'maniac' ? 0.45 : t === 'fish' ? 0.2 : 0.3);
+    const lim = new Float32Array(169); for (let k = 0; k < 169; k++) lim[k] = 1 - open[k];
+    for (let k = 0; k < 169; k++) used[k] = lim[k];
+    const key = 'R3|' + ctx.o + '|' + ctx.j;
+    put('raise', ctx.S ? libOrder(ctx.S, key, 'raise') : ORD_EQ, four); put('call', ctx.S ? libOrder(ctx.S, key, 'cont') : ORD_EQ, cont - four);
+  } else if (node === 'iso') {                 // villain limped, faces an isolation raise
+    const B = ctx.size >= 4 ? 'isoB' : 'isoS'; const f = clamp(rate(t, B + '_f', B + '_n') / Math.sqrt(mm.call), 0.05, 0.9), r = clamp(rate(t, B + '_r', B + '_n') * Math.sqrt(mm.agg), 0, 0.4);
+    const lr = ctx.range; let m = 0; for (let k = 0; k < 169; k++) m += lr[k] * CMB[k] / 1326;
+    for (let k = 0; k < 169; k++) used[k] = 1 - lr[k];
+    put('raise', ORD_EQ, r * m); put('call', ORD_PLAY, (1 - f - r) * m);
+  } else if (node === 'vsshove') {             // villain faces an all-in: the library's call range, wider or narrower by type
+    const fac = ({ fish: 1.35, maniac: 1.4, lag: 1.1, reg: 0.9, nit: 0.6 }[t] || 1) * Math.sqrt(mm.call);
+    put('call', ORD_EQ, Math.min(0.9, ctx.libCall * fac));
+  } else if (node === 'bbvslimp') {
+    const r = clamp(({ fish: 0.12, nit: 0.12, reg: 0.3, lag: 0.38, maniac: 0.5 }[t] || 0.3) * Math.sqrt(mm.open), 0.03, 0.7); put('raise', ORD_EQ, r);
+  } else if (node === 'vs4bet') {
+    const range = ctx.range; let m = 0; for (let k = 0; k < 169; k++) m += range[k] * CMB[k] / 1326;
+    for (let k = 0; k < 169; k++) used[k] = 1 - range[k];
+    const c = { fish: 0.55, maniac: 0.6, lag: 0.45, reg: 0.4, nit: 0.3 }[t] || 0.4;
+    put('call', ORD_EQ, c * m);
+  }
+  return out;
+}
+const ORD_CACHE = {};
+function libOrder(S, key, pred) {
+  const ck = LIBKEY + '|' + S + '|' + key + '|' + pred;
+  if (ORD_CACHE[ck]) return ORD_CACHE[ck];
+  const sp = lib(S, key); if (!sp) return (ORD_CACHE[ck] = ORD_EQ);
+  const want = { raise: c => c[0] === 'R' || c === 'A', call: c => c === 'C', cont: c => c !== 'F' }[pred];
+  const sc = N.map((_, k) => sp.ac.reduce((a, c, i) => a + (want(c) ? sp.F[k][i] : 0), 0) * (sp.W[k] > 0 ? 1 : 0));
+  return (ORD_CACHE[ck] = [...Array(169).keys()].sort((a, b) => (sc[b] - sc[a]) || (M.eqr[b] - M.eqr[a])));
+}
+function actOf(pol, k) { let x = rnd(); for (const a in pol) { x -= pol[a][k]; if (x < 0) return a; } return 'fold'; }
+
+// ------------------------------------------------------------------ postflop: parameters by type and street
+function shr(v, p, m) { return v && v[0] ? v.map((x, i) => i === 0 ? x : (x + m * (p[i] / Math.max(1, p[0]))) / (v[0] + m)) : p.map((x, i) => i === 0 ? x : x / Math.max(1, p[0])); }
+function pLead(pl, st, ag, ip) {
+  const t = pl.type, mm = pl.m || ONE;
+  const P = M.post.lead; const a = P['all|' + st + '|' + ag + '|' + ip] || [1, 0.4, 0.5]; const v = P[t + '|' + st + '|' + ag + '|' + ip];
+  let f = ((v ? v[1] : 0) + 15 * a[1] / a[0]) / ((v ? v[0] : 0) + 15);
+  if (t === 'nit') f *= 0.7;
+  f = clamp(f * (ag ? mm.cb : Math.sqrt(mm.agg)), 0.03, 0.95);
+  const size = v && v[0] >= 15 && v[2] ? v[2] : (a[2] || 0.5);
+  return { f, size };
+}
+const szCls = r => r < 0.4 ? 's' : r < 0.8 ? 'm' : 'l';
+function pFace(pl, st, r) {
+  const t = pl.type, mm = pl.m || ONE, P = M.post.face;
+  const cls = ['s', 'm', 'l'].map(c => shr(P[t + '|' + st + '|' + c], P['all|' + st + '|' + c] || [1, 0.45, 0.45, 0.1], 25));
+  const F = cls.map(x => x[1]); for (let i = 1; i < 3; i++) F[i] = Math.max(F[i], F[i - 1]);
+  F.push(Math.min(0.88, F[2] + 0.1));                      // overbets: folds keep rising slowly (river: 59 % → 67 %)
+  const X = [0.3, 0.6, 1.1, 3].map(Math.log), lr = Math.log(Math.max(0.08, r));
+  let fo;
+  if (lr <= X[0]) fo = F[0] - 0.06 * (X[0] - lr); else if (lr >= X[3]) fo = F[3];
+  else for (let i = 0; i < 3; i++) if (lr <= X[i + 1]) { fo = F[i] + (lr - X[i]) / (X[i + 1] - X[i]) * (F[i + 1] - F[i]); break; }
+  let ra = cls[r < 0.4 ? 0 : r < 0.8 ? 1 : 2][3];
+  if (t === 'nit') { fo = fo * 1.2; ra *= 0.7; }
+  fo = clamp(fo * (st === 'flop' ? Math.pow(mm.fc, 0.7) : Math.pow(mm.sd, -0.4)), 0.05, 0.85); ra = clamp(ra * Math.pow(mm.agg, 0.7), 0, 0.35);
+  if (fo + ra > 0.97) ra = 0.97 - fo;
+  return { fold: fo, raise: ra, call: Math.max(0, 1 - fo - ra) };
+}
+function pFaceR(pl, st) {
+  const t = pl.type, mm = pl.m || ONE, P = M.post.facer; const a = P['all|' + st] || [1, 0.4, 0.5, 0.1]; const v = P[t + '|' + st];
+  const x = shr(v, a, 20); const fo = clamp(x[1] * Math.pow(mm.sd, -0.5), 0.05, 0.9), ra = clamp(x[3] * Math.pow(mm.agg, 0.5), 0, 0.3);
+  return { fold: fo, raise: ra, call: Math.max(0, 1 - fo - ra) };
+}
+function lam(pl, st) {
+  const t = pl.type, mm = pl.m || ONE;
+  const R = M.river, pp = R.pop.todas, lp = pp.farol + pp.par_baja; const kk = R.kinds[t];
+  let lt = lp; if (kk && kk.sd) lt = ((kk.farol + kk.par_baja) * kk.sd + lp * 20) / (kk.sd + 20);
+  if (t === 'nit') lt = lp * 0.6;
+  const base = { flop: 0.5, turn: 0.42, river: lp }[st];
+  return clamp(base * lt / lp * Math.pow(mm.agg, 0.4), 0.08, 0.72);
+}
+
+// ------------------------------------------------------------------ hand strength on a board for every live combo
+function strength(board, dead) {
+  const sc = new Int32Array(NC).fill(-1), live = [];
+  for (let i = 0; i < NC; i++) { const [a, b] = COMBOS[i]; if (dead[a] || dead[b]) continue; sc[i] = ev2(a, b, board); live.push(i); }
+  const sorted = live.slice().sort((x, y) => sc[x] - sc[y]);
+  const hs = new Float32Array(NC); let i = 0;
+  while (i < sorted.length) { let j = i; while (j + 1 < sorted.length && sc[sorted[j + 1]] === sc[sorted[i]]) j++; const v = ((i + j) / 2 + 0.5) / sorted.length; for (let k = i; k <= j; k++) hs[sorted[k]] = v; i = j + 1; }
+  const outs = new Int8Array(NC), ehs = new Float32Array(NC);
+  if (board.length < 5) {
+    const rest = []; for (let c = 0; c < 52; c++) if (!dead[c]) rest.push(c);
+    const bb = board.slice(); bb.push(0);
+    for (const ix of live) {
+      const [a, b] = COMBOS[ix]; const c0 = cat(sc[ix]); let o = 0;
+      if (c0 < 4) for (const x of rest) { if (x === a || x === b) continue; bb[bb.length - 1] = x; const c1 = cat(ev2(a, b, bb)); if (c1 >= 4 || (c0 <= 1 && c1 >= 3 && c1 !== cat(evBoardWith(bb)))) o++; }
+      outs[ix] = o;
+    }
+  }
+  const per = board.length === 3 ? 0.04 : board.length === 4 ? 0.02 : 0;
+  for (const ix of live) ehs[ix] = hs[ix] + (1 - hs[ix]) * Math.min(0.8, outs[ix] * per);
+  return { sc, hs, ehs, outs, live };
+}
+function evBoardWith(cards) { for (let i = 0; i < cards.length; i++) BUF[i] = cards[i]; return evalCards(BUF, cards.length); }
+// hand class against the board, as in the river measurements
+function handClass(a, b, board) {
+  const s7 = ev2(a, b, board), s5 = evBoardWith(board); const c7 = cat(s7), c5 = cat(s5);
+  if (c7 <= c5) return 'aire';
+  if (c7 === 1 || (c7 === 2 && c5 === 1)) {
+    const br = board.map(c => c >> 2), top = Math.max(...br), ra = a >> 2, rb = b >> 2;
+    let pr = -1; if (ra === rb && !br.includes(ra)) pr = ra; else { [ra, rb].forEach(r => { if (br.filter(x => x === r).length === 1) pr = Math.max(pr, r); }); }
+    if (pr < 0) return 'aire';
+    return pr >= top ? 'alta' : 'baja';
+  }
+  return 'fuerte';
+}
+function describe(a, b, board) {
+  const s = ev2(a, b, board), c = cat(s), c5 = cat(evBoardWith(board));
+  const names = ['carta alta', 'pareja', 'doble pareja', 'trío', 'escalera', 'color', 'full', 'póker', 'escalera de color'];
+  if (c <= c5 && c < 4) return 'nada (juegas lo de la mesa)';
+  if (c === 1 || (c === 2 && c5 === 1)) {
+    const cl = handClass(a, b, board); const ra = a >> 2, rb = b >> 2, br = board.map(x => x >> 2), top = Math.max(...br);
+    if (ra === rb && ra > top) return 'overpair (' + RCH[ra] + RCH[ra] + ')';
+    if (cl === 'alta') { const k = br.includes(ra) && ra === top ? rb : ra; return 'pareja alta, kicker ' + RCH[k]; }
+    if (ra === rb) return 'pareja de ' + RCH[ra] + ' por debajo de la mesa';
+    return 'pareja ' + (cl === 'baja' ? 'media o baja' : '');
+  }
+  if (c === 3) return (a >> 2) === (b >> 2) ? 'set' : 'trío';
+  return names[c];
+}
+function drawText(a, b, board) {
+  if (board.length >= 5) return '';
+  const dead = {}; [a, b, ...board].forEach(c => dead[c] = 1); const c0 = cat(ev2(a, b, board)); if (c0 >= 4) return '';
+  let fl = 0, st = 0; const bb = board.slice(); bb.push(0);
+  for (let x = 0; x < 52; x++) { if (dead[x]) continue; bb[bb.length - 1] = x; const c1 = cat(ev2(a, b, bb)); if (c1 === 5 || c1 === 8) fl++; else if (c1 === 4) st++; }
+  const t = []; if (fl >= 8) t.push('proyecto de color'); if (st >= 7) t.push('proyecto de escalera abierto'); else if (st >= 3) t.push('proyecto de escalera interior');
+  return t.join(' y ');
+}
+
+// ------------------------------------------------------------------ equity of the hero against every combo of a range
+function equities(hero, board, w) {
+  const dead = {}; [...hero, ...board].forEach(c => dead[c] = 1);
+  const rem = []; for (let c = 0; c < 52; c++) if (!dead[c]) rem.push(c);
+  const e = new Float32Array(NC), n = new Float32Array(NC);
+  const ids = []; for (let i = 0; i < NC; i++) if (w[i] > 0) ids.push(i);
+  let runs;
+  if (board.length === 5) runs = [[]];
+  else if (board.length === 4) runs = rem.map(x => [x]);
+  else { runs = []; const seen = {}; let tries = 0; while (runs.length < 240 && tries < 5000) { tries++; const x = mpick(rem), y = mpick(rem); if (x === y) continue; const k = Math.min(x, y) * 64 + Math.max(x, y); if (seen[k]) continue; seen[k] = 1; runs.push([x, y]); } }
+  for (const r of runs) {
+    const bd = board.concat(r); const hs = ev2(hero[0], hero[1], bd);
+    for (const i of ids) { const [a, b] = COMBOS[i]; if (r.includes(a) || r.includes(b)) continue; const vs = ev2(a, b, bd); e[i] += hs > vs ? 1 : hs === vs ? 0.5 : 0; n[i]++; }
+  }
+  for (const i of ids) e[i] = n[i] ? e[i] / n[i] : 0.5;
+  return e;
+}
+
+// ------------------------------------------------------------------ GTO solver (CFR+) between the two ranges, one street at a time
+// River: exact for its tree (bets of 33 / 75 / 125 % and one raise). Turn: the river is a chance node with a sample of
+// river cards and a smaller river tree. Flop: the turn and river are not played; at the end of the flop the pot goes
+// to showdown over a sample of turn+river runouts (an approximation: it ignores betting on later streets).
+// The solver lives in a background worker; the page asks it for the strategy and the EV of every action at a node.
+function solverCore() {
+  // bet sizes by street; 'tt' is the turn inside a flop solve and 'rr' the river inside a turn solve (one size, raise all-in)
+  const SIZES = { f: [0.33, 0.75], t: [0.6, 1.25], r: [0.33, 0.75, 1.25], tt: [0.75], rr: [0.75] };
+  function groupsOf(b5, live) {
+    const sc = new Int32Array(NC).fill(-1), lv = [];
+    for (const i of live) { const a = CA[i], b = CB[i]; if (b5.includes(a) || b5.includes(b)) continue; sc[i] = ev2(a, b, b5); lv.push(i); }
+    lv.sort((x, y) => sc[x] - sc[y]);
+    const groups = []; for (let i = 0; i < lv.length;) { let j = i; while (j + 1 < lv.length && sc[lv[j + 1]] === sc[lv[i]]) j++; groups.push(lv.slice(i, j + 1)); i = j + 1; }
+    return { lv, groups };
+  }
+  function make(d) {
+    const board = d.board, pot0 = d.pot0, eff = d.eff, kind = board.length === 5 ? 'r' : board.length === 4 ? 't' : 'f';
+    const dead = {}; board.forEach(c => dead[c] = 1);
+    // support of each range: weights below thr x max are dropped (d.keep forces a combo in, e.g. the hand you hold),
+    // and every loop runs only over the combos a player can actually have
+    const thr = d.thr != null ? d.thr : 1e-6, RG = [d.r0, d.r1].map(r => new Float64Array(NC)), IN = [new Uint8Array(NC), new Uint8Array(NC)];
+    [d.r0, d.r1].forEach((r, p) => { let mx = 0; for (let i = 0; i < NC; i++) if (!dead[CA[i]] && !dead[CB[i]] && (r[i] || 0) > mx) mx = r[i];
+      for (let i = 0; i < NC; i++) if (!dead[CA[i]] && !dead[CB[i]] && (r[i] || 0) > thr * mx) { RG[p][i] = r[i]; IN[p][i] = 1; } });
+    (d.keep || []).forEach(([p, h]) => { if (h >= 0 && !dead[CA[h]] && !dead[CB[h]]) IN[p][h] = 1; });
+    const live = []; for (let i = 0; i < NC; i++) if (IN[0][i] || IN[1][i]) live.push(i);
+    const SPL = new Map(), split = lv => { let s = SPL.get(lv); if (!s) { s = [lv.filter(i => IN[0][i]), lv.filter(i => IN[1][i])]; SPL.set(lv, s); } return s; };
+    const rem = []; for (let c = 0; c < 52; c++) if (!dead[c]) rem.push(c);
+    let seed = board.reduce((a, c) => a * 53 + c, 7) >>> 0; const rr = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+    const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rr() * (i + 1)); const x = a[i]; a[i] = a[j]; a[j] = x; } return a; };
+    const without = cs => live.filter(i => !cs.includes(CA[i]) && !cs.includes(CB[i]));
+    const kh = (lists) => { const K = new Float64Array(NC); for (const i of live) K[i] = lists.filter(cs => !cs.includes(CA[i]) && !cs.includes(CB[i])).length; return K; };
+    // runout sets: showdowns averaged over a sample of the cards to come
+    function runset(lists) { return { runs: lists.map(cs => Object.assign({ cards: cs }, groupsOf(board.concat(cs), live))), Kh: kh(lists) }; }
+    let R0 = null, RIV = null, TURNS = null, FT = null, ALL = null;
+    if (kind === 'r') R0 = Object.assign({ cards: [] }, groupsOf(board, live));
+    if (kind === 't') { RIV = shuffle(rem.slice()).slice(0, d.K || 5); }
+    if (kind === 'f') {
+      TURNS = shuffle(rem.slice()).slice(0, d.KT || 4);
+      FT = TURNS.map(tc => runset(shuffle(rem.filter(c => c !== tc)).slice(0, d.KR || 3).map(rc => [tc, rc])));
+      ALL = { runs: [].concat(...FT.map(s => s.runs)), Kh: kh([].concat(...FT.map(s => s.runs.map(r => r.cards)))) };
+    }
+    const RIVSET = kind === 't' ? runset(RIV.map(c => [c])) : null;
+    function build(st, cx, pl, c, facing, nr) {
+      const n = { pl, c, lv: cx.lv, lp: split(cx.lv), acts: [] };
+      if (!facing) {
+        n.acts.push({ name: 'check', child: pl === 0 ? build(st, cx, 1, c, false, 0) : end(st, cx, c, false) });
+        const seen = {};
+        const base = Math.max(c[0], c[1]);  // chips already in from earlier streets of this solve: a bet goes on top of them
+        SIZES[st].forEach(x => { let amt = Math.min(eff, base + x * (pot0 + c[0] + c[1])); if (amt - base >= (eff - base) * 0.85) amt = eff; amt = Math.round(amt * 100) / 100; if (amt <= Math.max(c[0], c[1]) || seen[amt]) return; seen[amt] = 1;
+          const c2 = c.slice(); c2[pl] = amt; n.acts.push({ name: 'bet', size: x, amt, child: build(st, cx, 1 - pl, c2, true, 0) }); });
+        return n;
+      }
+      const opp = c[1 - pl];
+      n.acts.push({ name: 'fold', child: { term: 'fold', folder: pl, c, lv: cx.lv, lp: split(cx.lv) } });
+      const c2 = c.slice(); c2[pl] = opp; n.acts.push({ name: 'call', child: end(st, cx, c2, opp >= eff - 0.01) });
+      // raises: on the street being solved a 3x raise and then an all-in re-raise; on the later streets inside the solve, all-in
+      const sub = st === 'rr' || st === 'tt';
+      if (nr < (sub ? 1 : 2) && opp < eff - 0.01) { let to = sub || nr >= 1 ? eff : Math.min(eff, 3 * opp); if (to >= eff * 0.7) to = eff; const c3 = c.slice(); c3[pl] = to; n.acts.push({ name: 'raise', amt: to, child: build(st, cx, 1 - pl, c3, true, nr + 1) }); }
+      return n;
+    }
+    function end(st, cx, c, allin) {
+      if (st === 'r') return { term: 'sd', c, run: R0 };
+      if (st === 'rr') return { term: 'sd', c, run: cx.run };
+      if (st === 'tt') return { term: 'avg', c, set: cx.set };
+      if (st === 't') return allin ? { term: 'avg', c, set: RIVSET } : chance(c, RIVSET.runs.map((r, i) => ({ cards: r.cards, cx: { lv: r.lv, run: r }, st: 'rr' })));
+      return allin ? { term: 'avg', c, set: ALL } : chance(c, TURNS.map((tc, i) => ({ cards: [tc], cx: { lv: without([tc]), set: FT[i] }, st: 'tt' })));
+    }
+    function chance(c, kids) { return { chance: true, c, Kh: kh(kids.map(k => k.cards)), kids: kids.map(k => ({ cards: k.cards, lv: k.cx.lv, node: build(k.st, k.cx, 0, c, false, 0) })) }; }
+    const root = build(kind, { lv: live }, 0, [0, 0], false, 0);
+    const all = []; (function reg(n) { if (n.term) return; if (n.chance) { n.kids.forEach(k => reg(k.node)); return; } all.push(n); n.reg = new Float64Array(n.acts.length * NC); n.sum = new Float64Array(n.acts.length * NC); n.acts.forEach(a => reg(a.child)); })(root);
+    const CARD = new Float64Array(52), LOW = new Float64Array(52), GC = new Float64Array(52);
+    function sd(oppR, lvO, groups, lvT) {
+      const W = groups ? new Float64Array(NC) : null, T = new Float64Array(NC); let tot = 0, lowTot = 0;
+      CARD.fill(0); LOW.fill(0);
+      for (const i of lvO) { const r = oppR[i]; if (!r) continue; tot += r; CARD[CA[i]] += r; CARD[CB[i]] += r; }
+      if (!groups) { for (const i of lvT) T[i] = tot - CARD[CA[i]] - CARD[CB[i]] + oppR[i]; return { T }; }
+      for (const g of groups) {
+        let gt = 0;
+        for (const i of g) { const r = oppR[i]; if (!r) continue; gt += r; GC[CA[i]] += r; GC[CB[i]] += r; }
+        for (const i of g) { const a = CA[i], b = CB[i]; T[i] = tot - CARD[a] - CARD[b] + oppR[i]; W[i] = (lowTot - LOW[a] - LOW[b]) + 0.5 * (gt - GC[a] - GC[b] + oppR[i]); }
+        for (const i of g) { const r = oppR[i], a = CA[i], b = CB[i]; GC[a] = 0; GC[b] = 0; if (!r) continue; lowTot += r; LOW[a] += r; LOW[b] += r; }
+      }
+      return { W, T };
+    }
+    // showdown of one runout for player t against the opponent's weights: loops only over the hands each one can hold, with the
+    // per-player split of the strength groups cached on the runout; results in shared scratch arrays (read right away)
+    const SW = new Float64Array(NC), ST = new Float64Array(NC);
+    function sdRun(run, t, oppR) {
+      const sp = run.sp || (run.sp = [0, 1].map(tt => ({ lo: run.lv.filter(i => IN[1 - tt][i]), hi: run.lv.filter(i => IN[tt][i]),
+        g: run.groups.map(g => [g.filter(i => IN[1 - tt][i]), g.filter(i => IN[tt][i])]).filter(x => x[0].length || x[1].length) })));
+      const S = sp[t]; let tot = 0, lowTot = 0;
+      CARD.fill(0); LOW.fill(0);
+      for (const i of S.lo) { const r = oppR[i]; if (!r) continue; tot += r; CARD[CA[i]] += r; CARD[CB[i]] += r; }
+      for (const [go, gh] of S.g) {
+        let gt = 0;
+        for (const i of go) { const r = oppR[i]; if (!r) continue; gt += r; GC[CA[i]] += r; GC[CB[i]] += r; }
+        for (const i of gh) { const a = CA[i], b = CB[i], ri = oppR[i]; ST[i] = tot - CARD[a] - CARD[b] + ri; SW[i] = (lowTot - LOW[a] - LOW[b]) + 0.5 * (gt - GC[a] - GC[b] + ri); }
+        for (const i of go) { const r = oppR[i], a = CA[i], b = CB[i]; GC[a] = 0; GC[b] = 0; if (!r) continue; lowTot += r; LOW[a] += r; LOW[b] += r; }
+      }
+      return S.hi;
+    }
+    const mask = (r, cards) => { const o = new Float64Array(NC); for (const i of live) if (!cards.includes(CA[i]) && !cards.includes(CB[i])) o[i] = r[i]; return o; };
+    // current strategy (regret matching) into a scratch buffer per tree depth: no allocation per node visit; only the
+    // acting player's possible hands are written and read
+    const SBUF = [];
+    function strat(n, dp) { const A = n.acts.length, st = SBUF[dp] || (SBUF[dp] = new Float64Array(6 * NC)); for (const h of n.lp[n.pl]) { let s = 0; for (let a = 0; a < A; a++) { const r = n.reg[a * NC + h]; if (r > 0) s += r; } for (let a = 0; a < A; a++) { const r = n.reg[a * NC + h]; st[a * NC + h] = s > 0 ? (r > 0 ? r / s : 0) : 1 / A; } } return st; }
+    function term(n, t, rO) {
+      const u = new Float64Array(NC), P = pot0 + n.c[0] + n.c[1];
+      if (n.term === 'fold') { const L = n.lp[t], { T } = sd(rO, n.lp[1 - t], null, L); const val = n.folder === t ? -n.c[t] : pot0 + n.c[1 - t]; for (const h of L) u[h] = val * T[h]; return u; }
+      if (n.term === 'sd') { const L = sdRun(n.run, t, rO); for (const h of L) u[h] = P * SW[h] - n.c[t] * ST[h]; return u; }
+      for (const R2 of n.set.runs) { const L = sdRun(R2, t, rO); for (const h of L) { const k = n.set.Kh[h]; if (k) u[h] += (P * SW[h] - n.c[t] * ST[h]) / k; } }
+      return u;
+    }
+    function walk(n, t, rT, rO, wIt, avg, dp = 0) {
+      if (n.term) return term(n, t, rO);
+      if (n.chance) { const u = new Float64Array(NC); for (const k of n.kids) { const ua = walk(k.node, t, mask(rT, k.cards), mask(rO, k.cards), wIt, avg, dp + 1); for (const h of split(k.lv)[t]) if (n.Kh[h]) u[h] += ua[h] / n.Kh[h]; } return u; }
+      const A = n.acts.length, st = avg ? n.av : strat(n, dp), lv = n.lp[t], u = new Float64Array(NC);
+      if (n.pl === t) {
+        const ua = [];
+        for (let a = 0; a < A; a++) { const r2 = new Float64Array(NC); for (const h of lv) r2[h] = rT[h] * st[a * NC + h]; ua.push(walk(n.acts[a].child, t, r2, rO, wIt, avg, dp + 1)); }
+        for (const h of lv) { let v = 0; for (let a = 0; a < A; a++) v += st[a * NC + h] * ua[a][h]; u[h] = v; }
+        if (!avg) for (let a = 0; a < A; a++) for (const h of lv) { const r0 = n.reg[a * NC + h]; const x = (r0 > 0 ? r0 * DPOS : r0 * DNEG) + ua[a][h] - u[h]; n.reg[a * NC + h] = DC || x > 0 ? x : 0; n.sum[a * NC + h] += wIt * rT[h] * st[a * NC + h]; }
+      } else {
+        const lo = n.lp[1 - t];
+        for (let a = 0; a < A; a++) { const r2 = new Float64Array(NC); let m = 0; for (const h of lo) { const x = rO[h] * st[a * NC + h]; r2[h] = x; m += x; } if (!(m > 0)) continue; const ua = walk(n.acts[a].child, t, rT, r2, wIt, avg, dp + 1); for (const h of lv) u[h] += ua[h]; }
+      }
+      return u;
+    }
+    const t0 = performance.now(); let it = 0;
+    // flop and turn: Discounted CFR (alpha 1.5, beta 0, gamma 2), about half the regret of CFR+ in the same time on real spots;
+    // river: CFR+ with linear averaging (as good or better there)
+    const DC = kind !== 'r'; let DPOS = 1, DNEG = DC ? 0.5 : 0;
+    for (; it < d.iters; it++) { const T1 = it + 1; DPOS = DC && it ? Math.pow(it, 1.5) / (Math.pow(it, 1.5) + 1) : 1; const w = DC ? T1 * T1 : T1; walk(root, 0, RG[0], RG[1], w); walk(root, 1, RG[1], RG[0], w); if (performance.now() - t0 > d.ms) break; }
+    all.forEach(n => { const A = n.acts.length, av = new Float64Array(A * NC).fill(1 / A); for (const h of n.lp[n.pl]) { let s = 0; for (let a = 0; a < A; a++) s += n.sum[a * NC + h]; for (let a = 0; a < A; a++) av[a * NC + h] = s > 0 ? n.sum[a * NC + h] / s : 1 / A; } n.av = av; n.reg = null; n.sum = null; });
+    // value of a subtree for player t when t plays its best response (hand by hand) against the opponent's average
+    // strategy: the EV of an action assuming you play well afterwards. The average strategy alone is meaningless for hands
+    // that never take that action (it stays uniform), which inflated the cost of off-path actions.
+    function walkBR(n, t, rO) {
+      if (n.term) return term(n, t, rO);
+      if (n.chance) { const u = new Float64Array(NC); for (const k of n.kids) { const ua = walkBR(k.node, t, mask(rO, k.cards)); for (const h of split(k.lv)[t]) if (n.Kh[h]) u[h] += ua[h] / n.Kh[h]; } return u; }
+      const A = n.acts.length, lv = n.lp[t], u = new Float64Array(NC);
+      if (n.pl === t) {
+        for (const h of lv) u[h] = -Infinity;
+        for (let a = 0; a < A; a++) { const ua = walkBR(n.acts[a].child, t, rO); for (const h of lv) if (ua[h] > u[h]) u[h] = ua[h]; }
+      } else {
+        const lo = n.lp[1 - t], st = n.av;
+        for (let a = 0; a < A; a++) { const r2 = new Float64Array(NC); let m = 0; for (const h of lo) { const x = rO[h] * st[a * NC + h]; r2[h] = x; m += x; } if (!(m > 0)) continue; const ua = walkBR(n.acts[a].child, t, r2); for (const h of lv) u[h] += ua[h]; }
+      }
+      return u;
+    }
+    function nav(seq) {
+      let n = root; const reach = [RG[0].slice(), RG[1].slice()];
+      for (const tk of seq) {
+        if (!n || n.term || n.chance) return null;
+        let ai = -1;
+        if (tk.act === 'bet') { let best = 1e9; n.acts.forEach((a, i) => { if (a.name !== 'bet') return; const dd = tk.allin && a.amt >= eff - 0.01 ? -1 : Math.abs(Math.log(a.size) - Math.log(Math.max(0.1, tk.r))); if (dd < best) { best = dd; ai = i; } }); }
+        else ai = n.acts.findIndex(a => a.name === tk.act);
+        if (ai < 0 && tk.act === 'raise') ai = n.acts.findIndex(a => a.name === 'call');
+        if (ai < 0) return null;
+        for (const h of live) reach[n.pl][h] *= n.av[ai * NC + h];
+        n = n.acts[ai].child;
+      }
+      return { n, reach };
+    }
+    function query(seq, pl, h) {
+      const g = nav(seq); if (!g || !g.n || g.n.term || g.n.chance || g.n.pl !== pl) return { fail: !g ? 'nav' : !g.n || g.n.term || g.n.chance ? 'term' : 'pl ' + g.n.pl, seq };
+      if (!IN[pl][h]) return { fail: 'fuera de rango', seq };
+      const n = g.n, rO = g.reach[1 - pl], { T } = sd(rO, live, null, live);
+      let tot = 0; for (const x of live) tot += g.reach[pl][x];
+      const acts = n.acts.map((a, ai) => {
+        const u = walkBR(a.child, pl, rO);
+        let fr = 0; for (const x of live) fr += g.reach[pl][x] * n.av[ai * NC + x];
+        return { name: a.name, size: a.size || 0, amt: a.amt || 0, allin: (a.amt || 0) >= eff - 0.01, f: n.av[ai * NC + h], fr: tot > 0 ? fr / tot : 0, ev: (T[h] > 0 ? u[h] / T[h] : 0) + n.c[pl] };
+      });
+      return { acts, iters: it, ms: Math.round(performance.now() - t0), kind, pot: pot0 + n.c[0] + n.c[1], runs: kind === 'r' ? 1 : kind === 't' ? RIV.length : TURNS.length };
+    }
+    function reach(seq) { const g = nav(seq); return g ? g.reach : null; }
+    return { query, reach, iters: it, kind };
+  }
+  const S = {}, ORDER = [];
+  return function handle(d) {
+    if (d.cmd === 'solve') { const sol = make(d); delete S[d.id]; S[d.id] = sol; ORDER.push(d.id); while (ORDER.length > 8) { const k = ORDER.shift(); if (k !== d.id) delete S[k]; } return { id: d.id, ok: true, iters: sol.iters }; }
+    const s = S[d.sid]; if (!s) return { id: d.id, none: true };
+    if (d.cmd === 'query') return { id: d.id, res: s.query(d.seq, d.pl, d.h) };
+    if (d.cmd === 'reach') return { id: d.id, res: s.reach(d.seq) };
+    return { id: d.id };
+  };
+}
+let SOLVER = null, SOLVER_LOCAL = null;
+function solverWorker() {
+  if (SOLVER !== null) return SOLVER;
+  try {
+    const src = 'const NC=' + NC + ';const COMBOS=' + JSON.stringify(COMBOS) + ';const CA=new Int32Array(COMBOS.map(c=>c[0])),CB=new Int32Array(COMBOS.map(c=>c[1]));const CNT=new Int8Array(13),SM=new Int32Array(4),BUF=new Int32Array(7);' +
+      [straightHigh, pop, topK, evalCards, ev2, solverCore].map(f => f.toString()).join('\n') +
+      // queries jump ahead of solves, so a verdict never waits behind (or loses) its solution
+      ';const H=solverCore();const Q=[];let busy=false;function pump(){if(busy||!Q.length)return;let k=Q.findIndex(m=>m.cmd!=="solve");if(k<0)k=0;const d=Q.splice(k,1)[0];busy=true;let r;try{r=H(d);}catch(err){r={id:d.id,err:String(err)};}busy=false;postMessage(r);setTimeout(pump,0);}onmessage=e=>{Q.push(e.data);setTimeout(pump,0);};';
+    SOLVER = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+    const cbs = {}; SOLVER._cbs = cbs; SOLVER.onmessage = e => { const cb = cbs[e.data.id]; if (cb) { delete cbs[e.data.id]; cb(e.data); } };
+  } catch (e) { SOLVER = false; }
+  return SOLVER;
+}
+let SOLVE_ID = 0;
+// one call to the solver (worker, or the page itself when workers are not available); answers come in order
+function solverCall(msg) {
+  const id = ++SOLVE_ID; msg = Object.assign({ id }, msg);
+  const w = solverWorker();
+  if (!w) { if (!SOLVER_LOCAL) SOLVER_LOCAL = solverCore(); return new Promise(res => setTimeout(() => { try { res(SOLVER_LOCAL(msg)); } catch (e) { res({ id, err: String(e) }); } }, 0)); }
+  return new Promise(res => { w._cbs[id] = res; w.postMessage(msg); });
+}
+
+// ------------------------------------------------------------------ villain postflop policies on his current range
+function normW(w) { let s = 0; for (let i = 0; i < NC; i++) s += w[i]; const o = new Float32Array(NC); if (s > 0) for (let i = 0; i < NC; i++) o[i] = w[i] / s; return o; }
+function allocate(order, w, mass, taken) {
+  const p = new Float32Array(NC); let acc = 0;
+  for (const i of order) { if (acc >= mass - 1e-9) break; const av = w[i] * (1 - taken[i]); if (av <= 1e-12) continue; const t = Math.min(av, mass - acc); p[i] = t / w[i]; acc += t; taken[i] += p[i]; }
+  return p;
+}
+function orders(w, S) {
+  const ids = []; for (let i = 0; i < NC; i++) if (w[i] > 0) ids.push(i);
+  const desc = ids.slice().sort((a, b) => S.ehs[b] - S.ehs[a]);
+  const asc = desc.slice().reverse();
+  const bluff = ids.slice().sort((a, b) => (S.outs[b] - S.outs[a]) || (S.ehs[a] - S.ehs[b]));
+  return { desc, asc, bluff };
+}
+const SZR = { flop: [0.33, 0.6, 1.0], turn: [0.33, 0.65, 1.2], river: [0.33, 0.65, 1.1] };
+function sizeMix(pl, st, ag) {
+  let m;
+  if (st === 'river') { const P = M.river.pop; m = [P['pequeña'].n, P.media.n, P.grande.n + P.sobreapuesta.n]; }
+  else { const d = M.street[st][ag ? 'cbet' : 'other']; m = [d['pequeña'].n, d.media.n, d.grande.n]; }
+  let t = m[0] + m[1] + m[2]; m = m.map(x => x / t);
+  const tilt = { maniac: 0.12, fish: 0.08, lag: 0.03, reg: 0, nit: -0.03 }[pl.type] || 0;   // looser players bet bigger
+  m[0] = Math.max(0.03, m[0] - tilt); m[2] = Math.max(0.03, m[2] + tilt); t = m[0] + m[1] + m[2];
+  return m.map(x => x / t);
+}
+function polLead(pl, st, ag, ip, w, S) {
+  const { f, size } = pLead(pl, st, ag, ip), l = lam(pl, st), O = orders(w, S), taken = new Float32Array(NC);
+  const trap = { fish: 0.35, reg: 0.2, lag: 0.15, maniac: 0.1, nit: 0.3 }[pl.type] || 0.2;
+  const hold = allocate(O.desc, w, 0.12, new Float32Array(NC));           // the top 12 % of his range: some of it checks to trap
+  for (let i = 0; i < NC; i++) taken[i] = hold[i] * trap;
+  const val = allocate(O.desc, w, f * (1 - l), taken);
+  const bl = allocate(st === 'river' ? O.asc : O.bluff, w, f * l, taken);
+  // size class of each betting hand: the best value bets big, medium hands small (small river bets are weak at his tables), bluffs as the mix
+  const base = sizeMix(pl, st, ag), mix = new Float32Array(NC * 3);
+  let vm = 0; for (const i of O.desc) vm += w[i] * val[i];
+  let acc = 0;
+  for (const i of O.desc) {
+    if (!(w[i] > 0)) continue;
+    const vv = w[i] * val[i], bb = w[i] * bl[i], tot = vv + bb; if (tot <= 0) continue;
+    const u = vm > 0 ? Math.min(1, (acc + vv / 2) / vm) : 0.5; acc += vv;
+    const pv = [base[0] * (0.4 + 1.2 * u), base[1], base[2] * (1.6 - 1.2 * u)]; const sv = pv[0] + pv[1] + pv[2];
+    for (let k = 0; k < 3; k++) mix[i * 3 + k] = (vv * pv[k] / sv + bb * base[k]) / tot;
+  }
+  return { bet: addP(val, bl), size, f, l, mix, ratios: SZR[st] };
+}
+// flop: folds on this kind of board compared with all flops at the same size (low connected boards fold much less to small bets)
+function texFactor(st, r) {
+  if (st !== 'flop' || !M.tex || !G || G.board.length < 3) return 1;
+  const d = M.tex[texLabel(G.board.slice(0, 3))]; if (!d) return 1;
+  const small = r < 0.4, x = small ? d.pop_small : d.pop_big; if (!x || !(x.n >= 25) || x.fold == null) return 1;
+  const C = M.street.flop.cbet, base = small ? C['pequeña'].fold : (C.media.fold * C.media.n + C.grande.fold * C.grande.n) / (C.media.n + C.grande.n);
+  return clamp(x.fold / base, 0.5, 1.5);
+}
+// typical strength of the range a rival has when he faces a bet / a raise (average EHS, measured with caltest.js):
+// his folds go up or down from the measured rate only as far as his range is weaker or stronger than that
+const RSREF = { F: { flop: 0.68, turn: 0.67, river: 0.66 }, R: { flop: 0.72, turn: 0.71, river: 0.70 } };
+function polFace(pl, st, r, w, S) {
+  const q = Object.assign({}, pFace(pl, st, r)), O = orders(w, S), taken = new Float32Array(NC);
+  let rs = 0; for (let i = 0; i < NC; i++) if (w[i] > 0) rs += w[i] * S.ehs[i];
+  q.fold = clamp(q.fold * clamp(1 - 1.5 * (rs - RSREF.F[st]), 0.55, 1.35) * texFactor(st, r), 0.04, 0.85); if (q.fold + q.raise > 0.97) q.raise = 0.97 - q.fold; q.call = 1 - q.fold - q.raise; q.rs = rs;
+  const rv = allocate(O.desc, w, q.raise * 0.75, taken);
+  const rb = allocate(O.bluff.filter(i => S.outs[i] >= 4), w, q.raise * 0.25, taken);
+  const fo = allocate(O.asc, w, q.fold, taken);
+  const ra = addP(rv, rb), call = new Float32Array(NC); for (let i = 0; i < NC; i++) if (w[i] > 0) call[i] = Math.max(0, 1 - ra[i] - fo[i]);
+  return { fold: fo, call, raise: ra, q };
+}
+function polFaceR(pl, st, w, S) {
+  const q = Object.assign({}, pFaceR(pl, st)), O = orders(w, S), taken = new Float32Array(NC);
+  let rs = 0; for (let i = 0; i < NC; i++) if (w[i] > 0) rs += w[i] * S.ehs[i]; q.rs = rs;
+  q.fold = clamp(q.fold * clamp(1 - 1.5 * (rs - RSREF.R[st]), 0.55, 1.35), 0.04, 0.85); if (q.fold + q.raise > 0.97) q.raise = 0.97 - q.fold; q.call = 1 - q.fold - q.raise;
+  const ra = allocate(O.desc, w, q.raise, taken); const fo = allocate(O.asc, w, q.fold, taken);
+  const call = new Float32Array(NC); for (let i = 0; i < NC; i++) if (w[i] > 0) call[i] = Math.max(0, 1 - ra[i] - fo[i]);
+  return { fold: fo, call, raise: ra, q };
+}
+
+// ------------------------------------------------------------------ the hand
+let G = null;   // current hand
+function later(fn, ms) { const g = G; setTimeout(() => { if (G === g) fn(); }, ms); }
+const seatOf = pos => G.seats[pos];
+function newSeats() {
+  const mw = mixWeights();
+  return POS.map((p, i) => ({ pos: i, type: null, prof: null, cards: null, inv: 0, folded: false, bubble: '', hero: false }));
+}
+function stackChoice() {
+  const all = STACKS().filter(s => s >= 10 && s <= 100);
+  const sel = { all: all, short: all.filter(s => s <= 20), mid: all.filter(s => s >= 22 && s <= 40), deep: all.filter(s => s >= 50) }[SET.stack] || all;
+  return pick(sel.length ? sel : all);
+}
+// the hands the user wants to practise ("AKs, QQ, T9s, AJ" — AJ means suited and offsuit)
+let HANDS = [];
+function parseHands(txt) {
+  const out = new Set(); const bad = [];
+  (txt || '').toUpperCase().replace(/[;\s]+/g, ',').split(',').filter(Boolean).forEach(tok => {
+    const m = tok.match(/^([AKQJT2-9])([AKQJT2-9])([SO]?)$/); if (!m) { bad.push(tok); return; }
+    const i = RANKS.indexOf(m[1]), j = RANKS.indexOf(m[2]); const a = Math.min(i, j), b = Math.max(i, j);
+    if (a === b) { out.add(a * 13 + a); return; }
+    if (m[3] !== 'O') out.add(a * 13 + b); if (m[3] !== 'S') out.add(b * 13 + a);
+  });
+  return { list: [...out], bad };
+}
+function heroCards(dead) {
+  if (!HANDS.length) return deal(2, dead);
+  const k = pick(HANDS); const ids = CLASS_COMBOS[k].filter(i => !dead[COMBOS[i][0]] && !dead[COMBOS[i][1]]); const [a, b] = COMBOS[pick(ids)];
+  dead[a] = 1; dead[b] = 1; return [a, b];
+}
+function deal(n, dead) { const out = []; while (out.length < n) { const c = Math.floor(rnd() * 52); if (!dead[c]) { dead[c] = 1; out.push(c); } } return out; }
+function libSize(S, key, code) { const sp = lib(S, key); if (!sp) return null; const a = sp.ac.find(x => x[0] === code); return a ? parseFloat(a.slice(1)) : null; }
+
+// scenario: everybody before the hero acts with his type's preflop policy; keep it only if the library has the spot
+function makeScenario(seed, isSub) {
+  const focus = SET.focus || '', adapt = SET.mode === 'leaks';
+  const fStacks = focus ? STACKS().filter(x => x >= 3 && LIB[LIBKEY][x] && LIB[LIBKEY][x][focus]) : null;
+  for (let tries = 0; tries < (focus || adapt ? 4000 : 400); tries++) {
+    // each try has its own seed: replaying a hand only needs the seed of the try that was kept
+    const sub = isSub ? seed : ((seed + Math.imul(tries, 2654435761)) >>> 0); if (isSub && tries > 0) break; RNG = mulberry32(sub);
+    let S = SET.stackx !== 'auto' && STACKS().includes(+SET.stackx) ? +SET.stackx : stackChoice(), hp = SET.pos >= 0 ? +SET.pos : Math.floor(rnd() * 6);
+    const FP = fixedPlayers();
+    if (FP && SET.pos < 0) hp = REPLAY && REPLAY.cfg && REPLAY.cfg.thp != null ? REPLAY.cfg.thp : TABLE.hp;
+    if (focus) { hp = +focus.split('|')[1]; if (!fStacks.includes(S)) S = pick(fStacks.length ? fStacks : STACKS()); }
+    const mw = mixWeights();
+    const seats = newSeats(); const dead = {};
+    const hc = heroCards(dead);
+    seats.forEach(s => { s.hero = s.pos === hp; if (s.hero) { s.type = 'hero'; s.cards = hc; } else { const g = FP ? FP[(s.pos - hp + 6) % 6 - 1] : genPlayer(); s.type = g.type; s.st = g.st; s.m = g.m; s.prof = g.st; s.pid = g.id || null; s.cards = deal(2, dead); } s.k = classOf(s.cards[0], s.cards[1]); s.stack = S; });
+    const acts = []; let opener = null, limper = null, shover = null, caller = null, bad = false, openSize = null;
+    for (let p = 0; p < hp; p++) {
+      const s = seats[p], t = s.type;
+      if (opener == null && limper == null && shover == null) {
+        if (p === 5) break;
+        const pol = prePolicy(s, 'open', { p, S }); let a = actOf(pol, s.k);
+        if (a === 'raise' && S <= 12) a = 'shove';
+        if (a === 'raise') { opener = p; openSize = libSize(S, '|' + p + '|', 'R') || 2.2; acts.push([p, 'raise', openSize]); }
+        else if (a === 'shove') { shover = p; acts.push([p, 'shove', S]); }
+        else if (a === 'limp') { limper = p; acts.push([p, 'limp', 1]); }
+        else acts.push([p, 'fold']);
+      } else if (opener != null && caller == null && shover == null) {
+        const pol = prePolicy(s, 'vsopen', { j: p, o: opener, S }); const a = actOf(pol, s.k);
+        if (a === 'raise') { bad = true; break; }
+        if (a === 'call') { caller = p; acts.push([p, 'call', openSize]); } else acts.push([p, 'fold']);
+      } else if (limper != null) {
+        const pol = prePolicy(s, 'open', { p, S }); const a = actOf(pol, s.k);
+        if (a !== 'fold') { bad = true; break; } acts.push([p, 'fold']);
+      } else if (shover != null) {
+        if (rnd() < 0.08) { caller = p; acts.push([p, 'call', S]); } else acts.push([p, 'fold']);
+      } else if (caller != null) {
+        const pol = prePolicy(s, 'vsopen', { j: p, o: opener, S }); const a = actOf(pol, s.k);
+        if (a !== 'fold') { bad = true; break; } acts.push([p, 'fold']);
+      } else acts.push([p, 'fold']);
+    }
+    if (bad) continue;
+    let key;
+    if (shover != null) key = caller != null ? 'OVC|' + hp + '|' + shover + ',' + caller : 'S|' + hp + '|' + shover;
+    else if (opener != null) key = caller != null ? 'SQZ|' + hp + '|' + opener + ',' + caller : 'R|' + hp + '|' + opener;
+    else if (limper != null) key = (limper === 4 && hp === 5) ? 'L|5|4' : 'ROL|' + hp + '|' + limper;
+    else { if (hp === 5) continue; key = '|' + hp + '|'; }
+    const sp = lib(S, key); if (!sp) continue;
+    const hero = seats[hp], k = hero.k, w = sp.W[k];
+    if (w <= 0.01) continue;
+    // skip most of the obvious folds unless the user wants them
+    const best = sp.F[k].indexOf(Math.max(...sp.F[k]));
+    if (focus && key !== focus) continue;
+    if (adapt && !focus && !isSub) { const o = LEAKS.map[key]; let a = clamp((o ? o.avg : LEAKS.g) / LEAKS.max, 0.04, 1); if (o && o.err[N[k]]) a = Math.min(1, a * 3); if (rnd() > a) continue; }
+    if (!SET.easy && !HANDS.length && !(adapt && LEAKS.map[key] && LEAKS.map[key].err[N[k]]) && sp.ac[best] === 'F' && sp.F[k][best] > 0.98) { const ls = sp.L[k] || []; const nb = Math.min(...ls.filter((x, i) => i !== best)); if (nb > 0.25 && rnd() < 0.88) continue; }
+    if (SET.mode === 'post' && !(key.startsWith('|') || key.startsWith('R|') || key.startsWith('ROL|') || key.startsWith('L|'))) continue;
+    if (SET.mode === 'post' && !sp.ac.some((c, a) => c !== 'F' && c !== 'A' && sp.F[k][a] > 0.3)) continue;
+    const runout = deal(5, dead);
+    return { S, hp, seats, acts, key, sp, opener, limper, shover, caller, openSize, runout, sub };
+  }
+  return null;
+}
+
+// ------------------------------------------------------------------ render
+const SLOTS = [[50, 86], [9, 64], [13, 19], [50, 8], [87, 19], [91, 64]];
+const SLOTS_PH = [[50, 88], [15, 66], [17, 22], [50, 9], [83, 22], [85, 66]];
+function render() {
+  if (!G) return;
+  const tb = $('table'); tb.querySelectorAll('.seat,.dealer').forEach(e => e.remove());
+  const ph = tb.clientWidth < 560, SL = ph ? SLOTS_PH : SLOTS;
+  G.seats.forEach(s => {
+    const slot = SL[(s.pos - G.hp + 6) % 6];
+    const d = document.createElement('div'); d.className = 'seat' + (s.hero ? ' hero' : '') + (s.folded ? ' folded' : '') + (G.turn === s.pos ? ' act' : '');
+    d.style.left = slot[0] + '%'; d.style.top = slot[1] + '%';
+    const inMw = G.mw && G.mw.ps.includes(s.pos), showCards = s.hero || G.reveal === s.pos || (inMw && G.mw.reveal && !s.folded);
+    const cards = s.folded && !s.hero ? '' : '<div class="cards">' + (showCards ? s.cards.map(c => cardHTML(c)).join('') : (s.pos === G.vill || inMw || G.street === 'pre' ? backHTML() + backHTML() : '')) + '</div>';
+    const obsMode = SET.hud === 'obs' && s.pid && G.street !== 'end', ob = s.pid ? obsOf(s.pid) : null;
+    const etype = obsMode ? (ob.n >= 15 ? kindOf(100 * ob.v / ob.n, 100 * ob.p / ob.n) : null) : s.type;
+    const badge = s.hero ? '<span class="tbadge tb-hero">TÚ</span>' : etype ? '<span class="tbadge tb-' + etype + '" title="' + TYPES[etype][0] + (obsMode ? ' (según lo que has visto)' : '') + '">' + TYPES[etype][1] + (obsMode ? '?' : '') + '</span>' : '<span class="tbadge tb-reg" title="Aún no hay manos suficientes">?</span>';
+    const hud = s.hero ? (G.ctxName || '') : obsMode ? (ob.n ? ob.n + ' manos · ' + Math.round(100 * ob.v / ob.n) + '/' + Math.round(100 * ob.p / ob.n) : 'sin manos vistas') : Math.round(s.st.vpip) + '/' + Math.round(s.st.pfr) + '/' + Math.round(s.st.three) + ' · AF ' + s.st.af.toFixed(1);
+    const top = slot[1] < 50;
+    d.innerHTML = (top ? '' : '<div class="bubble">' + (s.bubble || '') + '</div>') + (s.hero ? cards : '') +
+      '<div class="plate"><div class="prow"><span class="pos">' + POS[s.pos] + (s.pid ? '<small style="font-weight:500;color:var(--muted)"> ' + s.pid + '</small>' : '') + '</span>' + badge + '<span class="stk">' + fst(Math.max(0, (s.disp || s.stack) - spent(s))) + ' bb</span></div><div class="hud"' + (s.hero || obsMode ? '' : ' title="' + hudTitle(s) + '"') + '>' + hud + '</div></div>' +
+      (s.hero ? '' : cards) + (top ? '<div class="bubble">' + (s.bubble || '') + '</div>' : '');
+    tb.appendChild(d);
+  });
+  const bslot = SL[(3 - G.hp + 6) % 6]; const dl = document.createElement('div'); dl.className = 'dealer'; dl.textContent = 'D';
+  dl.style.left = (bslot[0] + (50 - bslot[0]) * 0.28) + '%'; dl.style.top = (bslot[1] + (48 - bslot[1]) * 0.32) + '%'; tb.appendChild(dl);
+  $('pot').textContent = 'Bote ' + f1(potNow()) + ' bb';
+  $('board').innerHTML = (G.board || []).map(c => cardHTML(c)).join('');
+}
+function spent(s) { if (!G || G.street === 'pre' || G.street === 'allin' || G.vill == null) return s.inv; if (s.pos === G.hp) return s.stack - G.hStack + (G.hIn || 0); if (s.pos === G.vill) return s.stack - G.vStack + (G.vIn || 0); return s.inv; }
+function potNow() { return ANTE + G.seats.reduce((a, s) => a + s.inv, 0) + (G.dead || 0); }
+function log(t, cls) { G.log.push([t, cls || '']); $('log').innerHTML = G.log.map(([x, c]) => '<div class="' + c + '">' + x + '</div>').join(''); $('log').scrollTop = 1e6; }
+const who = s => s.hero ? 'Tú' : POS[s.pos] + ' (' + TNAME(s.type) + ')';
+function setActions(btns, prompt) {
+  $('prompt').innerHTML = prompt || '';
+  const A = $('actions'); A.innerHTML = '';
+  btns.forEach((b, i) => { const e = document.createElement('button'); e.type = 'button'; e.className = 'btn ' + (b.cls || ''); e.textContent = b.label; e.title = b.label === 'Siguiente mano' ? 'Tecla Enter' : 'Tecla ' + (i + 1); e.addEventListener('click', b.fn); A.appendChild(e); });
+}
+
+// ------------------------------------------------------------------ preflop flow
+let LEAKS = { map: {}, g: 0.05, max: 0.2 };
+function leakStats() {
+  const out = {}; const L = M.leaks || {}; let gl = 0, gn = 0;
+  for (const k in L) { gl += L[k][1]; gn += L[k][0]; out[k] = { n: L[k][0], loss: L[k][1], err: Object.assign({}, L[k][3] || {}), real: L[k] }; }
+  const g = gn ? gl / gn : 0.05;
+  HIST.forEach(d => { const k = d.street === 'pre' ? d.key : d.pkey; if (!k) return; const o = out[k] || (out[k] = { n: 0, loss: 0, err: {} }); o.n += 1.5; o.loss += 1.5 * d.loss; if (d.loss >= 0.1 && d.hand) o.err[d.hand] = (o.err[d.hand] || 0) + 1; });
+  let max = g; for (const k in out) { out[k].avg = (out[k].loss + 10 * g) / (out[k].n + 10); if (out[k].n >= 15) max = Math.max(max, out[k].avg); }
+  return { map: out, g, max };
+}
+function keyName(key) {
+  const [h, p, v] = key.split('|'); const P = POS[+p]; const vs = (v || '').split(',').filter(x => x !== '').map(x => POS[+x]);
+  return ({ '': 'Abrir desde ' + P, R: P + ' contra open de ' + vs[0], ROL: P + ' contra limp de ' + vs[0], L: 'BB contra limp de SB', S: P + ' contra all-in de ' + vs[0],
+    SQZ: P + ' contra open de ' + vs[0] + ' y call de ' + vs[1], OVC: P + ' contra all-in de ' + vs[0] + ' y call de ' + vs[1], R3: P + ' contra 3-bet de ' + vs[0], RJ: P + ' contra 3-bet all-in de ' + vs[0],
+    R34: P + ' contra 4-bet de ' + vs[0], R3J: P + ' contra 4-bet all-in de ' + vs[0], R34J: P + ' contra 5-bet all-in de ' + vs[0], ROL3: P + ' contra limp-resubida de ' + vs[0], ROLJ: P + ' contra limp y all-in de ' + vs[0],
+    LR: 'SB: limp y la BB sube', LJ: 'SB: limp y la BB va all-in', LRJ: 'BB: subes el limp y la SB va all-in', LR3: 'BB: subes el limp y la SB resube', LR3J: 'SB: resubes y la BB va all-in' })[h] || key;
+}
+function setFocus(key) {
+  SET.focus = key || ''; store.set('set', SET);
+  const f = $('focus'); f.hidden = !SET.focus;
+  if (SET.focus) { f.innerHTML = '<span>Practicando solo: <b>' + keyName(SET.focus) + '</b></span>'; const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.style.padding = '3px 10px'; b.textContent = 'Volver a manos normales'; b.addEventListener('click', () => { setFocus(''); startHand(); }); f.appendChild(b); }
+}
+let REPLAY = null;
+function startHand(seed, isSub) {
+  const real = SET.mode === 'real'; $('table').hidden = real; $('realbox').hidden = !real;
+  if (real) { startReal(); return; }
+  if (typeof seed !== 'number') {
+    seed = (Math.random() * 4294967296) >>> 0; REPLAY = null;
+    if (LIBKEY !== SET.ctx) { loadLib(); return; }
+  }
+  if (!LIB[LIBKEY]) return;
+  RNG = mulberry32(seed);
+  if (SET.mode === 'leaks' || SET.focus) LEAKS = leakStats();
+  const sc = makeScenario(seed, !!isSub);
+  if (!sc) { setActions([{ label: 'Probar otra vez', cls: 'pri', fn: startHand }], 'No he encontrado una situación con estos ajustes. Prueba otro stack o contexto.'); return; }
+  G = { S: sc.S, hp: sc.hp, seats: sc.seats, key: sc.key, street: 'pre', board: [], log: [], decs: [], dead: 0, vill: null, reveal: null, turn: sc.hp, sc, seed: sc.sub, runout: sc.runout, replay: !!REPLAY,
+    mode: SET.mode, cfg: { ctx: LIBKEY, stack: SET.stack, stackx: SET.stackx, pos: SET.pos, hands: SET.hands, mix: SET.mix, mode: SET.mode, easy: SET.easy, focus: SET.focus || '' } };
+  G.ctxName = $('s-ctx').querySelector('option[value="' + LIBKEY + '"]').textContent + ' · ' + sc.S + ' bb';
+  if (SET.table === 'fixed' && !REPLAY && TABLE) { G.cfg.tp = TABLE.players.map(p => ({ id: p.id, type: p.type, st: p.st, m: p.m })); G.cfg.thp = sc.hp; G.fixed = true; if (SET.pos < 0 && !SET.focus) TABLE.hp = (sc.hp + 5) % 6; TABLE.hands++; saveTable(); }
+  const lv = pick([[100, 200], [150, 300], [200, 400], [250, 500], [300, 600], [400, 800], [500, 1000], [600, 1200], [800, 1600], [1000, 2000], [1500, 3000]]);
+  const bi = LIBKEY.startsWith('pko') ? wpick({ 5: 1, 10: 3, 20: 3, 50: 2, 100: 1 }) : wpick({ 5: 1, 10: 2, 20: 3, 50: 2, 100: 1 });
+  const lvl = 4 + Math.floor(rnd() * 14);
+  G.stake = { bi: +bi, sb: lv[0], bb: lv[1], lvl, name: pick(LIBKEY.startsWith('pko') ? ['KO', 'Bounty Builder', 'Mystery KO', 'Space KO'] : ['Freezeout', 'Deepstack', 'Hyper', 'Turbo']) };
+  // displayed stacks: the effective stack is the library's; whoever covers whom follows the context
+  const covered = LIBKEY.endsWith('cubierto'), covers = LIBKEY.endsWith('cubre');
+  G.seats.forEach(s => { s.disp = s.hero ? (covers ? sc.S * (1.3 + rnd() * 1.5) : sc.S) : (covered ? sc.S * (1.05 + rnd() * 2) : covers ? sc.S * (0.75 + rnd() * 0.25) : sc.S * (0.6 + rnd() * 1.8)); });
+  G.seats.forEach(s => { if (!s.hero && covers) s.disp = Math.max(s.disp, sc.S * 0.75); });
+  $('stake').textContent = G.stake.name + ' ' + G.stake.bi + ' € · nivel ' + lvl + ' · ciegas ' + lv[0] + '/' + lv[1] + ' + ante BB ' + lv[1] + ' · tu stack efectivo ' + sc.S + ' bb';
+  const sb = G.seats[4], bb = G.seats[5]; sb.inv = SBB; bb.inv = 1;
+  log('<b>Mano nueva</b> · ' + G.ctxName + ' · tú en ' + POS[G.hp] + ' con ' + G.seats[G.hp].cards.map(ctext).join(' '), 'st');
+  log('Ciegas 0,5/1 bb y ante de la BB 1 bb');
+  sc.acts.forEach(([p, a, x]) => applyPre(G.seats[p], a, x));
+  render(); coachIdle();
+  if (G.mode === 'post') { autoPre(); return; }
+  heroPre();
+}
+function applyPre(s, a, x) {
+  if (!s.hero) { s.acted = true; if (a === 'limp' || a === 'call' || a === 'raise' || a === 'shove') s.vp = true; if (a === 'raise' || a === 'shove') s.pr = true; }
+  if (a === 'fold') { s.folded = true; s.bubble = 'Fold'; log(who(s) + ' foldea'); }
+  else if (a === 'limp') { s.inv = Math.max(s.inv, 1); s.bubble = 'Limp'; log(who(s) + ' hace limp'); }
+  else if (a === 'call') { s.inv = Math.min(s.stack, x); s.bubble = 'Paga ' + f1(x); log(who(s) + ' paga ' + f1(x) + ' bb'); }
+  else if (a === 'check') { s.bubble = 'Check'; log(who(s) + ' pasa'); }
+  else if (a === 'raise') { s.inv = Math.min(s.stack, x); s.bubble = 'Sube a ' + f1(x); log(who(s) + ' sube a ' + f1(x) + ' bb'); }
+  else if (a === 'shove') { s.inv = s.stack; s.bubble = 'All-in ' + f1(s.stack); log(who(s) + ' va all-in (' + f1(s.stack) + ' bb)'); }
+}
+function acLabel(code, sp) {
+  if (code === 'F') return 'Fold';
+  if (code === 'L') return 'Limp';
+  if (code === 'A') return 'All-in ' + f1(G.S) + ' bb';
+  if (code === 'C') { const toCall = Math.max(...G.seats.map(s => s.inv)) - G.seats[G.hp].inv; return toCall <= 0.01 ? 'Check' : 'Pagar ' + f1(Math.max(...G.seats.map(s => s.inv))) + ' bb'; }
+  return 'Subir a ' + f1(parseFloat(code.slice(1))) + ' bb';
+}
+function heroPre() {
+  const sp = lib(G.S, G.key); G.spot = sp; G.turn = G.hp; render();
+  const btns = sp.ac.map((code, i) => ({ label: acLabel(code, sp), cls: code === 'F' ? 'fold' : '', fn: () => heroPreAct(i) }));
+  setActions(btns, '<b>Tu turno</b> · ' + spotTitle(G.key) + ' · ' + G.seats[G.hp].cards.map(ctext).join(' ') + ' (' + N[G.seats[G.hp].k] + ')');
+}
+function spotTitle(key) {
+  const [h, p, v] = key.split('|'); const vs = (v || '').split(',').filter(x => x !== '').map(Number);
+  const T = j => POS[j] + ' ' + TNAME(G.seats[j].type);
+  return ({ '': 'Abres de primeras', R: 'Te abren: ' + (vs.length ? T(vs[0]) : ''), ROL: 'Limp de ' + (vs.length ? T(vs[0]) : ''), L: 'La SB (' + TNAME(G.seats[4].type) + ') hace limp', S: 'All-in de ' + (vs.length ? T(vs[0]) : ''),
+    SQZ: 'Open de ' + (vs.length ? T(vs[0]) : '') + ' y call de ' + (vs.length > 1 ? T(vs[1]) : ''), OVC: 'All-in de ' + (vs.length ? T(vs[0]) : '') + ' y call de ' + (vs.length > 1 ? T(vs[1]) : ''),
+    R3: 'Te hacen 3-bet: ' + (vs.length ? T(vs[0]) : ''), RJ: 'Te hacen 3-bet all-in: ' + (vs.length ? T(vs[0]) : ''), R34: 'Te hacen 4-bet: ' + (vs.length ? T(vs[0]) : ''), R3J: 'Te hacen 4-bet all-in: ' + (vs.length ? T(vs[0]) : ''),
+    R34J: '5-bet all-in de ' + (vs.length ? T(vs[0]) : ''), ROL3: 'El limper resube: ' + (vs.length ? T(vs[0]) : ''), ROLJ: 'El limper va all-in: ' + (vs.length ? T(vs[0]) : ''), LR: 'Hiciste limp y la BB sube', LJ: 'Hiciste limp y la BB va all-in',
+    LRJ: 'Subiste el limp y la SB va all-in', LR3: 'Subiste el limp y la SB resube', LR3J: 'Resubiste y la BB va all-in' })[h] || key;
+}
+function gradePre(sp, k, i) {
+  const L = sp.L[k] || null, F = sp.F[k];
+  const loss = L ? L[i] : (F[i] >= 0.1 ? 0 : 0.5);
+  const v = loss <= 0.05 ? 'ok' : loss <= 0.3 ? 'meh' : 'bad';
+  return { loss, v };
+}
+function setHeroRange(sp, i) {
+  G.hcls = new Float32Array(169); let m = 0;
+  for (let k = 0; k < 169; k++) { G.hcls[k] = sp.W[k] * sp.F[k][i]; m += G.hcls[k] * CMB[k]; }
+  // an action the library (almost) never takes: use every hand that goes on in that spot as the theory range
+  if (m < 20) { const fi = sp.ac.indexOf('F'); for (let k = 0; k < 169; k++) G.hcls[k] = sp.W[k] * (fi >= 0 ? 1 - sp.F[k][fi] : 1); }
+}
+function heroPreAct(i) {
+  setActions([], 'Juegan los demás…');
+  const sp = G.spot, hero = G.seats[G.hp], k = hero.k, code = sp.ac[i];
+  setHeroRange(sp, i);
+  const g = gradePre(sp, k, i);
+  const rec = { street: 'pre', key: G.key, S: G.S, hand: N[k], choice: acLabel(code, sp), loss: g.loss, v: g.v, vt: mainVillainType(), pot: potNow() };
+  G.decs.push(rec); saveDec(rec);
+  coachPre(sp, k, i, g);
+  // apply the hero's action and let the others answer
+  const maxInv = Math.max(...G.seats.map(s => s.inv));
+  if (code === 'F') { applyPre(hero, 'fold'); render(); return endHand('Has foldeado.'); }
+  if (code === 'C') { if (maxInv - hero.inv <= 0.01) applyPre(hero, 'check'); else applyPre(hero, 'call', maxInv); }
+  else if (code === 'L') applyPre(hero, 'limp');
+  else if (code === 'A') applyPre(hero, 'shove');
+  else applyPre(hero, 'raise', parseFloat(code.slice(1)));
+  render();
+  later(() => continuePre(code), 250);
+}
+function mainVillainType() { const k = G.key.split('|'); const v = (k[2] || '').split(',')[0]; if (v !== '') return G.seats[+v].type; return G.vill != null ? G.seats[G.vill].type : null; }
+// after a hero action preflop: players still to act answer; the first one that continues becomes the villain
+function continuePre(code) {
+  const hist = G.key.split('|')[0], hp = G.hp, hero = G.seats[hp];
+  const others = G.seats.filter(s => !s.hero && !s.folded);
+  const order = [...Array(6).keys()].map(i => (hp + 1 + i) % 6).filter(p => p !== hp);
+  if (hist === '') {                       // the hero opened (or limped from the SB)
+    if (code === 'L') {                    // SB limp: the BB decides
+      const bb = G.seats[5]; const pol = prePolicy(bb, 'bbvslimp', {}); const a = actOf(pol, bb.k);
+      if (a === 'raise') { const lr = lib(G.S, 'LR|4|5'); const x = lr && lr.sz && lr.sz[0] === 'R' ? parseFloat(lr.sz.slice(1)) : 3.5; applyPre(bb, 'raise', x); G.vill = 5; return nextSpot('LR|4|5'); }
+      applyPre(bb, 'check'); G.vill = 5; return toFlop();
+    }
+    const S = G.S, isShove = code === 'A', size = isShove ? S : parseFloat(code.slice(1));
+    for (const p of order) {
+      const s = G.seats[p]; if (s.folded || p < 0) continue;
+      if (p < hp && p !== 4 && p !== 5) continue;  // players before the hero already folded
+      let a;
+      if (isShove) { const ls = lib(S, 'S|' + p + '|' + hp); let lc = 0.12; if (ls) { lc = 0; for (let k = 0; k < 169; k++) lc += ls.F[k][ls.ac.indexOf('C')] * ls.W[k] * CMB[k] / 1326; } a = actOf(prePolicy(s, 'vsshove', { libCall: lc }), s.k); }
+      else a = actOf(prePolicy(s, 'vsopen', { j: p, o: hp, S }), s.k);
+      if (a === 'fold') { applyPre(s, 'fold'); continue; }
+      G.vill = p;
+      if (isShove) { applyPre(s, 'call', S); return allinShowdown(); }
+      if (a === 'call') {
+        applyPre(s, 'call', size);
+        const q = overcall(order.slice(order.indexOf(p) + 1).filter(x => !(x < hp && x !== 4 && x !== 5)), hp, size);
+        if (q != null) return mwPre([p, q], [prePolicy(s, 'vsopen', { j: p, o: hp, S }).call, overRange(q, hp)], hp);
+        foldRest(p); return toFlop();
+      }
+      // re-raise: all-in when short, otherwise the library's 3-bet size
+      const r3 = lib(S, 'R3|' + hp + '|' + p);
+      const shove = S <= 22 || !r3 || !(r3.sz && r3.sz[0] === 'R');
+      if (shove) { applyPre(s, 'shove'); foldRest(p); return nextSpot('RJ|' + hp + '|' + p); }
+      applyPre(s, 'raise', parseFloat(r3.sz.slice(1))); foldRest(p); return nextSpot('R3|' + hp + '|' + p);
+    }
+    return endHand('Todos foldean: te llevas las ciegas.', true);
+  }
+  if (hist === 'R' || hist === 'SQZ') {
+    const o = +G.key.split('|')[2].split(',')[0]; G.vill = o;
+    if (code === 'C' && hist === 'SQZ') {         // open, a caller and you: three-way pot
+      const c = +G.key.split('|')[2].split(',')[1], keep = new Set([G.hp, o, c]);
+      G.seats.forEach(s => { if (!keep.has(s.pos) && !s.folded) { s.folded = true; if (!s.bubble) { s.bubble = 'Fold'; log(who(s) + ' foldea'); } } });
+      if (G.mode === 'pre') return endHand('Fin del preflop (en este modo no se juega el resto).', false, true);
+      const so = G.seats[o], sc2 = G.seats[c];
+      return mwStart([o, c], [prePolicy(so, 'open', { p: o, S: G.S }).raise, prePolicy(sc2, 'vsopen', { j: c, o, S: G.S }).call], o);
+    }
+    if (code === 'C') {                           // you call the open: the players behind you may call too
+      const size = G.seats[o].inv, behind = [...Array(6).keys()].map(i => (hp + 1 + i) % 6).filter(x => x !== hp && x !== o && (x === 4 || x === 5 || x > hp) && !G.seats[x].folded && !G.seats[x].hero);
+      const q = overcall(behind, o, size);
+      if (q != null) return mwPre([o, q], [prePolicy(G.seats[o], 'open', { p: o, S: G.S }).raise, overRange(q, o)], o);
+      foldRestBehind(); return toFlop();
+    }
+    if (code === 'A') { const s = G.seats[o]; const ls = lib(G.S, 'RJ|' + o + '|' + hp); let lc = 0.1; if (ls) { lc = 0; for (let k = 0; k < 169; k++) lc += ls.F[k][ls.ac.indexOf('C')] * ls.W[k] * CMB[k] / 1326; } foldRestBehind(); const a = actOf(prePolicy(s, 'vsshove', { libCall: Math.max(lc, 0.02) }), s.k); if (a === 'call') { applyPre(s, 'call', G.S); return allinShowdown(); } applyPre(s, 'fold'); return endHand('Foldea a tu all-in.', true); }
+    // 3-bet: the opener answers from his open range
+    foldRestBehind(); G.hero3b = true;
+    const s = G.seats[o]; const openR = prePolicy(s, 'open', { p: o, S: G.S }).raise; const a = actOf(prePolicy(s, 'vs3bet', { range: openR, o, j: hp, S: G.S }), s.k);
+    if (a === 'fold') { applyPre(s, 'fold'); return endHand('Foldea a tu 3-bet.', true); }
+    if (a === 'call') { applyPre(s, 'call', parseFloat(code.slice(1))); return toFlop(); }
+    const r34 = lib(G.S, 'R34|' + hp + '|' + o);
+    if (G.S <= 45 || !r34) { applyPre(s, 'shove'); return nextSpot('R3J|' + hp + '|' + o); }
+    applyPre(s, 'raise', parseFloat(r34.sz.slice(1))); return nextSpot('R34|' + hp + '|' + o);
+  }
+  if (hist === 'ROL' || hist === 'L') {
+    const lp = +G.key.split('|')[2]; const s = G.seats[lp]; G.vill = lp;
+    // you limp behind (not from the BB): the BB checks and the pot is three-way; otherwise only you and the limper go on
+    if (code === 'C' && G.hp !== 5) { const keep = new Set([G.hp, lp, 5]); G.seats.forEach(x => { if (!keep.has(x.pos) && !x.folded) { x.folded = true; if (!x.bubble) { x.bubble = 'Fold'; log(who(x) + ' foldea'); } } }); render(); }
+    else foldRestBehind();
+    if (code === 'C') { if (G.hp !== 5) { const bb = G.seats[5]; if (!bb.folded && !bb.hero) { applyPre(bb, 'check');
+      if (G.mode === 'pre') return endHand('Fin del preflop (en este modo no se juega el resto).', false, true);
+      const lr = prePolicy(s, 'open', { p: lp, S: G.S }).limp, base = lr.some(x => x > 0) ? lr : new Float32Array(169).fill(0.4);
+      const bbR = prePolicy(bb, 'bbvslimp', {}).raise, bbC = new Float32Array(169).map((x, k) => 1 - (bbR[k] || 0));
+      return mwStart([lp, 5], [base, bbC], null); } } return toFlop(); }
+    const size = code === 'A' ? G.S : parseFloat(code.slice(1));
+    const limpR = prePolicy(s, 'open', { p: lp, S: G.S }).limp;
+    const pol = code === 'A' ? prePolicy(s, 'vsshove', { libCall: 0.08 }) : prePolicy(s, 'iso', { size, range: limpR.some(x => x > 0) ? limpR : new Float32Array(169).fill(0.4) });
+    const a = actOf(pol, s.k);
+    if (a === 'fold' || !a) { applyPre(s, 'fold'); return endHand('El limper foldea.', true); }
+    if (code === 'A') { applyPre(s, 'call', G.S); return allinShowdown(); }
+    if (a === 'call') { applyPre(s, 'call', size); return toFlop(); }
+    if (hist === 'L') { applyPre(s, 'shove'); return nextSpot('LRJ|5|4'); }
+    const r3 = lib(G.S, 'ROL3|' + hp + '|' + lp);
+    if (G.S <= 30 || !r3) { applyPre(s, 'shove'); return nextSpot('ROLJ|' + hp + '|' + lp); }
+    applyPre(s, 'raise', parseFloat(r3.sz.slice(1))); return nextSpot('ROL3|' + hp + '|' + lp);
+  }
+  if (['S', 'OVC', 'RJ', 'R3J', 'R34J', 'ROLJ', 'LJ', 'LRJ', 'LR3J'].includes(hist)) {
+    const v = +G.key.split('|')[2].split(',')[0]; G.vill = v; if (!(code === 'C' && hist === 'OVC')) foldRestBehind();
+    if (code === 'C' && hist === 'OVC') {        // all-in, a call and you call: three-way showdown with side pots
+      const c = +G.key.split('|')[2].split(',')[1], keep = new Set([G.hp, v, c]);
+      G.seats.forEach(s => { if (!keep.has(s.pos) && !s.folded) { s.folded = true; if (!s.bubble) { s.bubble = 'Fold'; log(who(s) + ' foldea'); } } });
+      applyPre(hero, 'call', Math.min(hero.stack, Math.max(G.seats[v].inv, G.seats[c].inv)));
+      G.mw = { ps: [G.hp, v, c], w: {}, reveal: true }; G.vill = null; G.street = 'allin'; G.board = G.runout.slice(0, 5);
+      log('All-in a tres. Mesa: ' + G.board.map(ctext).join(' '), 'st'); render();
+      return mwShowdown();
+    }
+    if (code === 'C') { applyPre(hero, 'call', G.seats[v].stack); return allinShowdown(); }
+    return endHand('Has foldeado.');
+  }
+  if (['R3', 'R34', 'ROL3', 'LR', 'LR3'].includes(hist)) {
+    const v = +G.key.split('|')[2]; G.vill = v;
+    if (code === 'C') return toFlop();
+    if (code === 'A') { const s = G.seats[v]; const range = new Float32Array(169).fill(0); const pr = prePolicy(s, 'open', { p: v, S: G.S }).raise; const a = actOf(prePolicy(s, 'vs4bet', { range: pr.some(x => x > 0) ? pr : new Float32Array(169).fill(0.2) }), s.k); if (a === 'call') { applyPre(s, 'call', G.S); return allinShowdown(); } applyPre(s, 'fold'); return endHand('Foldea a tu all-in.', true); }
+    if (code[0] === 'R') { const s = G.seats[v]; applyPre(s, 'shove'); const nk = { R3: 'R34J', LR: 'LR3J' }[hist]; if (nk && lib(G.S, nk + '|' + hp + '|' + v)) return nextSpot(nk + '|' + hp + '|' + v); return endHand('El rival va all-in; esta línea no está en la librería.', false, true); }
+  }
+  endHand('Fin de la mano.', false, true);
+}
+// overcalls: after a call, each player behind may also call the open. Measured in your 11.700 hands: after an open and a
+// call, the others call 18,1 % (cold-call without a caller 16,4 %, ratio 1,10) and the BB 49,3 % (53,1 %, ratio 0,93).
+// Squeezes are left out.
+const OVC = { bb: 0.93, other: 1.1 };
+function overcall(players, opener, size) {
+  for (const q of players) {
+    const s = G.seats[q]; if (s.folded || s.hero) continue;
+    const pol = prePolicy(s, 'vsopen', { j: q, o: opener, S: G.S }), pcall = (pol.call ? pol.call[s.k] : 0) * (q === 5 ? OVC.bb : OVC.other);
+    if (rnd() < pcall) { applyPre(s, 'call', size); return q; }
+    applyPre(s, 'fold');
+  }
+  return null;
+}
+function overRange(q, opener) { const s = G.seats[q], c = prePolicy(s, 'vsopen', { j: q, o: opener, S: G.S }).call; return c.some(x => x > 0) ? c : new Float32Array(169).fill(0.2); }
+function mwPre(vills, ranges, aggr) {
+  const keep = new Set([G.hp, ...vills]); G.seats.forEach(s => { if (!keep.has(s.pos) && !s.folded) { s.folded = true; if (!s.bubble) { s.bubble = 'Fold'; log(who(s) + ' foldea'); } } }); render();
+  if (G.mode === 'pre') return endHand('Fin del preflop (en este modo no se juega el resto).', false, true);
+  if (vills.concat([G.hp]).some(p => G.seats[p].inv >= G.seats[p].stack - 0.01)) { G.vill = vills[0]; vills.slice(1).forEach(p => { G.seats[p].folded = true; }); return toFlop(); }
+  return mwStart(vills, ranges, aggr);
+}
+function foldRest(p) { G.vill = p; foldRestBehind(); }
+function foldRestBehind() { const keep = new Set([G.hp, G.vill]); G.seats.forEach(s => { if (!keep.has(s.pos) && !s.folded) { const was = s.bubble; s.folded = true; if (!was) { s.bubble = 'Fold'; log(who(s) + ' foldea'); } } }); render(); }
+function nextSpot(key) {
+  const sp = lib(G.S, key); render();
+  if (!sp) return endHand('Esta línea no está en la librería.', false, true);
+  const k = G.seats[G.hp].k; if (sp.W[k] <= 0.001) { /* the library never gets here with this hand */ }
+  G.key = key; later(() => (G.mode === 'post' ? autoPreAct() : heroPre()), 350);
+}
+function autoPre() { autoPreAct(); }
+function autoPreAct() {
+  const sp = lib(G.S, G.key); G.spot = sp; const k = G.seats[G.hp].k; const F = sp.F[k];
+  let i = F.indexOf(Math.max(...F)); if (G.mode === 'post' && sp.ac[i] === 'F') { const j = sp.ac.findIndex((c, x) => c !== 'F' && F[x] > 0.15); if (j < 0) { return later(startHand, 10); } i = j; }
+  const code = sp.ac[i]; const hero = G.seats[G.hp]; const maxInv = Math.max(...G.seats.map(s => s.inv)); setHeroRange(sp, i);
+  if (code === 'F') { applyPre(hero, 'fold'); return later(startHand, 10); }
+  if (code === 'C') { if (maxInv - hero.inv <= 0.01) applyPre(hero, 'check'); else applyPre(hero, 'call', maxInv); }
+  else if (code === 'L') applyPre(hero, 'limp'); else if (code === 'A') applyPre(hero, 'shove'); else applyPre(hero, 'raise', parseFloat(code.slice(1)));
+  render(); continuePre(code);
+}
+
+// ------------------------------------------------------------------ all-in before the river
+function allinShowdown() {
+  G.street = 'allin'; const v = G.seats[G.vill], h = G.seats[G.hp]; const need = 5 - G.board.length;
+  const dead = {}; G.seats.forEach(s => s.cards.forEach(c => dead[c] = 1)); G.board.forEach(c => dead[c] = 1);
+  G.board = G.runout.slice(0, 5); G.reveal = G.vill;
+  const eff = Math.min(h.stack, v.stack); h.inv = Math.min(h.inv, eff); v.inv = Math.min(v.inv, eff);
+  const hs = ev2(h.cards[0], h.cards[1], G.board), vs = ev2(v.cards[0], v.cards[1], G.board);
+  log('All-in y pago. Mesa: ' + G.board.map(ctext).join(' '), 'st');
+  log(who(v) + ' enseña ' + v.cards.map(ctext).join(' '));
+  render();
+  const pot = potNow(); let res = hs > vs ? pot - h.inv : hs === vs ? pot / 2 - h.inv : -h.inv;
+  if (hs > vs && bounty() && v.inv >= v.stack - 0.01) { res += bounty(); log('Cobras su bounty: ' + f1(bounty()) + ' bb.'); }
+  endHand(hs > vs ? 'Ganas el bote (' + f1(pot) + ' bb).' : hs === vs ? 'Bote repartido.' : 'Pierdes el bote.', false, false, res);
+}
+
+// ------------------------------------------------------------------ postflop
+function rangeOfVillain() {
+  // the villain's preflop range, from his type and what he did
+  const v = G.seats[G.vill], t = v.type, hist0 = G.sc.key.split('|')[0];
+  let cls;
+  const vsOpenOf = o => prePolicy(v, 'vsopen', { j: v.pos, o, S: G.S });
+  if (hist0 === '') {                                  // hero opened (or limped), villain called or checked
+    if (G.key === 'LR|4|5' || G.limpPot) cls = new Float32Array(169).fill(1).map((x, k) => 1 - (prePolicy(v, 'bbvslimp', {}).raise[k]));
+    else { const pol = vsOpenOf(G.hp); cls = G.threeBetPot ? pol.raise : pol.call; }
+  } else if (hist0 === 'R') {                          // villain opened
+    const open = prePolicy(v, 'open', { p: v.pos, S: G.S }).raise;
+    cls = G.threeBetPot ? prePolicy(v, 'vs3bet', { range: open, o: v.pos, j: G.hp, S: G.S }).call : open;
+  } else if (hist0 === 'ROL' || hist0 === 'L') {
+    const lr = prePolicy(v, 'open', { p: v.pos, S: G.S }).limp; const base = lr.some(x => x > 0) ? lr : new Float32Array(169).fill(0.4);
+    cls = G.isoPot ? prePolicy(v, 'iso', { size: G.isoSize || 4, range: base }).call : base;
+  } else cls = new Float32Array(169).fill(0.3);
+  if (!cls.some(x => x > 0)) cls = new Float32Array(169).fill(0.3);
+  // the villain's own hand must be possible in his range
+  if (cls[v.k] <= 0) cls[v.k] = 0.05;
+  const w = new Float32Array(NC); const h = G.seats[G.hp].cards;
+  for (let i = 0; i < NC; i++) { const [a, b, k] = COMBOS[i]; if (a === h[0] || a === h[1] || b === h[0] || b === h[1]) continue; w[i] = cls[k]; }
+  return w;
+}
+// the villain's range in theory: the library's frequencies for his line when the library has them
+function theoryVillain() {
+  const v = G.vill, hp = G.hp, S = G.S, hist0 = G.sc.key.split('|')[0], last = G.key.split('|')[0];
+  const fromLib = (key, pred) => { const sp = lib(S, key); if (!sp) return null; const c = new Float32Array(169); let any = 0;
+    for (let k = 0; k < 169; k++) { let f = 0; sp.ac.forEach((code, a) => { if (pred(code)) f += sp.F[k][a]; }); c[k] = sp.W[k] * f; any += c[k]; } return any > 0 ? c : null; };
+  const isR = c => c[0] === 'R' || c === 'A', isC = c => c === 'C', isL = c => c === 'L';
+  let cls = null;
+  if (hist0 === '' && G.limpPot) cls = fromLib('L|5|4', isC);
+  else if (hist0 === '' && last === 'R3') cls = fromLib('R|' + v + '|' + hp, isR);
+  else if (hist0 === '' && last === 'LR') cls = fromLib('L|5|4', isR);
+  else if (hist0 === '') cls = fromLib('R|' + v + '|' + hp, isC);
+  else if (hist0 === 'R' && G.hero3b) cls = fromLib('R3|' + v + '|' + hp, isC);
+  else if (hist0 === 'R') cls = fromLib('|' + v + '|', isR);
+  else if (hist0 === 'L' && !G.isoPot) cls = fromLib('|4|', isL);
+  const w = new Float32Array(NC); const h = G.seats[G.hp].cards;
+  if (!cls) return G.vw.slice();
+  for (let i = 0; i < NC; i++) { if (CA[i] === h[0] || CA[i] === h[1] || CB[i] === h[0] || CB[i] === h[1]) continue; w[i] = cls[COMBOS[i][2]]; }
+  return w;
+}
+function toFlop() {
+  const h = G.seats[G.hp], v = G.seats[G.vill];
+  if (G.mode === 'pre') return endHand('Fin del preflop (en este modo no se juega el resto).', false, true);
+  if (v.inv >= v.stack - 0.01 || h.inv >= h.stack - 0.01) return allinShowdown();
+  const hist0 = G.sc.key.split('|')[0], last = G.key.split('|')[0];
+  G.threeBetPot = (hist0 === 'R' && !!G.hero3b) || last === 'R3';
+  G.isoPot = (hist0 === 'ROL' || hist0 === 'L') && h.inv > 1.01;
+  G.limpPot = hist0 === '' && h.inv <= 1.01;
+  G.isoSize = h.inv;
+  // who was the last preflop aggressor
+  G.aggr = G.threeBetPot ? (last === 'R3' ? G.vill : G.hp) : (hist0 === 'R' ? G.vill : (G.isoPot || (hist0 === '' && !G.limpPot)) ? G.hp : null);
+  if (last === 'R3' && G.threeBetPot) G.aggr = G.vill;
+  G.vw = rangeOfVillain();
+  G.vT = theoryVillain();
+  G.hw = new Float32Array(NC); const hk = G.seats[G.hp].k; const hc = G.hcls || new Float32Array(169).fill(0.2);
+  for (let i = 0; i < NC; i++) G.hw[i] = Math.max(hc[COMBOS[i][2]], COMBOS[i][2] === hk ? 0.03 : 0);
+  G.hT = G.hw.slice(); G.gtoPrevP = null; G.gtoP = null;
+  G.base = potNow(); G.seats.forEach(s => { s.contrib = s.inv; });
+  G.hStack = h.stack - h.inv; G.vStack = v.stack - v.inv;
+  const order = [4, 5, 0, 1, 2, 3]; G.ip = order.indexOf(G.hp) > order.indexOf(G.vill);
+  const dead = {}; G.seats.forEach(s => s.cards.forEach(c => dead[c] = 1));
+  G.deck = dead; G.board = G.runout.slice(0, 3); G.street = 'flop';
+  G.seats.forEach(s => { s.bubble = ''; });
+  startStreet();
+}
+// ---- the GTO world: theory ranges for both players (library preflop, then the equilibrium itself street after street)
+function zeroBlocked(w, board) { const bd = {}; (board || G.board).forEach(c => bd[c] = 1); for (let i = 0; i < NC; i++) if (bd[CA[i]] || bd[CB[i]]) w[i] = 0; return w; }
+// each street is solved from the ranges the equilibrium of the previous street leaves (or, if that solve is not available,
+// from the ranges narrowed like a solid regular); the solve runs in the background and never depends on how fast you play
+function gtoStreetStart() {
+  if (window.__NOGTO) { G.gtoP = Promise.resolve(null); return; }   // tests that only measure the rivals
+  const g = G, st = G.street, hp = G.ip ? 1 : 0, prevP = G.gtoPrevP || Promise.resolve(null);
+  const potS = pot(), effS = Math.min(G.hStack, G.vStack), board = G.board.slice(), hi = comboIndex(G.seats[G.hp].cards);
+  const fbH = zeroBlocked(G.hT.slice(), board), fbV = zeroBlocked(G.vT.slice(), board), vwNow = G.vw.slice();
+  const gs = G.gs = { used: false };
+  G.gtoP = prevP.then(p => p ? solverCall({ cmd: 'reach', sid: p.sid, seq: p.seq }) : null).then(r => {
+    if (G !== g && !gs.used) return null;          // the hand is over and you made no decision on this street: nothing to solve
+    let H = fbH, V = fbV;
+    if (r && r.res) { H = zeroBlocked(Float32Array.from(r.res[hp]), board); V = zeroBlocked(Float32Array.from(r.res[1 - hp]), board); }
+    if (!(H[hi] > 1e-6)) H[hi] = 1e-3;
+    let sv = 0; for (let i = 0; i < NC; i++) sv += V[i]; if (!(sv > 1e-9)) V = zeroBlocked(vwNow, board);
+    const hr = normW(H), vr = normW(V);
+    return solverCall({ cmd: 'solve', board, r0: hp ? vr : hr, r1: hp ? hr : vr, pot0: potS, eff: effS, keep: [[hp, hi]],
+      iters: st === 'flop' ? 400 : st === 'turn' ? 250 : 400, ms: st === 'flop' ? 5000 : st === 'turn' ? 4500 : 2500, K: 5, KT: 4, KR: 3 });
+  }).catch(e => { console.warn('GTO: error al preparar la calle', String(e)); return null; });
+}
+function startStreet() {
+  G.hIn = 0; G.vIn = 0; G.nAct = 0; G.lastBet = 0; G.nRaises = 0; G.aggrStreet = null;
+  const dead = {}; G.seats[G.hp].cards.forEach(c => dead[c] = 1); G.board.forEach(c => dead[c] = 1);
+  G.S2 = strength(G.board, dead);
+  for (let i = 0; i < NC; i++) if (G.vw[i] > 0 && G.S2.sc[i] < 0) G.vw[i] = 0;
+  const bd = {}; G.board.forEach(c => bd[c] = 1); G.S2h = strength(G.board, bd);
+  for (let i = 0; i < NC; i++) if (G.hw[i] > 0 && G.S2h.sc[i] < 0) G.hw[i] = 0;
+  G.rseq = [];
+  gtoStreetStart();
+  log({ flop: 'Flop', turn: 'Turn', river: 'River' }[G.street] + ': ' + G.board.map(ctext).join(' ') + ' · bote ' + f1(pot()) + ' bb', 'st');
+  G.seats.forEach(s => { s.bubble = ''; }); render();
+  G.toAct = G.ip ? 'v' : 'h';
+  step();
+}
+const pot = () => G.base + G.hIn + G.vIn;
+const ST = () => G.street;
+function step() {
+  // the street ends when both have acted and the bets are equal
+  if (G.nAct >= 2 && Math.abs(G.hIn - G.vIn) < 1e-6) return endStreet();
+  if (G.toAct === 'v') villainAct(); else heroAct();
+}
+function endStreet() {
+  const seqE = G.rseq.slice(); G.gtoPrevP = (G.gtoP || Promise.resolve(null)).then(res => res && res.ok ? { sid: res.id, seq: seqE } : null);
+  G.aggr = G.aggrStreet != null ? G.aggrStreet : null;
+  G.base = pot(); G.hStack -= G.hIn; G.vStack -= G.vIn; G.hIn = G.vIn = 0;
+  if (G.hStack <= 0.01 || G.vStack <= 0.01) return runout();
+  if (G.street === 'river') return showdown();
+  const dead = Object.assign({}, G.deck); G.board.forEach(c => dead[c] = 1);
+  G.board = G.runout.slice(0, G.board.length + 1); G.deck = dead; G.street = G.street === 'flop' ? 'turn' : 'river';
+  later(startStreet, 350);
+}
+function runout() {
+  const dead = Object.assign({}, G.deck); G.board.forEach(c => dead[c] = 1);
+  G.board = G.runout.slice(0, 5);
+  log('All-in. Mesa: ' + G.board.map(ctext).join(' '), 'st');
+  showdown();
+}
+function showdown() {
+  const h = G.seats[G.hp], v = G.seats[G.vill]; G.reveal = G.vill; render();
+  const hs = ev2(h.cards[0], h.cards[1], G.board), vs = ev2(v.cards[0], v.cards[1], G.board);
+  log(who(v) + ' enseña ' + v.cards.map(ctext).join(' ') + ' (' + describe(v.cards[0], v.cards[1], G.board) + ')');
+  const P = G.base, hc = h.stack - G.hStack; let res = hs > vs ? P - hc : hs === vs ? P / 2 - hc : -hc;
+  if (hs > vs && bounty() && G.vStack <= 0.01) { res += bounty(); log('Cobras su bounty: ' + f1(bounty()) + ' bb.'); }
+  endHand(hs > vs ? 'Ganas en el showdown con ' + describe(h.cards[0], h.cards[1], G.board) + '.' : hs === vs ? 'Bote repartido.' : 'Pierdes en el showdown.', false, false, res);
+}
+// ------------------------------------------------------------------ pots with three players after the flop
+// The solver is heads-up, so a three-way pot is played against how these two rivals play (their policies, scaled for
+// multiway: fewer bets, more folds when someone already called) and corrected with the EV against them (explotación):
+// Monte Carlo over their current ranges and the cards to come. Every player's s.inv is his total in the hand.
+const MW_ORDER = [4, 5, 0, 1, 2, 3];
+const mwLeft = p => { const s = G.seats[p]; return Math.max(0, s.stack - s.inv); };
+const mwAllin = p => mwLeft(p) <= 0.01;
+const mwPot = () => potNow();
+function mwStart(vills, ranges, aggr) {
+  const h = G.seats[G.hp];
+  G.mw = { ps: [G.hp].concat(vills), w: {}, aggr, reveal: false };
+  vills.forEach((p, j) => { const w = new Float32Array(NC), cls = ranges[j], v = G.seats[p]; if (cls[v.k] <= 0) cls[v.k] = 0.05;
+    for (let i = 0; i < NC; i++) { const [a, b, k] = COMBOS[i]; if (a === h.cards[0] || a === h.cards[1] || b === h.cards[0] || b === h.cards[1]) continue; w[i] = cls[k]; }
+    G.mw.w[p] = w; });
+  G.vill = null; G.ip = false;
+  G.board = G.runout.slice(0, 3); G.street = 'flop';
+  G.seats.forEach(s => { s.bubble = ''; });
+  log('<b>Bote a tres</b>: ' + vills.map(p => who(G.seats[p])).join(' y ') + ' contigo. Sin solución GTO (el solver es a dos): te corrijo contra cómo juegan ellos.', 'st');
+  mwStreet();
+}
+function mwStreet() {
+  const M = G.mw; M.order = MW_ORDER.filter(p => M.ps.includes(p) && !G.seats[p].folded); M.inS = {}; M.acted = {}; M.bet = 0; M.next = 0; M.callers = 0;
+  M.order.forEach(p => { M.inS[p] = 0; });
+  const dead = {}; G.seats[G.hp].cards.forEach(c => dead[c] = 1); G.board.forEach(c => dead[c] = 1);
+  G.S2 = strength(G.board, dead);
+  for (const p of M.ps) { const w = M.w[p]; if (w) for (let i = 0; i < NC; i++) if (w[i] > 0 && G.S2.sc[i] < 0) w[i] = 0; }
+  log({ flop: 'Flop', turn: 'Turn', river: 'River' }[G.street] + ': ' + G.board.map(ctext).join(' ') + ' · bote ' + f1(mwPot()) + ' bb', 'st');
+  G.seats.forEach(s => { s.bubble = ''; }); render();
+  mwStep();
+}
+function mwStep() {
+  const M = G.mw; if (G.seats[G.hp].folded) return;
+  const A = M.order.filter(p => !G.seats[p].folded);
+  if (A.length === 1) return mwWin(A[0]);
+  const need = p => !G.seats[p].folded && !mwAllin(p) && (!M.acted[p] || M.inS[p] < M.bet - 1e-6);
+  const L = M.order.length; let p = null;
+  for (let k = 0; k < L; k++) { const q = M.order[(M.next + k) % L]; if (need(q)) { p = q; M.next = (M.order.indexOf(q) + 1) % L; break; } }
+  if (p == null) return mwEndStreet();
+  // with nobody else able to act and nothing to call, the street is over
+  if (p !== G.hp && A.filter(q => q !== p && !mwAllin(q)).length === 0 && M.inS[p] >= M.bet - 1e-6) return mwEndStreet();
+  if (p === G.hp) mwHeroAct(); else mwVillainAct(p);
+}
+function mwPut(p, to) {          // player p puts chips so his street total is `to` (capped at his stack)
+  const M = G.mw, s = G.seats[p], add = Math.min(mwLeft(p), Math.max(0, to - M.inS[p])); s.inv += add; M.inS[p] += add; return add;
+}
+function mwVillainAct(p) {
+  const M = G.mw, v = G.seats[p], t = v.type, st = ST(), w = M.w[p], S = G.S2, vi = comboIndex(v.cards);
+  G.turn = p; render();
+  const facing = M.bet - M.inS[p], P = mwPot();
+  let act;
+  if (facing <= 1e-6) {
+    const last = M.order.filter(q => !G.seats[q].folded).slice(-1)[0] === p;
+    const pol = polLead(v, st, M.aggr === p ? 1 : 0, last ? 1 : 0, normW(w), S), MWL = 0.75;
+    const pb = pol.bet[vi] * MWL; act = rnd() < pb ? 'bet' : 'check';
+    let kc = 1; if (act === 'bet') { const x = rnd(); kc = x < pol.mix[vi * 3] ? 0 : x < pol.mix[vi * 3] + pol.mix[vi * 3 + 1] ? 1 : 2; }
+    for (let i = 0; i < NC; i++) if (w[i] > 0) w[i] *= act === 'bet' ? pol.bet[i] * MWL * (pol.mix[i * 3 + kc] || 0) : 1 - pol.bet[i] * MWL;
+    if (act === 'bet') { const amt = Math.max(1, Math.round(pol.ratios[kc] * (0.88 + 0.24 * rnd()) * P * 10) / 10); mwPut(p, amt); M.bet = M.inS[p]; M.callers = 0; M.aggr = p;
+      v.bubble = (mwAllin(p) ? 'All-in ' : 'Apuesta ') + f1(M.inS[p]); log(who(v) + ' apuesta ' + f1(M.inS[p]) + ' bb' + (mwAllin(p) ? ' (all-in)' : '')); }
+    else { v.bubble = 'Check'; log(who(v) + ' pasa'); }
+  } else {
+    const nw = normW(w), pol = M.inS[p] > 0 ? polFaceR(v, st, nw, S) : polFace(v, st, facing / Math.max(0.5, P - facing), nw, S);
+    const ff = M.callers > 0 ? 1.2 : 1.08;     // multiway: tighter, and tighter still when someone already called
+    const fo = new Float32Array(NC), ra = new Float32Array(NC), ca = new Float32Array(NC);
+    for (let i = 0; i < NC; i++) if (w[i] > 0) { fo[i] = Math.min(0.97, pol.fold[i] * ff); ra[i] = pol.raise[i] * 0.7; ca[i] = Math.max(0, 1 - fo[i] - ra[i]); }
+    const x = rnd(); act = x < fo[vi] ? 'fold' : x < fo[vi] + ra[vi] ? 'raise' : 'call';
+    if (act === 'raise' && mwLeft(p) <= facing + 0.01) act = 'call';
+    const pk = { fold: fo, call: ca, raise: ra }[act]; for (let i = 0; i < NC; i++) if (w[i] > 0) w[i] *= pk[i];
+    if (act === 'fold') { v.folded = true; v.bubble = 'Fold'; log(who(v) + ' foldea'); }
+    else if (act === 'call') { mwPut(p, M.bet); M.callers++; v.bubble = mwAllin(p) ? 'All-in' : 'Paga'; log(who(v) + ' paga' + (mwAllin(p) ? ' (all-in)' : '')); }
+    else { const to = Math.min(v.stack - (v.inv - M.inS[p]), Math.max(3 * M.bet, M.bet + 0.5 * P)); mwPut(p, to); M.bet = M.inS[p]; M.callers = 0; M.aggr = p;
+      v.bubble = (mwAllin(p) ? 'All-in ' : 'Sube a ') + f1(M.inS[p]); log(who(v) + (mwAllin(p) ? ' va all-in: ' : ' sube a ') + f1(M.inS[p]) + ' bb'); }
+  }
+  M.acted[p] = true; render();
+  later(mwStep, 450);
+}
+// joint samples of the live rivals' hands (from their ranges now) and of the cards to come
+function mwSamples(n) {
+  const M = G.mw, h = G.seats[G.hp].cards, act = M.order.filter(p => p !== G.hp && !G.seats[p].folded);
+  const cum = act.map(p => { const w = M.w[p], ids = [], cw = []; let s = 0; for (let i = 0; i < NC; i++) if (w[i] > 0) { s += w[i]; ids.push(i); cw.push(s); } return { p, ids, cw, s }; });
+  const out = [];
+  for (let k = 0; k < n * 4 && out.length < n; k++) {
+    const used = new Set([h[0], h[1], ...G.board]), hands = {}; let ok = true;
+    for (const c of cum) {
+      if (!c.ids.length) { ok = false; break; }
+      const x = Math.random() * c.s; let lo = 0, hi = c.ids.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (c.cw[m] < x) lo = m + 1; else hi = m; }
+      const i = c.ids[lo]; if (used.has(CA[i]) || used.has(CB[i])) { ok = false; break; } used.add(CA[i]); used.add(CB[i]); hands[c.p] = i;
+    }
+    if (!ok) continue;
+    const bd = G.board.slice(); while (bd.length < 5) { const c = Math.floor(Math.random() * 52); if (!used.has(c)) { used.add(c); bd.push(c); } }
+    const hs = ev2(h[0], h[1], bd), res = {}; for (const p in hands) { const i = hands[p]; res[p] = Math.sign(hs - ev2(CA[i], CB[i], bd)); }
+    out.push({ hands, res });
+  }
+  return { out, act };
+}
+// share of the pot the hero takes in a sample against the players in C (0 if anyone beats him, split on ties)
+function mwShare(smp, C) { let t = 0; for (const p of C) { const r = smp.res[p]; if (r < 0) return 0; if (r === 0) t++; } return 1 / (1 + t); }
+function mwOptions() {
+  const M = G.mw, st = ST(), P = mwPot(), facing = Math.max(0, M.bet - M.inS[G.hp]), left = mwLeft(G.hp);
+  const { out, act } = mwSamples(500), n = Math.max(1, out.length);
+  const last = M.order.filter(q => !G.seats[q].folded).slice(-1)[0] === G.hp, Rf = st === 'river' ? 1 : last ? 0.9 : 0.8;
+  const eqAll = out.reduce((a, s) => a + mwShare(s, act), 0) / n;
+  const opts = [];
+  // a bet or raise to street total L: each rival answers with his policy for the hand he holds in the sample
+  const aggressive = (L, label, kind, r) => {
+    const add = Math.min(left, L - M.inS[G.hp]); L = M.inS[G.hp] + add;
+    const pols = {}; act.forEach(p => { const v = G.seats[p], nw = normW(M.w[p]); pols[p] = M.inS[p] > 0 ? polFaceR(v, st, nw, G.S2) : polFace(v, st, (L - M.inS[p]) / Math.max(0.5, P), nw, G.S2); });
+    let ev = 0, foldAll = 0;
+    for (const s of out) {
+      const pr = act.map(p => { const i = s.hands[p], q = pols[p]; const f = Math.min(0.97, q.fold[i] * 1.08), r2 = q.raise[i] * 0.7; return { p, f, r: r2, c: Math.max(0, 1 - f - r2) }; });
+      let e = 0, noRaise = 1; pr.forEach(x => { noRaise *= 1 - x.r; });
+      const m = pr.length;
+      for (let mask = 0; mask < (1 << m); mask++) {
+        let pb = 1; const C = []; let callAdd = 0;
+        for (let j = 0; j < m; j++) { if (mask & (1 << j)) { pb *= pr[j].c; C.push(pr[j].p); callAdd += Math.min(mwLeft(pr[j].p) + M.inS[pr[j].p], L) - M.inS[pr[j].p]; } else pb *= pr[j].f; }
+        if (!C.length) { e += pb * P; foldAll += pb / n; continue; }
+        e += pb * ((P + add + callAdd) * mwShare(s, C) * (st === 'river' ? 1 : 0.9) - add);
+      }
+      e += (1 - noRaise) * (-add);
+      ev += e / n;
+    }
+    opts.push({ label, kind, L, r, ev, foldAll });
+  };
+  if (facing <= 1e-6) {
+    opts.push({ label: 'Check', kind: 'check', L: 0, ev: Rf * eqAll * P });
+    const R0 = { flop: [0.33, 0.75], turn: [0.6, 1.25], river: [0.33, 0.75, 1.25] }[st];
+    const seen = {}; R0.forEach(r => { let L = Math.round(r * P * 10) / 10; if (L >= left * 0.85) L = left; if (seen[L] || L <= 0) return; seen[L] = 1;
+      aggressive(L, L >= left - 0.01 ? 'All-in (' + f1(L) + ' bb)' : 'Apostar ' + f1(L) + ' bb (' + Math.round(100 * L / P) + ' %)', 'bet', r); });
+  } else {
+    opts.push({ label: 'Fold', kind: 'fold', L: 0, ev: 0 });
+    const call = Math.min(facing, left);
+    opts.push({ label: 'Pagar ' + f1(call) + ' bb' + (call >= left - 0.01 ? ' (all-in)' : ''), kind: 'call', L: M.inS[G.hp] + call, ev: Rf * eqAll * (P + call) - call, need: call / (P + call) });
+    if (left > call + 0.01) { const to = Math.min(left + M.inS[G.hp], Math.max(3 * M.bet, M.bet + 0.5 * P)); aggressive(to, to >= left + M.inS[G.hp] - 0.01 ? 'Subir all-in (' + f1(to) + ' bb)' : 'Subir a ' + f1(to) + ' bb', 'raise', 0); }
+  }
+  return { opts, P, facing, eqAll, act, n: out.length };
+}
+function mwHeroAct() {
+  G.turn = G.hp; render();
+  const o = mwOptions(); G.opts = o;
+  const h = G.seats[G.hp];
+  const pr = '<b>Tu turno</b> · ' + { flop: 'Flop', turn: 'Turn', river: 'River' }[ST()] + ' · bote ' + f1(o.P) + ' bb a tres' + (o.facing > 0 ? ' · te toca pagar ' + f1(o.facing) + ' bb' : '') + ' · tienes ' + describe(h.cards[0], h.cards[1], G.board);
+  setActions(o.opts.map((op, i) => ({ label: op.label, cls: op.kind === 'fold' ? 'fold' : '', fn: () => mwHeroPost(i) })), pr);
+}
+function mwHeroPost(i) {
+  setActions([], 'Juegan los rivales…');
+  const M = G.mw, o = G.opts, op = o.opts[i], P = o.P, h = G.seats[G.hp];
+  const best = o.opts.reduce((a, b) => b.ev > a.ev ? b : a), xloss = Math.max(0, best.ev - op.ev);
+  const v = xloss <= Math.max(0.1, 0.03 * P) ? 'ok' : xloss <= Math.max(0.4, 0.1 * P) ? 'meh' : 'bad';
+  const first = G.seats[o.act[0]];
+  const rec = { street: ST(), pkey: G.sc.key, hand: N[h.k], choice: op.label, loss: xloss, xloss, v, vt: first ? first.type : 'reg', pot: P, board: G.board.map(ctext).join(' '), basis: 'x', mw: 1 };
+  stamp(rec); G.decs.push(rec); saveDec(rec);
+  // the correction
+  const rows = o.opts.map((x, a) => '<tr class="' + (x === best ? 'best ' : '') + (a === i ? 'mine' : '') + '"><td>' + x.label + '</td><td class="' + (x.ev >= 0 ? 'pos-n' : 'neg-n') + '">' + f1s(x.ev) + ' bb</td><td>' + (x === best ? 'mejor' : '−' + f1(best.ev - x.ev)) + '</td></tr>').join('');
+  const why = ['Tienes <b>' + describe(h.cards[0], h.cards[1], G.board) + '</b>. Contra los dos rangos a la vez ganas el <b>' + pc(o.eqAll) + '</b> de las veces (' + o.n + ' muestras).'];
+  o.act.forEach(p => { const s = G.seats[p], mix = rangeMix(normW(M.w[p])); why.push(who(s) + ': ' + pc(mix.fuerte) + ' doble pareja o más, ' + pc(mix.alta) + ' pareja alta, ' + pc(mix.baja) + ' pareja media o baja' + (ST() !== 'river' ? ', ' + pc(mix.proy) + ' proyectos' : '') + ', ' + pc(mix.aire) + ' nada.'); });
+  const bets = o.opts.filter(x => x.foldAll != null); if (bets.length) why.push((bets[0].kind === 'raise' ? 'Si subes' : 'Si apuestas') + ', foldean todos ' + bets.map(x => 'el ' + pc(x.foldAll) + ' con ' + x.label.replace(/^(Apostar|Subir a|Subir)\s*/, '').replace(/^all-in/i, 'all-in')).join(' y ') + '. A tres los faroles funcionan mucho menos: hace falta que foldeen todos.');
+  const call = o.opts.find(x => x.kind === 'call'); if (call) why.push('Para pagar necesitas ganar el ' + pc(call.need) + ' contra los que siguen; tienes un ' + pc(o.eqAll) + ' (y a tres se realiza menos).');
+  $('coach').innerHTML = '<div class="verdict"><span class="vchip ' + VCH[v][1] + '">' + VCH[v][0] + '</span><span class="sit">' + { flop: 'Flop', turn: 'Turn', river: 'River' }[ST()] + ' · bote a tres · ' + G.board.map(ctext).join(' ') + ' · bote ' + f1(P) + ' bb</span></div>' +
+    '<p>' + (xloss > 0.05 && v !== 'ok' ? 'Contra estos dos rivales lo mejor es <b>' + best.label + '</b>; tu jugada da ' + f1(xloss) + ' bb menos.' : 'Contra estos dos rivales tu jugada es de las mejores.') + '</p>' +
+    '<table class="ev"><tr><th>Opción</th><th>EV</th><th>Diferencia</th></tr>' + rows + '</table><ul class="why">' + why.map(x => '<li>' + x + '</li>').join('') + '</ul>' +
+    '<p class="small">Botes a tres: el solver GTO del simulador es a dos, así que la nota es la de la explotación (EV contra cómo juegan estos rivales, con muestras de sus rangos y de las cartas que faltan). Es una aproximación: si te suben, cuento que foldeas.</p>';
+  $('rangebox').hidden = true;
+  if (op.kind === 'fold') { h.folded = true; h.bubble = 'Fold'; log('Tú foldeas'); render(); return endHand('Has foldeado.', false, false, -h.inv); }
+  if (op.kind === 'check') { h.bubble = 'Check'; log('Tú pasas'); }
+  else if (op.kind === 'call') { mwPut(G.hp, M.bet); h.bubble = mwAllin(G.hp) ? 'All-in' : 'Paga'; log('Tú pagas' + (mwAllin(G.hp) ? ' (all-in)' : '')); M.callers++; }
+  else { mwPut(G.hp, op.L); M.bet = Math.max(M.bet, M.inS[G.hp]); M.callers = 0; M.aggr = G.hp; h.bubble = (mwAllin(G.hp) ? 'All-in ' : (op.kind === 'raise' ? 'Sube a ' : 'Apuesta ')) + f1(M.inS[G.hp]); log('Tú ' + (op.kind === 'raise' ? 'subes a ' : 'apuestas ') + f1(M.inS[G.hp]) + ' bb' + (mwAllin(G.hp) ? ' (all-in)' : '')); }
+  M.acted[G.hp] = true; render();
+  later(mwStep, 400);
+}
+function mwEndStreet() {
+  const M = G.mw, A = M.order.filter(p => !G.seats[p].folded);
+  if (G.street === 'river') return mwShowdown();
+  if (A.filter(p => !mwAllin(p)).length <= 1) { G.board = G.runout.slice(0, 5); log('All-in. Mesa: ' + G.board.map(ctext).join(' '), 'st'); return mwShowdown(); }
+  G.board = G.runout.slice(0, G.board.length + 1); G.street = G.street === 'flop' ? 'turn' : 'river';
+  later(mwStreet, 350);
+}
+function mwWin(p) {
+  const res = p === G.hp ? mwPot() - G.seats[G.hp].inv : -G.seats[G.hp].inv;
+  return endHand(p === G.hp ? 'Foldean los dos: te llevas el bote (' + f1(mwPot()) + ' bb).' : 'Gana ' + who(G.seats[p]) + '.', p === G.hp, false, res);
+}
+// showdown with side pots: every level of contribution is a pot that only the players who reached it can win
+function mwShowdown() {
+  const M = G.mw, live = M.ps.filter(p => !G.seats[p].folded); M.reveal = true; render();
+  const sc = {}; live.forEach(p => { const s = G.seats[p]; sc[p] = ev2(s.cards[0], s.cards[1], G.board); if (!s.hero) log(who(s) + ' enseña ' + s.cards.map(ctext).join(' ') + ' (' + describe(s.cards[0], s.cards[1], G.board) + ')'); });
+  const levels = [...new Set(live.map(p => G.seats[p].inv))].sort((a, b) => a - b);
+  let prev = 0, won = 0, extra = ANTE + (G.dead || 0);
+  for (const lv of levels) {
+    let amt = 0; G.seats.forEach(s => { amt += Math.max(0, Math.min(s.inv, lv) - prev); }); amt += extra; extra = 0;
+    const elig = live.filter(p => G.seats[p].inv >= lv - 1e-9), top = Math.max(...elig.map(p => sc[p])), win = elig.filter(p => sc[p] === top);
+    if (win.includes(G.hp)) won += amt / win.length;
+    prev = lv;
+  }
+  let res = won - G.seats[G.hp].inv;
+  const hb = sc[G.hp], beat = live.filter(p => p !== G.hp && hb > sc[p] && mwAllin(p) && G.seats[p].inv <= G.seats[G.hp].inv + 1e-9);
+  if (bounty() && beat.length) { res += bounty() * beat.length; log('Cobras ' + (beat.length > 1 ? beat.length + ' bounties' : 'su bounty') + ': ' + f1(bounty() * beat.length) + ' bb.'); }
+  const h = G.seats[G.hp];
+  endHand(won > h.inv + 1e-6 ? 'Ganas en el showdown con ' + describe(h.cards[0], h.cards[1], G.board) + '.' : won > 1e-6 ? 'Recuperas parte del bote.' : 'Pierdes en el showdown.', false, false, res);
+}
+// calibration counters: what the simulated rivals actually do, by type, street and situation (compared with the measured
+// frequencies of your tables in the tests: scratchpad/tests/caltest.js)
+const CAL = {};
+function calAdd(k, i, n) { const a = CAL[k] || (CAL[k] = new Array(n).fill(0)); a[0]++; if (i > 0) a[i]++; }
+function villainAct() {
+  const v = G.seats[G.vill], t = v.type, st = ST(), w = G.vw, S = G.S2, vi = comboIndex(v.cards);
+  G.turn = G.vill; render();
+  const facing = G.hIn - G.vIn;
+  let act, amt = 0;
+  if (facing <= 1e-6) {
+    const ag = G.aggr === G.vill ? 1 : 0; const ip = G.ip ? 0 : 1;
+    const pol = polLead(v, st, ag, ip, normW(w), S);
+    const pb = pol.bet[vi]; act = rnd() < pb ? 'bet' : 'check'; const potB = pot();
+    calAdd('L|' + t + '|' + st + '|' + ag + '|' + ip, act === 'bet' ? 1 : 0, 2);
+    let kc = 1;
+    if (act === 'bet') { const x = rnd(); kc = x < pol.mix[vi * 3] ? 0 : x < pol.mix[vi * 3] + pol.mix[vi * 3 + 1] ? 1 : 2; }
+    for (let i = 0; i < NC; i++) if (w[i] > 0) w[i] *= act === 'bet' ? pol.bet[i] * (pol.mix[i * 3 + kc] || 0) : 1 - pol.bet[i];
+    const bsz = pol.ratios[kc] * (0.88 + 0.24 * rnd());
+    if (G.vT) theoryNarrow(G.vT, G.S2h, 1, 0, pot(), act, 0, G.aggr === G.vill ? 1 : 0, G.ip ? 0 : 1);
+    G.rseq.push({ pl: G.ip ? 0 : 1, act, r: 0 });
+    if (act === 'bet') { amt = Math.min(G.vStack, Math.max(1, Math.round(bsz * pot() * 10) / 10)); G.rseq[G.rseq.length - 1].r = amt / potB; G.rseq[G.rseq.length - 1].allin = amt >= Math.min(G.vStack, G.hStack) - 0.01; G.vIn += amt; G.aggrStreet = G.vill; v.bubble = 'Apuesta ' + f1(amt); log(who(v) + ' apuesta ' + f1(amt) + ' bb'); G.vBetInfo = { f: pol.f, l: pol.l, size: pol.size }; }
+    else { v.bubble = 'Check'; log(who(v) + ' pasa'); }
+  } else {
+    const nw = normW(w);
+    const pol = G.vIn > 0 ? polFaceR(v, st, nw, S) : polFace(v, st, facing / (pot() - facing), nw, S);
+    const x = rnd(); act = x < pol.fold[vi] ? 'fold' : x < pol.fold[vi] + pol.raise[vi] ? 'raise' : 'call';
+    if (act === 'raise' && G.vStack - G.vIn <= facing + 0.01) act = 'call';
+    calAdd(G.vIn > 0 ? 'R|' + t + '|' + st : 'F|' + t + '|' + st + '|' + szCls(facing / (pot() - facing)), { fold: 1, call: 2, raise: 3 }[act], 4);
+    if (pol.q.rs != null) { const k = 'rs' + (G.vIn > 0 ? 'R|' : 'F|') + st, a = CAL[k] || (CAL[k] = [0, 0, 0]); a[0]++; a[1] += pol.q.rs; a[2] += pol.q.fold; }
+    if (G.vT) theoryNarrow(G.vT, G.S2h, 1, facing, pot(), act, G.vIn, 0, 0);
+    G.rseq.push({ pl: G.ip ? 0 : 1, act });
+    for (let i = 0; i < NC; i++) if (w[i] > 0) w[i] *= pol[act][i];
+    if (act === 'fold') { v.folded = true; v.bubble = 'Fold'; log(who(v) + ' foldea'); render(); return endHand('El rival foldea: te llevas ' + f1(pot() - (G.hIn - G.vIn)) + ' bb.', true, false, (G.base + G.vIn) - (G.seats[G.hp].stack - G.hStack)); }
+    if (act === 'call') { amt = Math.min(G.hIn, G.vStack) - G.vIn; G.vIn += amt; if (G.vIn < G.hIn) G.hIn = G.vIn; v.bubble = G.vIn >= G.vStack - 0.01 ? 'All-in' : 'Paga'; log(who(v) + ' paga ' + f1(amt) + ' bb' + (G.vIn >= G.vStack - 0.01 ? ' (all-in)' : '')); }
+    if (act === 'raise') { const to = Math.min(G.vStack, G.vIn > 0 ? G.vStack : Math.max(3 * G.hIn, G.hIn + pot() * 0.5)); amt = to - G.vIn; G.vIn = to; G.aggrStreet = G.vill; v.bubble = (to >= G.vStack - 0.01 ? 'All-in ' : 'Sube a ') + f1(to); log(who(v) + (to >= G.vStack - 0.01 ? ' va all-in: ' : ' sube a ') + f1(to) + ' bb'); }
+  }
+  G.nAct++; G.toAct = 'h'; render();
+  if (act === 'call' && Math.abs(G.hIn - G.vIn) < 1e-6) return later(endStreet, 400);
+  later(step, 450);
+}
+function comboIndex(cs) { const a = Math.min(cs[0], cs[1]), b = Math.max(cs[0], cs[1]); return COMBOS.findIndex(c => c[0] === a && c[1] === b); }
+
+// ------------------------------------------------------------------ EV of each option for the hero (range against range model)
+function realize(st, allin) { if (allin || st === 'river') return 1; return G.ip ? 1 : (st === 'flop' ? 0.85 : 0.92); }
+const bounty = () => (G && G.cfg && G.cfg.ctx.startsWith('pko') && G.cfg.ctx.endsWith('cubre')) ? 0.25 * G.S : 0;
+function heroOptions() {
+  const BNT = bounty();
+  const st = ST(), w = normW(G.vw), S = G.S2, h = G.seats[G.hp], v = G.seats[G.vill], t = v.type;
+  const E = equities(h.cards, G.board, w); G.E = E; G.checkInfo = null;
+  const P = pot(), facing = G.vIn - G.hIn, base = G.base;
+  const hMax = G.hStack, vMax = G.vStack, effMax = Math.min(hMax, vMax);   // most each can still put in this street
+  const opts = [];
+  const sumW = f => { let s = 0; for (let i = 0; i < NC; i++) if (w[i] > 0) s += f(i); return s; };
+  const R = realize(st, false);
+  // villain's answer to a hero bet / raise to level L (street total), with hero's best answer to his raise
+  function evAgainst(L, polFn) {
+    const allin = L >= effMax - 0.01; const Rb = realize(st, allin);
+    const pol = polFn();
+    const foldPart = sumW(i => w[i] * pol.fold[i]) * (base + G.vIn + G.hIn);
+    const callPart = sumW(i => w[i] * (pol.call[i] + (allin ? pol.raise[i] : 0)) * (E[i] * ((base + 2 * L) * Rb + (allin ? BNT : 0)) - (L - G.hIn)));
+    let raisePart = 0, rr = 0;
+    const rmass = sumW(i => w[i] * pol.raise[i]);
+    if (rmass > 1e-6 && !allin) {
+      const L2 = Math.min(effMax, Math.max(3 * L, L + 0.5 * (base + 2 * L)));
+      const cEV = sumW(i => w[i] * pol.raise[i] * (E[i] * (base + 2 * L2 + (L2 >= effMax - 0.01 ? BNT : 0)) - (L2 - G.hIn)));
+      const fEV = -rmass * (L - G.hIn);
+      raisePart = Math.max(cEV, fEV); rr = rmass;
+    }
+    const fm = sumW(i => w[i] * pol.fold[i]), cm = sumW(i => w[i] * (pol.call[i] + (allin ? pol.raise[i] : 0)));
+    const eqc = cm > 0 ? sumW(i => w[i] * (pol.call[i] + (allin ? pol.raise[i] : 0)) * E[i]) / cm : 0;
+    return { ev: foldPart + callPart + raisePart, fold: fm, call: cm, raise: allin ? 0 : rr, eqc };
+  }
+  const eqAll = sumW(i => w[i] * E[i]);
+  if (facing <= 1e-6) {
+    // check
+    let evc;
+    if (G.ip) evc = eqAll * P * R;
+    else {
+      const ag = G.aggr === G.vill ? 1 : 0; const pl = polLead(v, st, ag, 1, w, S);
+      const checks = sumW(i => w[i] * (1 - pl.bet[i]) * E[i]) * P * R;
+      const bm = sumW(i => w[i] * pl.bet[i]);
+      let resp = 0, vbAvg = 0;
+      for (let kc = 0; kc < 3; kc++) {
+        const vb = Math.min(vMax, Math.max(1, pl.ratios[kc] * P)), allin = vb >= effMax - 0.01;
+        const callEV = sumW(i => w[i] * pl.bet[i] * pl.mix[i * 3 + kc] * (E[i] * ((P + 2 * vb) * realize(st, allin) + (allin ? BNT : 0)) - vb));
+        resp += Math.max(0, callEV); vbAvg += vb * sumW(i => w[i] * pl.bet[i] * pl.mix[i * 3 + kc]);
+      }
+      evc = checks + resp;
+      G.checkInfo = { bm, vb: bm > 0 ? vbAvg / bm : 0, eqb: bm > 0 ? sumW(i => w[i] * pl.bet[i] * E[i]) / bm : 0 };
+    }
+    opts.push({ kind: 'check', label: 'Check', ev: evc, L: 0 });
+    const sizes = st === 'flop' ? [0.33, 0.75] : st === 'turn' ? [0.6, 1.25] : [0.33, 0.75, 1.25];
+    const seen = {};
+    sizes.forEach(r => {
+      let B = Math.max(1, Math.round(r * P * 10) / 10); if (B >= effMax * 0.85) B = effMax; if (seen[B]) return; seen[B] = 1;
+      const x = evAgainst(B, () => polFace(v, st, B / P, w, S));
+      opts.push({ kind: 'bet', label: B >= effMax - 0.01 ? 'All-in ' + f1(B) + ' bb' : 'Apostar ' + f1(B) + ' bb (' + Math.round(100 * B / P) + ' %)', ev: x.ev, L: B, x, r: B / P });
+    });
+    if (!seen[effMax] && effMax <= 2.2 * P) { const x = evAgainst(effMax, () => polFace(v, st, effMax / P, w, S)); opts.push({ kind: 'bet', label: 'All-in ' + f1(effMax) + ' bb', ev: x.ev, L: effMax, x, r: effMax / P }); }
+  } else {
+    opts.push({ kind: 'fold', label: 'Fold', ev: 0 });
+    const callTo = Math.min(G.vIn, G.hIn + hMax); const allinCall = callTo >= effMax - 0.01 || G.vIn >= vMax - 0.01;
+    const evCall = sumW(i => w[i] * (E[i] * ((base + 2 * callTo) * realize(st, allinCall) + (allinCall ? BNT : 0)) - (callTo - G.hIn)));
+    opts.push({ kind: 'call', label: 'Pagar ' + f1(callTo - G.hIn) + ' bb', ev: evCall, L: callTo, eq: eqAll, need: (callTo - G.hIn) / (P + (callTo - G.hIn) + (allinCall ? BNT : 0)) });
+    if (!allinCall && G.nRaises < 2) {
+      let L = Math.min(effMax, Math.max(3 * G.vIn, G.vIn + P * 0.8)); if (L >= effMax * 0.8) L = effMax;
+      const x = evAgainst(L, () => polFaceR(v, st, w, S));
+      opts.push({ kind: 'raise', label: L >= effMax - 0.01 ? 'All-in ' + f1(L) + ' bb' : 'Subir a ' + f1(L) + ' bb', ev: x.ev, L, x });
+    }
+  }
+  return { opts, eqAll, P, facing };
+}
+function heroAct() {
+  G.turn = G.hp; render();
+  const o = heroOptions(); G.opts = o;
+  G.gto = null;
+  const facing = o.facing;
+  const pr = '<b>Tu turno</b> · ' + { flop: 'Flop', turn: 'Turn', river: 'River' }[ST()] + ' · bote ' + f1(o.P) + ' bb' + (facing > 0 ? ' · te apuestan ' + f1(facing) + ' bb' : '') + ' · tienes ' + describe(G.seats[G.hp].cards[0], G.seats[G.hp].cards[1], G.board) + (drawText(G.seats[G.hp].cards[0], G.seats[G.hp].cards[1], G.board) ? ' + ' + drawText(G.seats[G.hp].cards[0], G.seats[G.hp].cards[1], G.board) : '');
+  setActions(o.opts.map((op, i) => ({ label: op.label, cls: op.kind === 'fold' ? 'fold' : '', fn: () => heroPostAct(i) })), pr);
+}
+function heroPostAct(i) {
+  setActions([], 'Juega el rival…');
+  const o = G.opts, op = o.opts[i]; const best = o.opts.reduce((a, b) => b.ev > a.ev ? b : a);
+  const xloss = Math.max(0, best.ev - op.ev); const P = o.P;
+  op.allin = op.L >= Math.min(G.hStack, G.vStack) - 0.01;
+  const rec = { street: ST(), pkey: G.sc.key, hand: N[G.seats[G.hp].k], choice: op.label, loss: xloss, xloss, v: 'pend', vt: G.seats[G.vill].type, pot: P, board: G.board.map(ctext).join(' ') };
+  stamp(rec); G.decs.push(rec); const di = G.decs.length - 1; if (G.gs) G.gs.used = true;
+  const seq = G.rseq.slice(), hpl = G.ip ? 1 : 0, hi = comboIndex(G.seats[G.hp].cards), g = G, gp = G.gtoP, st0 = ST(), board0 = G.board.slice();
+  coachPost(o, i, best, xloss);
+  let done = false;
+  const finish = q => {
+    if (done) return; done = true; gradeGTO(rec, q, op, P); saveDec(rec);
+    if (G !== g) return;
+    const head = $('gtohead'); if (head && head.dataset.di === String(di)) head.innerHTML = gtoHead(rec, q, op, st0, board0, P, best);
+    const line = $('dec-' + di); if (line) line.outerHTML = decLine(rec, di);
+  };
+  (gp || Promise.resolve(null)).then(res => { if (!res || !res.ok) console.warn('GTO: sin solución', res); return res && res.ok ? solverCall({ cmd: 'query', sid: res.id, seq, pl: hpl, h: hi }) : null; })
+    .then(r => { const q = r && r.res && r.res.acts ? r.res : null; if (!q) console.warn('GTO: consulta fallida', JSON.stringify(r && r.res), JSON.stringify(seq), hpl); finish(q); }).catch(e => { console.warn('GTO: error', e); finish(null); });
+  setTimeout(() => finish(null), 120000);
+  const h = G.seats[G.hp];
+  heroNarrow(op, o);
+  if (op.kind === 'fold') { h.folded = true; h.bubble = 'Fold'; log('Tú foldeas'); render(); return endHand('Has foldeado.', false, false, -(h.stack - G.hStack + G.hIn)); }
+  if (op.kind === 'check') { h.bubble = 'Check'; log('Tú pasas'); }
+  if (op.kind === 'call') { const add = op.L - G.hIn; G.hIn = op.L; if (G.vIn > G.hIn) G.vIn = G.hIn; h.bubble = 'Paga'; log('Tú pagas ' + f1(add) + ' bb'); }
+  if (op.kind === 'bet' || op.kind === 'raise') { G.hIn = op.L; G.aggrStreet = G.hp; G.nRaises = (G.nRaises || 0) + (op.kind === 'raise' ? 1 : 0); h.bubble = (op.L >= G.hStack - 0.01 ? 'All-in ' : op.kind === 'bet' ? 'Apuesta ' : 'Sube a ') + f1(op.L); log('Tú ' + (op.kind === 'bet' ? 'apuestas ' : 'subes a ') + f1(op.L) + ' bb'); }
+  G.nAct++; G.toAct = 'v'; setActions([], 'Juega el rival…'); render();
+  if (op.kind === 'call') return later(endStreet, 400);
+  if (op.kind === 'check' && G.ip) return later(endStreet, 400);
+  later(step, 450);
+}
+// the hero's range after his action, played like a solid regular of his tables (used for the GTO comparison)
+const REGP = { type: 'reg', m: ONE };
+function theoryNarrow(w, S, pl, facing, P, kind, inBefore, ag, ip) {
+  const st = ST(), nw = normW(w); let pol, f;
+  if (facing <= 1e-6) { pol = polLead(REGP, st, ag, ip, nw, S); f = kind === 'check' ? (i => 1 - pol.bet[i]) : (i => pol.bet[i]); }
+  else { pol = inBefore > 0 ? polFaceR(REGP, st, nw, S) : polFace(REGP, st, facing / Math.max(0.1, P - facing), nw, S); f = i => (pol[kind] || pol.call)[i]; }
+  for (let i = 0; i < NC; i++) if (w[i] > 0) w[i] *= f(i);
+}
+function heroNarrow(op, o) {
+  if (!G.hw) return;
+  const st = ST(), w = normW(G.hw), S = G.S2h; let pol, f;
+  if (o.facing <= 1e-6) { pol = polLead(REGP, st, G.aggr === G.hp ? 1 : 0, G.ip ? 1 : 0, w, S); f = op.kind === 'check' ? (i => 1 - pol.bet[i]) : (i => pol.bet[i]); }
+  else { pol = G.hIn > 0 ? polFaceR(REGP, st, w, S) : polFace(REGP, st, o.facing / (o.P - o.facing), w, S); f = i => (pol[op.kind] || pol.call)[i]; }
+  for (let i = 0; i < NC; i++) if (G.hw[i] > 0) G.hw[i] *= f(i);
+  const hi = comboIndex(G.seats[G.hp].cards); if (G.hw[hi] <= 1e-6) G.hw[hi] = 1e-3;
+  if (G.hT) theoryNarrow(G.hT, S, 0, o.facing, o.P, op.kind, G.hIn, G.aggr === G.hp ? 1 : 0, G.ip ? 1 : 0);
+  G.rseq.push({ pl: G.ip ? 1 : 0, act: op.kind === 'raise' ? 'raise' : op.kind, r: op.kind === 'bet' ? op.L / o.P : 0, allin: op.L >= Math.min(G.hStack, G.vStack) - 0.01 });
+}
+
+// ------------------------------------------------------------------ coach
+function coachIdle() { $('coach').innerHTML = '<h2>Corrección</h2><p class="small">Decide en la mesa. Al momento te digo si era lo mejor, cuánto cuesta cada opción y por qué.</p>'; $('rangebox').hidden = true; }
+const VCH = { ok: ['Correcto', 'v-ok'], meh: ['Imprecisión', 'v-meh'], bad: ['Error', 'v-bad'] };
+function coachPre(sp, k, i, g) {
+  const L = sp.L[k] || sp.ac.map(() => 0), F = sp.F[k];
+  const bestI = L.indexOf(Math.min(...L));
+  const rows = sp.ac.map((code, a) => '<tr class="' + (a === bestI ? 'best ' : '') + (a === i ? 'mine' : '') + '"><td>' + acLabel(code, sp) + '</td><td>' + pc(F[a]) + '</td><td class="' + (L[a] < 0.05 ? 'pos-n' : 'neg-n') + '">' + (L[a] < 0.05 ? 'mejor' : '−' + f1(L[a]) + ' bb') + '</td></tr>').join('');
+  const why = [];
+  const mixed = F.filter(x => x >= 0.1).length > 1;
+  why.push('Con <b>' + N[k] + '</b> la tabla ' + (mixed ? 'mezcla: ' + sp.ac.map((c, a) => F[a] >= 0.1 ? acLabel(c, sp).replace(/ \d.*$/, '') + ' ' + pc(F[a]) : '').filter(Boolean).join(', ') : 'hace siempre <b>' + acLabel(sp.ac[bestI], sp) + '</b>') + '.');
+  const vsx = (G.key.split('|')[2] || '').split(',').filter(x => x !== '').map(Number);
+  if (vsx.length) { const vv = G.seats[vsx[0]].st; why.push('Este rival (' + TNAME(G.seats[vsx[0]].type) + '): VPIP ' + Math.round(vv.vpip) + ' · PFR ' + Math.round(vv.pfr) + ' · limp ' + Math.round(vv.limp) + ' · 3-bet ' + Math.round(vv.three) + ' · foldea al 3-bet ' + Math.round(vv.f3) + ' %.'); }
+  preTips(sp, k).forEach(x => why.push(x));
+  $('coach').innerHTML = '<div class="verdict"><span class="vchip ' + VCH[g.v][1] + '">' + VCH[g.v][0] + '</span><span class="sit">Preflop · ' + spotTitle(G.key) + ' · ' + G.S + ' bb</span></div>' +
+    (g.loss > 0.05 ? '<p>Tu jugada pierde <b>' + f1(g.loss) + ' bb</b> frente a lo mejor.</p>' : '') +
+    '<table class="ev"><tr><th>Opción</th><th>Tabla</th><th>EV frente a la mejor</th></tr>' + rows + '</table><ul class="why">' + why.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+  showLibRange(sp);
+}
+function nearest(arr, x) { return arr.reduce((a, b) => Math.abs(b - x) < Math.abs(a - x) ? b : a); }
+function preTips(sp, k) {
+  const tips = [], hist = G.key.split('|')[0], hp = G.hp, vs = (G.key.split('|')[2] || '').split(',').filter(x => x !== '').map(Number);
+  const vt = vs.length ? G.seats[vs[0]].type : null;
+  if (hist === '') {
+    const bb = G.seats[5], sb = G.seats[4];
+    if (hp >= 2 && hp <= 4) {
+      const t = hp === 4 ? bb.type : bb.type; const S0 = nearest([20, 30, 50], G.S); const r = M.rlab[S0 + '|' + hp + '|' + t];
+      if (r) { const best = r.rows.reduce((a, b) => b.ev > a.ev ? b : a); const gain = 100 * (best.ev - r.gto_ev);
+        tips.push('Contra esta BB (<b>' + TNAME(t) + '</b>), en el laboratorio de robos lo mejor fue abrir ' + (best.size ? 'a ' + f1(best.size) + ' bb ' : '') + 'jugando el ' + pc(best.play) + ' de tus manos (la tabla, ' + pc(r.gto_play) + '): ' + f1s(gain) + ' bb/100' + (Math.abs(gain) < 0.5 ? ', casi lo mismo' : '') + '.'); }
+    }
+    const fishBlind = [4, 5].filter(p => p !== hp && G.seats[p].type === 'fish');
+    if (fishBlind.length) tips.push('Hay un recreativo en las ciegas: defiende mucho (' + pc(rate('fish', 'st_c', 'st_n')) + ' de calls contra robos) y casi no resube. Abre algo más de manos con valor y menos faroles puros.');
+    if (G.seats[5].type === 'nit' && hp !== 5) tips.push('La BB es nit: foldea a los robos más que nadie. Roba más ancho.');
+  }
+  if (hist === 'R' && vt) {
+    const o = vs[0], S0 = nearest([20, 30, 50, 100], G.S);
+    if (vt === 'fish' && M.fish.open[S0 + '|' + o] && M.fish.open[S0 + '|' + o].resp[hp]) { const r = M.fish.open[S0 + '|' + o].resp[hp]; tips.push('Cuando un recreativo sube, lleva sobre todo manos buenas (abre solo el ' + pc(M.fish.open[S0 + '|' + o].raise_share) + ' desde ' + POS[o] + '). En el laboratorio, contra su open lo mejor fue jugar el ' + pc(1 - (r.exp.fold || 0)) + ' (la tabla, ' + pc(1 - (r.gto.fold || 0)) + '): ' + f1s(r.gain) + ' bb/100.'); }
+    else if (vt === 'nit') tips.push('Un nit abre muy pocas manos: paga y resube menos que la tabla; resube solo valor.');
+    else if (vt === 'maniac') tips.push('Un maníaco abre muchísimo (PFR ' + Math.round(G.seats[o].prof.pfr) + ' %): defiende más ancho y haz 3-bet de valor con más manos (y pagará).');
+    else if (vt === 'lag') tips.push('Un LAG abre más que la tabla: puedes defender algo más y hacer 3-bet algo más ancho por valor.');
+    else tips.push('Un regular abre parecido a la tabla: juega la tabla.');
+  }
+  if ((hist === 'ROL' || hist === 'L') && vt) {
+    const l = vs[0], S0 = nearest([20, 30, 50, 100], G.S);
+    const key = Object.keys(M.fish.iso).find(x => x === S0 + '|' + l + '|' + hp) || null;
+    if (vt === 'fish' && key) { const rows = M.fish.iso[key], best = rows.reduce((a, b) => b.ev > a.ev ? b : a); tips.push('Contra el limp de un recreativo, en el laboratorio lo mejor fue aislar a <b>' + f1(best.size) + ' bb</b> subiendo el ' + pc(1 - (best.freq.fold || 0) - (best.freq.call || 0)) + ' de tus manos.'); }
+    else if (vt === 'fish') tips.push('Contra un recreativo que hace limp: aísla grande (4–5 bb) con un rango de valor amplio; paga mucho y foldea poco.');
+    else tips.push('Un ' + TNAME(vt) + ' casi nunca hace limp: su limp puede llevar manos fuertes. No aísles con basura.');
+  }
+  if (['S', 'RJ', 'R3J', 'ROLJ', 'LJ', 'LRJ', 'OVC', 'R34J'].includes(hist)) {
+    tips.push('En las mesas reales la gente va all-in con menos manos que la tabla (laboratorio de all-in). ' + (vt === 'fish' || vt === 'maniac' ? 'Pero un ' + TNAME(vt) + ' va all-in con más manos: paga algo más ancho.' : 'Contra un ' + (vt ? TNAME(vt) : 'rival normal') + ', paga justo lo de la tabla o algo menos con las manos del límite.'));
+  }
+  if ((hist === 'R3' || hist === 'R34') && vt) {
+    const th = G.seats[vs[0]].prof.three; tips.push('Este ' + TNAME(vt) + ' hace 3-bet el ' + (th != null ? Math.round(th) + ' %' : '?') + ' de las veces. ' + (vt === 'nit' || vt === 'reg' ? 'Su 3-bet es fuerte: foldea las manos del límite.' : 'Resube mucho: defiende más ancho de lo normal.'));
+  }
+  return tips;
+}
+function showLibRange(sp) {
+  if (!SET.range) { $('rangebox').hidden = true; return; }
+  $('rangebox').hidden = false; $('rangetitle').textContent = 'La tabla para esta situación';
+  const k0 = G.seats[G.hp].k;
+  $('rng').innerHTML = N.map((h, k) => { const F = sp.F[k], W = sp.W[k]; const play = W * (1 - (sp.ac[0] === 'F' ? F[0] : 0)); const a = Math.max(0.06, play); return '<div style="background:color-mix(in srgb, var(--accent) ' + Math.round(100 * play) + '%, var(--bg))' + (k === k0 ? ';outline:2px solid var(--chip)' : '') + ';color:' + (play > 0.55 ? 'var(--accent-ink)' : 'var(--ink2)') + '">' + h.replace(/[so]$/, '') + '</div>'; }).join('');
+  $('rangecap').textContent = 'Más oscuro: se juega más (todo lo que no es fold). Tu mano va marcada.';
+}
+function showVillRange(w, title) {
+  if (!SET.range) { $('rangebox').hidden = true; return; }
+  const cls = new Float32Array(169), tot = new Float32Array(169);
+  for (let i = 0; i < NC; i++) { const k = COMBOS[i][2]; cls[k] += w[i]; }
+  let mx = 0; for (let k = 0; k < 169; k++) { cls[k] /= CMB[k]; mx = Math.max(mx, cls[k]); }
+  $('rangebox').hidden = false; $('rangetitle').textContent = title;
+  $('rng').innerHTML = N.map((h, k) => { const x = mx > 0 ? cls[k] / mx : 0; return '<div style="background:color-mix(in srgb, var(--t-' + G.seats[G.vill].type + ') ' + Math.round(100 * x) + '%, var(--bg));color:' + (x > 0.55 ? '#fff' : 'var(--ink2)') + '">' + h.replace(/[so]$/, '') + '</div>'; }).join('');
+  $('rangecap').textContent = 'Manos que puede tener ahora, según su tipo y todo lo que ha hecho en la mano (más color: más combinaciones).';
+}
+function rangeMix(w) {
+  const o = { fuerte: 0, alta: 0, baja: 0, proy: 0, aire: 0 }; let s = 0;
+  for (let i = 0; i < NC; i++) { if (!(w[i] > 0)) continue; const [a, b] = COMBOS[i]; let c = handClass(a, b, G.board); if ((c === 'aire' || c === 'baja') && G.S2.outs[i] >= 8 && G.board.length < 5) c = 'proy'; o[c] += w[i]; s += w[i]; }
+  for (const k in o) o[k] = s ? o[k] / s : 0; return o;
+}
+function mapAct(acts, op) {
+  if (op.kind === 'bet') {
+    if (op.allin) { const j = acts.findIndex(a => a.name === 'bet' && a.allin); if (j >= 0) return j; }
+    let bi = -1, bd = 1e9; acts.forEach((a, j) => { if (a.name !== 'bet') return; const d = Math.abs(Math.log(Math.max(0.05, a.size)) - Math.log(Math.max(0.05, op.r || 0.5))); if (d < bd) { bd = d; bi = j; } }); return bi;
+  }
+  if (op.kind === 'raise') return acts.findIndex(a => a.name === 'raise');
+  return acts.findIndex(a => a.name === op.kind);
+}
+// the grade: EV lost against the equilibrium with the hero's exact hand; an action the equilibrium plays often enough counts as correct
+function gradeGTO(rec, q, op, P) {
+  const ai = q ? mapAct(q.acts, op) : -1;
+  if (q && ai < 0) console.warn('GTO: acción sin equivalente', op.kind, op.label, q.acts.map(x => x.name).join(','));
+  if (!q || ai < 0) { rec.loss = rec.xloss; rec.basis = 'x'; rec.v = rec.xloss <= Math.max(0.1, 0.03 * P) ? 'ok' : rec.xloss <= Math.max(0.4, 0.1 * P) ? 'meh' : 'bad'; return; }
+  const bestEV = Math.max(...q.acts.map(a => a.ev)), mine = q.acts[ai];
+  rec.loss = Math.max(0, bestEV - mine.ev); rec.basis = 'gto'; rec.gf = mine.f;
+  const T = { flop: [0.1, 0.03, 0.4, 0.08], turn: [0.07, 0.02, 0.35, 0.07], river: [0.05, 0.015, 0.3, 0.06] }[rec.street] || [0.05, 0.015, 0.3, 0.06];
+  const okT = Math.max(T[0], T[1] * P);   // the EV decides; a frequent action in the equilibrium only gets some extra tolerance for the solver's noise
+  rec.v = rec.loss <= okT || (mine.f >= 0.25 && rec.loss <= 2 * okT) ? 'ok' : rec.loss <= Math.max(T[2], T[3] * P) ? 'meh' : 'bad';
+}
+const ACTN = (a, P) => a.name === 'check' ? 'Check' : a.name === 'fold' ? 'Fold' : a.name === 'call' ? 'Pagar' : a.name === 'bet' ? (a.allin ? 'All-in' : 'Apostar ' + Math.round(100 * a.size) + ' %') : (a.allin ? 'Subir all-in' : 'Subir');
+function gtoHead(rec, q, op, st, board, P, xbest) {
+  const sit = '<span class="sit">' + { flop: 'Flop', turn: 'Turn', river: 'River' }[st] + ' · ' + board.map(ctext).join(' ') + ' · bote ' + f1(P) + ' bb</span>';
+  if (!q) return '<div class="verdict"><span class="vchip ' + VCH[rec.v][1] + '">' + VCH[rec.v][0] + '</span>' + sit + '</div><p class="small">No he podido calcular el GTO de este spot; la nota es la de la explotación (abajo).</p>';
+  const best = q.acts.reduce((a, b) => b.ev > a.ev ? b : a), ai = mapAct(q.acts, op);
+  const rows = q.acts.map((a, j) => '<tr class="' + (a === best ? 'best ' : '') + (j === ai ? 'mine' : '') + '"><td>' + ACTN(a) + '</td><td>' + pc(a.f) + '</td><td class="' + (a.ev >= 0 ? 'pos-n' : 'neg-n') + '">' + f1s(a.ev) + ' bb</td><td>' + (a === best ? 'mejor' : '−' + f1(best.ev - a.ev)) + '</td><td>' + pc(a.fr) + '</td></tr>').join('');
+  const mixed = q.acts.filter(a => a.f >= 0.15);
+  const how = st === 'river' ? 'exacto para este árbol de apuestas' : st === 'turn' ? 'con ' + q.runs + ' rivers de muestra y un river simplificado' : 'aproximado: con ' + q.runs + ' turns de muestra (con apuestas en el turn) y el river como showdown';
+  const xb = xbest && mapAct(q.acts, xbest);
+  return '<div class="verdict"><span class="vchip ' + VCH[rec.v][1] + '">' + VCH[rec.v][0] + '</span>' + sit + '</div>' +
+    '<p>' + (mixed.length > 1 ? 'La teoría mezcla con tu mano: ' + mixed.map(a => '<b>' + ACTN(a) + '</b> ' + pc(a.f)).join(', ') + '.' : 'Según la teoría (GTO) lo mejor con tu mano es <b>' + ACTN(best) + '</b>.') + (rec.loss > 0.05 && rec.v !== 'ok' ? ' Tu jugada pierde <b>' + f1(rec.loss) + ' bb</b> frente al equilibrio.' : '') + '</p>' +
+    '<div style="overflow-x:auto"><table class="ev"><tr><th>Acción (GTO)</th><th>Con tu mano</th><th>EV</th><th>Diferencia</th><th>Con todo tu rango</th></tr>' + rows + '</table></div>' +
+    '<p class="small" style="margin-top:6px">Equilibrio entre tu rango y el suyo en teoría (librería preflop y el propio equilibrio en las calles anteriores), ' + how + '; ' + q.iters + ' iteraciones. Cuenta como correcta si pierde muy poco EV frente a la mejor (con algo más de margen si el equilibrio la usa a menudo con tu mano).' +
+    (xb >= 0 && xb !== q.acts.indexOf(best) && !(q.acts[xb].f >= 0.15) ? ' <b>Contra este rival concreto</b> gana más ' + xbest.label.toLowerCase() + ' (explotación, abajo).' : '') + '</p>';
+}
+function coachPost(o, i, best, loss) {
+  const op = o.opts[i], st = ST(), t = G.seats[G.vill].type, P = o.P, h = G.seats[G.hp];
+  const nw = normW(G.vw), mix = rangeMix(nw);
+  const rows = o.opts.map((x, a) => '<tr class="' + (x === best ? 'best ' : '') + (a === i ? 'mine' : '') + '"><td>' + x.label + '</td><td class="' + (x.ev >= 0 ? 'pos-n' : 'neg-n') + '">' + f1s(x.ev) + ' bb</td><td>' + (x === best ? 'mejor' : '−' + f1(best.ev - x.ev)) + '</td></tr>').join('');
+  const why = [];
+  why.push('Tienes <b>' + describe(h.cards[0], h.cards[1], G.board) + '</b>' + (drawText(h.cards[0], h.cards[1], G.board) ? ' con ' + drawText(h.cards[0], h.cards[1], G.board) : '') + '. Contra todo su rango ahora tienes un <b>' + pc(o.eqAll) + '</b> de equity' + (st !== 'river' && !G.ip ? ' (fuera de posición cuenta menos: no ves sus decisiones del resto de calles)' : '') + '.');
+  why.push('Su rango ahora (' + TNAME(t) + '): ' + pc(mix.fuerte) + ' doble pareja o más, ' + pc(mix.alta) + ' pareja alta, ' + pc(mix.baja) + ' pareja media o baja' + (st !== 'river' ? ', ' + pc(mix.proy) + ' proyectos' : '') + ', ' + pc(mix.aire) + ' nada.');
+  if (o.facing > 0) {
+    const call = o.opts.find(x => x.kind === 'call');
+    if (call) why.push('Para pagar ' + f1(o.facing) + ' bb en un bote de ' + f1(P) + ' necesitas ganar el <b>' + pc(call.need) + '</b>; tienes ' + pc(o.eqAll) + '.');
+  } else {
+    const bets = o.opts.filter(x => x.kind === 'bet' && x.x);
+    if (bets.length) why.push('Si apuestas, este ' + TNAME(t) + ' foldea ' + bets.map(x => pc(x.x.fold) + ' a ' + Math.round(100 * x.r) + ' %').join(', ') + '. Cuando paga, tu equity contra lo que paga: ' + bets.map(x => pc(x.x.eqc)).join(' / ') + '.');
+    if (!G.ip && G.checkInfo) why.push('Si pasas, apuesta el ' + pc(G.checkInfo.bm) + ' de las veces (' + f1(G.checkInfo.vb) + ' bb) y contra esa apuesta tendrías un ' + pc(G.checkInfo.eqb) + ' de equity.');
+  }
+  const vs = G.seats[G.vill].st; why.push('Este rival (' + (G.seats[G.vill].pid ? 'jugador ' + G.seats[G.vill].pid + ', ' : '') + TNAME(t) + '): VPIP ' + Math.round(vs.vpip) + ' · PFR ' + Math.round(vs.pfr) + ' · c-bet ' + Math.round(vs.cb) + ' % · foldea a la c-bet ' + Math.round(vs.fc) + ' % · llega al showdown ' + Math.round(vs.wtsd) + ' % · agresión ' + vs.af.toFixed(1) + '.');
+  if (bounty() && o.opts.some(x => x.L >= Math.min(G.hStack, G.vStack) - 0.01 && x.kind !== 'fold' && x.kind !== 'check')) why.push('PKO y le cubres: si los stacks entran y ganas, cobras su bounty (unos ' + f1(bounty()) + ' bb). Por eso ir all-in o pagar un all-in necesita menos equity de lo normal.');
+  postTips(st, t, o, op, best).forEach(x => why.push(x));
+  $('coach').innerHTML = '<div id="gtohead" data-di="' + (G.decs.length - 1) + '"><div class="verdict"><span class="vchip v-meh">Calculando…</span><span class="sit">' + { flop: 'Flop', turn: 'Turn', river: 'River' }[st] + ' · ' + G.board.map(ctext).join(' ') + ' · bote ' + f1(P) + ' bb</span></div><p class="small">Calculando el equilibrio GTO de esta calle (unos segundos)…</p></div>' +
+    '<h2 style="margin-top:12px">Contra este rival tal como juega (explotación)</h2>' +
+    '<p>Lo que más EV da contra él: <b>' + best.label + '</b>' + (loss > 0.05 ? '; tu jugada le da ' + f1(loss) + ' bb menos' : '') + '.</p>' +
+    '<table class="ev"><tr><th>Opción</th><th>EV</th><th>Diferencia</th></tr>' + rows + '</table><ul class="why">' + why.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+  showVillRange(G.vw, 'Rango del rival ahora');
+}
+// flop texture, the same classes as the measurements (flop_texture.py)
+function texLabel(flop) {
+  const r = flop.map(c => c >> 2).sort((a, b) => b - a), su = flop.map(c => c & 3);
+  const pair = new Set(r).size < 3, ns = new Set(su).size, suit = ns === 1 ? 'mono' : ns === 2 ? 'dos' : 'arco';
+  const hi = r[0] === 12 ? 'A' : r[0] >= 10 ? 'KQ' : r[0] >= 8 ? 'JT' : 'baja';
+  const u = [...new Set(r)].sort((a, b) => a - b);
+  const ul = u.map(x => x === 12 ? -1 : x).sort((a, b) => a - b);
+  const conn = u.length === 3 && (u[2] - u[0] <= 4 || (u.includes(12) && ul[2] - ul[0] <= 4));
+  const wet = suit === 'mono' || (conn && suit === 'dos') || (conn && !pair);
+  if (suit === 'mono') return 'monocolor';
+  if (pair) return 'doblada';
+  if (wet) return (hi === 'A' || hi === 'KQ' ? 'alta' : 'media/baja') + ' conectada';
+  return { A: 'A alta seca', KQ: 'K/Q alta seca', JT: 'J/T alta seca', baja: 'baja seca' }[hi];
+}
+function postTips(st, t, o, op, best) {
+  const tips = [], RV = M.river, K = RV.kinds[t] || null, P = o.P;
+  if (st === 'flop' && M.tex) { const lab = texLabel(G.board.slice(0, 3)), d = M.tex[lab];
+    if (d && d.pop.n >= 40) {
+      if (o.facing <= 0 && G.aggr === G.hp) tips.push('Mesa <b>' + lab + '</b>: a la c-bet pequeña foldean el ' + pc(d.pop_small.fold) + ' y a la grande el ' + pc(d.pop_big.fold) + ' (un farol pequeño necesita ~23 %, uno grande ~40 %); suben el ' + pc(d.pop.raise_) + '.' + (d.pop_small.fold < 0.23 ? ' Aquí la c-bet pequeña de farol pierde: o pasas o apuestas grande.' : ''));
+      else if (o.facing > 0 && G.aggr === G.vill) tips.push('En mesas ' + lab + ' los rivales hacen c-bet el ' + pc(d.cbet_pop) + ' de las veces' + (d.cbet_pop > 0.75 ? ': apuestan casi siempre, así que su rango de c-bet es ancho; defiende más.' : ': aquí su c-bet ya filtra algo; defiende con manos con equity.'));
+    } }
+  if (st === 'river' && o.facing > 0) {
+    const r = o.facing / (P - o.facing); const sz = r < 0.4 ? 'pequeña' : r < 0.8 ? 'media' : r < 1.3 ? 'grande' : 'sobreapuesta'; const pp = RV.pop[sz];
+    tips.push('En las mesas reales, las apuestas ' + (sz === 'sobreapuesta' ? 'de más del 130 % del bote' : sz + 's') + ' de river pierden contra una pareja alta el ' + pc(pp.farol + pp.par_baja) + ' de las veces (para pagar hace falta ' + pc(pp.need_call) + ').' + (K && K.sd >= 10 ? ' Un ' + TNAME(t) + ' va de farol el ' + pc(K.farol) + ' de sus apuestas de river.' : ''));
+    if (G.vIn > 0 && G.hIn > 0) tips.push('Ojo: si te suben en el river, es fuerte el ' + pc(RV.raises.pop.fuerte) + ' de las veces.');
+  }
+  if (st === 'river' && o.facing <= 0) tips.push('A una apuesta de river los rivales foldean: pequeña ' + pc(RV.pop['pequeña'].fold) + ', media ' + pc(RV.pop.media.fold) + ', grande ' + pc(RV.pop.grande.fold) + '. Un farol necesita ' + pc(RV.pop['pequeña'].need_bluff) + ', ' + pc(RV.pop.media.need_bluff) + ' y ' + pc(RV.pop.grande.need_bluff) + '. Con valor, apuesta el tamaño que pagan las manos peores.');
+  const SLd = M.street[st];
+  if (SLd && o.facing <= 0) {
+    if (G.aggr === G.hp && st === 'flop') tips.push('C-bet en el flop: a una pequeña (un tercio) foldean el ' + pc(SLd.cbet['pequeña'].fold) + '; un farol necesita ' + pc(SLd.cbet['pequeña'].need) + '.');
+    if (G.aggr === G.hp && st === 'turn') tips.push('Segundo barril: a uno pequeño solo foldean el ' + pc(SLd.cbet['pequeña'].fold) + ' y a uno grande el ' + pc(SLd.cbet.grande.fold) + '. Sin equity, mejor pasar.');
+    if (G.aggr === G.vill) tips.push('El agresor ha pasado: una apuesta media hace foldear al ' + pc(SLd.other.media.fold) + ' en el ' + st + '.');
+    if (SLd.kinds[t]) tips.push('Un ' + TNAME(t) + ' foldea a una apuesta en el ' + st + ' el ' + pc(SLd.kinds[t].fold) + ' de las veces (la media, ' + pc((SLd.cbet.todas.fold + SLd.other.todas.fold) / 2) + ').');
+  }
+  if (SLd && o.facing > 0 && G.hIn > 0) tips.push('Te han subido: en el ' + st + ', quien sube sigue apostando en la calle siguiente el ' + pc((SLd.raises.cr.barrel || 0.65)) + ' de las veces. Paga con manos que aguanten.');
+  if (op.kind === 'raise' && st !== 'river' && G.hIn === 0) tips.push('Check-raise de farol: en las mesas reales solo foldean el ' + pc(SLd ? SLd.raises.cr.fold : 0.34) + ' (haría falta más del ' + pc(SLd ? SLd.raises.cr.need : 0.46) + '). Haz check-raise con manos fuertes y proyectos fuertes.');
+  return tips;
+}
+
+// ------------------------------------------------------------------ end of hand and practice record
+function decLine(d, i) { return '<div class="dec ' + (d.v === 'pend' ? 'meh' : d.v) + '" id="dec-' + i + '">' + { pre: 'Preflop', flop: 'Flop', turn: 'Turn', river: 'River' }[d.street] + ': ' + d.choice + ' — ' + (d.v === 'pend' ? 'calculando el GTO…' : VCH[d.v][0] + (d.loss > 0.05 ? ' (−' + f1(d.loss) + ' bb)' : '') + (d.basis === 'gto' ? ' · GTO' : d.street !== 'pre' ? ' · explotación' : '')) + '</div>'; }
+function endHand(msg, won, skip, res) {
+  if (G.fixed && !G.obsDone) { G.obsDone = true; G.seats.forEach(s => { if (!s.pid || !s.acted) return; const p = TABLE.players.find(x => x.id === s.pid); if (!p) return; p.obs.n++; p.obs.v += s.vp ? 1 : 0; p.obs.p += s.pr ? 1 : 0; }); saveTable(); }
+  const hidden = G.vill != null && G.reveal !== G.vill && G.seats[G.vill] && !G.seats[G.vill].hero;
+  G.street = 'end'; G.turn = null; if (G.vill != null) G.reveal = G.vill; render();
+  if (res != null) log((res >= 0 ? 'Ganas ' : 'Pierdes ') + f1(Math.abs(res)) + ' bb en la mano.', 'st');
+  log(msg);
+  const tot = G.decs.reduce((a, d) => a + d.loss, 0);
+  const dl = G.decs.map((d, i) => decLine(d, i)).join('');
+  const vill = G.vill != null && G.reveal !== G.vill && G.seats[G.vill] && !G.seats[G.vill].hero ? '<p class="small">El rival tenía ' + G.seats[G.vill].cards.map(ctext).join(' ') + '.</p>' : '';
+  if (G.decs.length) {
+    const sum = document.createElement('div'); sum.style.marginTop = '12px';
+    const worst = G.decs.reduce((a, d) => (d.loss || 0) > (a.loss || 0) ? d : a);
+    sum.innerHTML = '<h2>Resumen de la mano</h2>' + dl + (G.vill != null && G.seats[G.vill] && !G.seats[G.vill].hero ? '<p class="small" style="margin-top:6px">El rival (' + TNAME(G.seats[G.vill].type) + ') tenía <b>' + G.seats[G.vill].cards.map(ctext).join(' ') + '</b>' + (G.board.length ? ' · mesa ' + G.board.map(ctext).join(' ') : '') + '.</p>' : '') +
+      (worst.loss > 0.3 ? '<p style="margin-top:6px">Lo más importante de esta mano: <b>' + { pre: 'preflop', flop: 'flop', turn: 'turn', river: 'river' }[worst.street] + '</b>, ' + worst.choice + ' te costó ' + f1(worst.loss) + ' bb. Repítela desde «Últimos fallos».</p>' : '<p class="small" style="margin-top:6px">Mano bien jugada: EV regalado ' + f1(tot) + ' bb.</p>');
+    $('coach').appendChild(sum);
+  }
+  $('prompt').innerHTML = '<b>' + msg + '</b>' + (res != null ? ' Resultado: ' + f1s(res) + ' bb.' : '') + ' Decisiones de la mano: ' + G.decs.length + ' · EV regalado ' + f1(tot) + ' bb.';
+  setActions([{ label: 'Siguiente mano', cls: 'pri', fn: startHand }], $('prompt').innerHTML);
+  if (hidden) log('El rival tenía ' + G.seats[G.vill].cards.map(ctext).join(' '));
+  if (!G.decs.length) coachIdle();
+  renderSess(); renderReads();
+  if (G.mode === 'post' && !G.decs.length) { const g = G; setTimeout(() => { if (G === g) startHand(); }, 900); }
+}
+const T0 = Date.now();
+function stamp(d) { if (d.seed != null) return; d.seed = G.seed; d.sub = 1; d.cfg = Object.assign({}, G.cfg, { mode: d.street === 'pre' ? 'full' : G.cfg.mode }); if (G.replay) d.replay = 1; }
+function saveDec(d) { d.t = Date.now(); stamp(d); HIST.push(d); if (HIST.length > 1500) HIST = HIST.slice(-1500); store.set('hist', HIST); renderSess(); }
+function leakTable() {
+  if (!M || !M.leaks) return '';
+  const L = Object.entries(M.leaks).sort((a, b) => b[1][1] - a[1][1]).slice(0, 8);
+  return '<h2 style="margin-top:14px">Tus fugas reales en torneos (preflop)</h2><p class="small">Dónde más EV regalas según tus manos de Winamax (las tres últimas semanas cuentan doble). «Practicar» te da solo esa situación; «Mis fugas» en los ajustes las mezcla según lo que más fallas.</p>' +
+    '<div class="tablewrap" style="overflow-x:auto"><table class="ev"><tr><th>Situación</th><th>Decisiones</th><th>Fallos</th><th>bb regalados</th><th></th></tr>' +
+    L.map(([k, v]) => '<tr><td>' + keyName(k) + '<br><span class="small">' + Object.entries(v[3] || {}).sort((a, b) => b[1] - a[1]).slice(0, 4).map(x => x[0]).join(' · ') + '</span></td><td>' + Math.round(v[0]) + '</td><td>' + pc(v[2] / v[0]) + '</td><td>' + f1(v[1]) + '</td><td><button class="btn" style="padding:2px 8px;font-size:12px" type="button" data-focus="' + k + '">Practicar</button></td></tr>').join('') + '</table></div>';
+}
+function renderSess() {
+  const H = HIST; const n = H.length;
+  const ok = H.filter(d => d.v === 'ok').length, lost = H.reduce((a, d) => a + d.loss, 0);
+  const S1 = H.filter(d => d.t >= T0), n1 = S1.length, ok1 = S1.filter(d => d.v === 'ok').length, l1 = S1.reduce((a, d) => a + d.loss, 0);
+  $('stats').innerHTML = '<span class="stat"><b>' + n1 + '</b>decisiones hoy</span><span class="stat"><b>' + (n1 ? pc(ok1 / n1) : '–') + '</b>correctas hoy</span><span class="stat"><b>' + (n1 ? f1(l1 / n1) : '–') + '</b>bb regalados por decisión</span>' + (n > n1 ? '<span class="stat"><b>' + n + '</b>en total · ' + pc(ok / n) + ' correctas</span>' : '');
+  if (!n) { $('sess').innerHTML = '<p class="small">Todavía no hay decisiones. Cada decisión que tomes se guarda en este navegador.</p>' + leakTable(); $('sess').querySelectorAll('[data-focus]').forEach(b => b.addEventListener('click', () => { setFocus(b.dataset.focus); window.scrollTo({ top: 0, behavior: 'smooth' }); startHand(); })); return; }
+  const grp = (f, labels) => Object.entries(labels).map(([k, lab]) => { const X = H.filter(d => f(d) === k); if (!X.length) return ''; const o = X.filter(d => d.v === 'ok').length / X.length, l = X.reduce((a, d) => a + d.loss, 0) / X.length; return '<tr><td>' + lab + '</td><td>' + X.length + '</td><td>' + pc(o) + '</td><td>' + f1(l) + '</td></tr>'; }).join('');
+  const EL = H.map((d, i) => [d, i]).filter(([d]) => d.v !== 'ok' && !d.replay).slice(-10).reverse();
+  const errs = EL.map(([d, i]) => '<div class="dec ' + d.v + '">' + { pre: 'Preflop', flop: 'Flop', turn: 'Turn', river: 'River' }[d.street] + ' · ' + d.hand + (d.board ? ' en ' + d.board : '') + (d.vt && TYPES[d.vt] ? ' contra ' + TNAME(d.vt) : '') + ': ' + d.choice + ' (−' + f1(d.loss) + ' bb)' + (d.seed != null && d.cfg ? ' <button class="btn" style="padding:2px 8px;font-size:12px" type="button" data-rep="' + i + '">Repetir</button>' : '') + '</div>').join('');
+  $('sess').innerHTML = '<table class="ev"><tr><th>Calle</th><th>Decisiones</th><th>Correctas</th><th>bb regalados</th></tr>' + grp(d => d.street, { pre: 'Preflop', flop: 'Flop', turn: 'Turn', river: 'River' }) + '</table>' +
+    '<table class="ev" style="margin-top:8px"><tr><th>Rival</th><th>Decisiones</th><th>Correctas</th><th>bb regalados</th></tr>' + grp(d => d.vt, Object.fromEntries(Object.entries(TYPES).map(([k, v]) => [k, v[0]]))) + '</table>' +
+    (errs ? '<h2 style="margin-top:12px">Últimos fallos</h2>' + errs : '') + leakTable() +
+    '<p style="margin-top:10px"><button class="btn" type="button" id="reset">Borrar mi práctica</button></p>';
+  $('reset').addEventListener('click', () => { HIST = []; store.set('hist', HIST); renderSess(); });
+  $('sess').querySelectorAll('[data-focus]').forEach(b => b.addEventListener('click', () => { setFocus(b.dataset.focus); window.scrollTo({ top: 0, behavior: 'smooth' }); startHand(); }));
+  $('sess').querySelectorAll('[data-rep]').forEach(b => b.addEventListener('click', () => replay(HIST[+b.dataset.rep])));
+}
+
+// ------------------------------------------------------------------ boot
+function fillStacks() {
+  const e = $('s-stackx'); const cur = SET.stackx; e.innerHTML = '<option value="auto">Al azar dentro del rango</option>' + STACKS().filter(x => x >= 3).map(x => '<option value="' + x + '">' + x + ' bb</option>').join(''); e.value = STACKS().includes(+cur) ? cur : 'auto';
+}
+function renderPrinciples() {
+  const R = M.river, P = R.pop, F = M.street.flop, T = M.street.turn, K = R.kinds;
+  const fishSt = rate('fish', 'st_c', 'st_n'), fishSr = rate('fish', 'st_r', 'st_n');
+  const groups = [
+    ['Antes del flop', [
+      'Juega la tabla de tu contexto (ChipEV, PKO, ICM...). Las tablas fuera de equilibrio te dicen cómo seguir cuando el rival se sale de lo normal.',
+      'Con un recreativo en las ciegas: defiende pagando el ' + pc(fishSt) + ' de los robos y resube solo el ' + pc(fishSr) + '. Abre algo más de manos con valor y menos faroles puros.',
+      'Contra el limp de un recreativo: aísla grande (4 bb en posición, más desde las ciegas) con un rango de valor amplio. Hace limp con el ' + pc(rate('fish', 'rfi_l', 'rfi_n')) + ' de sus manos.',
+      'Cuando un recreativo sube, lleva casi siempre manos buenas: juega bastante menos que contra un open normal.',
+      'All-ins: en las mesas reales se va all-in y se paga con menos manos que la tabla. Contra recreativos y maníacos, paga algo más ancho.',
+      'Con 3-bets: un regular o un nit resube fuerte (foldea lo del límite); un LAG o un maníaco resube mucho (defiende más).']],
+    ['Flop y turn', [
+      'C-bet pequeña (un tercio del bote) con casi todo: foldean el ' + pc(F.cbet['pequeña'].fold) + ' y un farol necesita ' + pc(F.cbet['pequeña'].need) + '.',
+      'Segundo barril solo con valor o proyecto: a uno pequeño foldean el ' + pc(T.cbet['pequeña'].fold) + ' (necesitas ' + pc(T.cbet['pequeña'].need) + ') y a uno grande el ' + pc(T.cbet.grande.fold) + ' (necesitas ' + pc(T.cbet.grande.need) + ').',
+      'Cuando el agresor pasa, apuesta tú: una apuesta media hace foldear al ' + pc(F.other.media.fold) + ' en el flop y al ' + pc(T.other.media.fold) + ' en el turn.',
+      'No hagas check-raise de farol: foldean el ' + pc(F.raises.cr.fold) + ' y haría falta ' + pc(F.raises.cr.need) + '. Quien te hace check-raise sigue apostando el turn el ' + pc(F.raises.cr.barrel) + ' de las veces.',
+      'A los regulares, faroles (foldean ' + pc(F.kinds.reg.fold) + ' en el flop y ' + pc(T.kinds.reg.fold) + ' en el turn); a los LAG y maníacos, valor (' + pc(F.kinds.lag.fold) + ' y ' + pc(T.kinds.lag.fold) + ').']],
+    ['River', [
+      'Apuestas pequeñas y medianas: paga con pareja. Pierden contra una pareja alta el ' + pc(P['pequeña'].farol + P['pequeña'].par_baja) + ' y el ' + pc(P.media.farol + P.media.par_baja) + ' (necesitas ' + pc(P['pequeña'].need_call) + ' y ' + pc(P.media.need_call) + ').',
+      'Apuestas grandes, all-ins y tres calles apostadas: la pareja alta va justa (' + pc(P.grande.farol + P.grande.par_baja) + ' pierden contra ella, necesitas ' + pc(P.grande.need_call) + '). Paga con doble pareja o mejor.',
+      'Regulares van de farol en el river el ' + pc(K.reg.farol) + ' de sus apuestas; recreativos el ' + pc(K.fish.farol) + '. Contra regulares foldea más; contra recreativos paga más.',
+      'Si te suben el river, créetelo: es doble pareja o mejor el ' + pc(R.raises.pop.fuerte) + ' de las veces.',
+      'Farolea apostando cuando te pasan (foldean ' + pc(P['pequeña'].fold) + ' a una pequeña, ' + pc(P.media.fold) + ' a una media), no subiendo.']]];
+  if (M.tex) groups.splice(2, 0, ['El flop según la mesa', Object.entries(M.tex).filter(([, d]) => d.pop.n >= 40).sort((a, b) => b[1].pop.n - a[1].pop.n).map(([lab, d]) =>
+    '<b>' + lab + '</b>: a la c-bet pequeña foldean ' + pc(d.pop_small.fold) + ', a la grande ' + pc(d.pop_big.fold) + '; suben ' + pc(d.pop.raise_) + '.' + (d.pop_small.fold < 0.23 ? ' La c-bet pequeña de farol no funciona aquí: pasa o apuesta grande.' : d.pop_small.fold >= 0.3 ? ' Buena mesa para c-bet pequeña con casi todo.' : ''))]);
+  if (M.postleaks && M.postleaks.all) {
+    // the GTO check of your own real hands after the flop (post_gto): how often you match the equilibrium and the costliest patterns
+    const PL = M.postleaks, ST = { flop: 'flop', turn: 'turn', river: 'river' };
+    const W = x => ({ check: 'pasar', fold: 'foldear', call: 'pagar', raise: 'subir', allin: 'all-in' })[x] || (/^bet(\d+)$/.test(x) ? 'apostar ' + x.slice(3) + ' %' : x);
+    groups.push(['Tus manos reales según el solver', ['En tus manos reales a dos después del flop aciertas el ' + pc(PL.all.ok) + ' de las decisiones y pierdes ' + PL.all.loss.toFixed(2).replace('.', ',') + ' bb por decisión frente al equilibrio (' +
+      ['flop', 'turn', 'river'].filter(s => PL.streets[s]).map(s => ST[s] + ' ' + pc(PL.streets[s].ok)).join(', ') + ' correctas).'].concat(
+      (PL.patterns || []).slice(0, 5).map(p => '<b>' + ST[p.st] + ', ' + (p.facing ? 'cuando te apuestan' : 'cuando eres el primero o te pasan') + '</b>: ' + W(p.did) + ' cuando el equilibrio prefiere ' + W(p.best) + ' (' + p.n + ' veces, ' + Math.round(p.total) + ' bb perdidos; por ejemplo ' + p.hands.slice(0, 3).join(', ') + ').'))]);
+  }
+  $('princ-body').innerHTML = groups.map(([t, xs]) => '<h2 style="margin-top:10px">' + t + '</h2><ul class="why">' + xs.map(x => '<li>' + x + '</li>').join('') + '</ul>').join('');
+}
+// play a past hand again: same settings and seed, so the seats, cards and board are the same
+function replay(d) {
+  REPLAY = d; const keep = Object.assign({}, SET); Object.assign(SET, { focus: '' }, d.cfg, { ctx: d.cfg.ctx });
+  const go = () => { HANDS = parseHands(SET.hands).list; startHand(d.seed, !!d.sub); Object.assign(SET, keep); HANDS = parseHands(SET.hands).list; window.scrollTo({ top: 0, behavior: 'smooth' }); log('Repites una mano en la que fallaste: ' + d.choice + ' (' + { pre: 'preflop', flop: 'flop', turn: 'turn', river: 'river' }[d.street] + ').', 'st'); };
+  LIBKEY = d.cfg.ctx;
+  if (LIB[LIBKEY]) go(); else fetch('../data/lib-' + LIBKEY + '.json').then(r => r.json()).then(x => { LIB[LIBKEY] = x; go(); });
+}
+function loadLib() {
+  LIBKEY = SET.ctx;
+  if (LIB[LIBKEY]) { fillStacks(); startHand(); return; }
+  setActions([], 'Cargando las tablas de ' + $('s-ctx').selectedOptions[0].textContent + '…');
+  fetch('../data/lib-' + LIBKEY + '.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => { LIB[LIBKEY] = d; fillStacks(); startHand(); })
+    .catch(() => setActions([{ label: 'Reintentar', cls: 'pri', fn: loadLib }], 'No he podido cargar las tablas. Reintenta.'));
+}
+// ------------------------------------------------------------------ your real hands as exercises
+// The decisions of your real heads-up postflop hands, reviewed with this same solver (post_gto.js): the same spot with
+// your exact cards, the EV of every action and what the equilibrium does. Errors come up more often than correct ones.
+let REAL = null;
+const RV = s => s === 'fish' ? 'recreativo' : TYPES[s] ? TNAME(s) : 'sin perfil';
+function realLine(sp) {
+  const H = POS[sp.hp], V = POS[sp.vp], agg = sp.ha === 'raise' ? H : sp.va === 'raise' ? V : null, oth = agg === H ? V : H;
+  if (sp.line === '3bp') return (agg || H) + ' resube (3-bet) y ' + (agg === H ? V : H) + ' paga';
+  if (sp.line === 'limp') return (sp.ha === 'limp' ? H : V) + ' hace limp y ' + (sp.ha === 'limp' ? V : H) + ' pasa';
+  if (sp.line === 'limp-raise') return (agg === H ? V : H) + ' hace limp, ' + (agg || V) + ' sube y ' + (agg === H ? V : H) + ' paga';
+  return (agg || V) + ' abre y ' + oth + ' paga';
+}
+function realTok(sp, t) {
+  const me = t[0] === 1, a = t[1], b = t[2], ai = t[3] ? ' (all-in)' : '';
+  const w = me ? { check: 'pasas', bet: 'apuestas ' + f1(b) + ' bb', call: 'pagas ' + f1(b) + ' bb', raise: 'subes a ' + f1(b) + ' bb', fold: 'foldeas' }
+    : { check: 'pasa', bet: 'apuesta ' + f1(b) + ' bb', call: 'paga ' + f1(b) + ' bb', raise: 'sube a ' + f1(b) + ' bb', fold: 'foldea' };
+  return (me ? 'tú ' : 'él ') + (w[a] || a) + ai;
+}
+function realPool() { const f = SET.realf || ''; return f ? REAL.filter(s => s.fk === f) : REAL; }
+function realNext() {
+  const done = store.get('real', {}), base = realPool(), all = base.filter(s => !done[s.id]);
+  if (!all.length) { const d2 = Object.assign({}, done); base.forEach(s => delete d2[s.id]); store.set('real', d2); return base[Math.floor(Math.random() * base.length)]; }
+  const err = all.filter(s => s.v !== 'ok'), ok = all.filter(s => s.v === 'ok');
+  const pool = err.length && (Math.random() < 0.7 || !ok.length) ? err : ok;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+function startReal() {
+  if (!REAL) {
+    setActions([], 'Cargando tus manos reales…');
+    fetch('../data/real_spots.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => { REAL = d.filter(s => s.acts && s.acts.length > 1); REAL.forEach(s => { s.fk = s.st + '|' + (s.acts.some(a => a[0] === 'fold') ? 'facing' : 'first'); }); startReal(); })
+      .catch(() => setActions([{ label: 'Reintentar', cls: 'pri', fn: startReal }], 'Todavía no he podido cargar tus manos reales revisadas.'));
+    return;
+  }
+  if (!REAL.length) { setActions([], 'Aún no hay decisiones reales revisadas.'); return; }
+  const fsel = $('rb-filter'); fsel.value = SET.realf || '';
+  if (!fsel.dataset.bound) { fsel.dataset.bound = 1; fsel.addEventListener('change', () => { SET.realf = fsel.value; store.set('set', SET); startReal(); }); }
+  if (!realPool().length) { SET.realf = ''; fsel.value = ''; }
+  { const pool = realPool(), dn = store.get('real', {}), seen = pool.filter(s => dn[s.id]), okS = seen.filter(s => dn[s.id][2] === 'ok').length, errs = pool.filter(s => s.v !== 'ok').length;
+    $('rb-count').textContent = pool.length + ' decisiones (' + errs + ' fallaste en la partida)' + (seen.length ? ' · llevas ' + seen.length + ', aciertas el ' + pc(okS / seen.length) : ''); }
+  const sp = realNext(), last = sp.s[sp.s.length - 1], STN = { flop: 'Flop', turn: 'Turn', river: 'River' };
+  const c = [0, 0]; last.t.forEach(t => { const p = t[0] ? 0 : 1; if (t[1] === 'raise') c[p] = t[2]; else if (t[1] === 'bet' || t[1] === 'call') c[p] += t[2]; });
+  const toCall = Math.max(0, c[1] - c[0]), potNow = last.p + c[0] + c[1];
+  $('stake').textContent = 'Tu mano real · ' + sp.tour + ' · ' + sp.d.split('-').reverse().join('/') + ' · stack efectivo ' + f1(sp.S) + ' bb al empezar la mano';
+  $('rb-board').innerHTML = last.b.map(x => cardHTML(x)).join('');
+  $('rb-hand').innerHTML = sp.c.map(x => cardHTML(x)).join('');
+  $('rb-info').textContent = 'Tú en ' + POS[sp.hp] + (sp.hip ? ' (en posición)' : ' (fuera de posición)') + ' contra ' + POS[sp.vp] + ', ' + RV(sp.vk);
+  $('rb-pot').textContent = 'Bote ' + f1(potNow) + ' bb' + (toCall > 0 ? ' · te toca pagar ' + f1(toCall) + ' bb' : '') + ' · te quedan ' + f1(last.e - c[0]) + ' bb';
+  const lines = ['<div class="st"><b>Mano real</b> · ' + sp.tour + ' · tú en ' + POS[sp.hp] + ' con ' + sp.c.map(ctext).join(' ') + '</div>', '<div>Preflop: ' + realLine(sp) + '.</div>'];
+  sp.s.forEach((s, k) => lines.push('<div>' + STN[['flop', 'turn', 'river'][k]] + ' ' + s.b.slice(k === 0 ? 0 : 2 + k).map(ctext).join(' ') + ' (bote ' + f1(s.p) + ' bb): ' + (s.t.length ? s.t.map(t => realTok(sp, t)).join(', ') : '') + (k === sp.s.length - 1 ? (s.t.length ? ', ' : '') + '<b>¿tú?</b>' : '') + '</div>'));
+  $('log').innerHTML = lines.join(''); $('log').scrollTop = 1e6;
+  const lab = a => { const n = a[0], amt = a[3], allin = amt >= last.e - 0.01;
+    return n === 'call' ? 'Pagar ' + f1(toCall) + ' bb' : n === 'raise' ? (allin ? 'Subir all-in (' + f1(amt) + ' bb)' : 'Subir a ' + f1(amt) + ' bb') : n === 'allin' ? 'All-in (' + f1(amt) + ' bb)' :
+      /^bet/.test(n) ? 'Apostar ' + n.slice(3) + ' % (' + f1(amt) + ' bb)' : { check: 'Check', fold: 'Fold' }[n] || n; };
+  coachIdle();
+  const done = store.get('real', {}), n = Object.keys(done).length, okN = Object.values(done).filter(x => x[2] === 'ok').length;
+  setActions(sp.acts.map((a, i) => ({ label: lab(a), fn: () => realAnswer(sp, i, lab, potNow) })),
+    '<b>' + STN[sp.st] + '</b> · ¿qué haces? <span class="small">(' + (n ? n + ' repasadas, ' + okN + ' correctas' : 'tus decisiones reales, revisadas con el solver') + ')</span>');
+}
+function realAnswer(sp, i, lab, potNow) {
+  const a = sp.acts[i], P = sp.pot, loss = Math.max(0, -a[2]);
+  const T = { flop: [0.1, 0.03, 0.4, 0.08], turn: [0.07, 0.02, 0.35, 0.07], river: [0.05, 0.015, 0.3, 0.06] }[sp.st], okT = Math.max(T[0], T[1] * P);
+  const v = loss <= okT || (a[1] >= 0.25 && loss <= 2 * okT) ? 'ok' : loss <= Math.max(T[2], T[3] * P) ? 'meh' : 'bad';
+  const done = store.get('real', {}); done[sp.id] = [a[0], +loss.toFixed(2), v]; store.set('real', done);
+  const bi = sp.acts.findIndex(x => x[2] === 0), ri = sp.acts.findIndex(x => x[0] === sp.did), mixed = sp.acts.filter(x => x[1] >= 0.15);
+  const rows = sp.acts.map((x, j) => '<tr class="' + (j === bi ? 'best ' : '') + (j === i ? 'mine' : '') + '"><td>' + lab(x) + (j === ri ? ' <span class="small">· lo que jugaste</span>' : '') + '</td><td>' + pc(x[1]) + '</td><td>' + (j === bi ? 'mejor' : '−' + f1(-x[2])) + '</td></tr>').join('');
+  const real = ri >= 0 ? sp.acts[ri] : null;
+  $('coach').innerHTML = '<div class="verdict"><span class="vchip ' + VCH[v][1] + '">' + VCH[v][0] + '</span><span class="sit">' + { flop: 'Flop', turn: 'Turn', river: 'River' }[sp.st] + ' · bote ' + f1(potNow) + ' bb</span></div>' +
+    '<p>' + (mixed.length > 1 ? 'La teoría mezcla con tu mano: ' + mixed.map(x => '<b>' + lab(x) + '</b> ' + pc(x[1])).join(', ') + '.' : 'Según la teoría (GTO) lo mejor con tu mano es <b>' + lab(sp.acts[bi]) + '</b>.') +
+    (loss > 0.05 && v !== 'ok' ? ' Tu respuesta pierde <b>' + f1(loss) + ' bb</b> frente al equilibrio.' : '') + '</p>' +
+    (real ? '<p>En la partida jugaste <b>' + lab(real) + '</b>' + (sp.v === 'ok' ? ', que era correcto.' : ' y perdiste ' + f1(sp.loss) + ' bb de EV frente al equilibrio.') + (ri === i ? ' Hoy has repetido la misma jugada.' : '') + '</p>' : '') +
+    '<div style="overflow-x:auto"><table class="ev"><tr><th>Acción (GTO)</th><th>Con tu mano</th><th>Diferencia</th></tr>' + rows + '</table></div>' +
+    '<p class="small" style="margin-top:6px">Revisado con el mismo solver del simulador: rangos de teoría de la librería preflop para la línea de cada uno y el equilibrio calle a calle. Las apuestas reales se asignan al tamaño más cercano del árbol. Rival en la partida: ' + RV(sp.vk) + '.</p>';
+  $('rangebox').hidden = true;
+  setActions([{ label: 'Siguiente mano', cls: 'pri', fn: startReal }], VCH[v][0] + ': ' + lab(a) + (v === 'ok' ? '' : ' · mejor: ' + lab(sp.acts[bi])));
+}
+function bindSettings() {
+  const map = { 's-ctx': 'ctx', 's-stack': 'stack', 's-stackx': 'stackx', 's-pos': 'pos', 's-mix': 'mix', 's-mode': 'mode', 's-table': 'table', 's-hud': 'hud' };
+  $('s-newtable').addEventListener('click', () => { TABLE = newTable(); saveTable(); SET.table = 'fixed'; $('s-table').value = 'fixed'; store.set('set', SET); renderReads(); startHand(); });
+  $('s-table').addEventListener('change', () => { if (SET.table === 'fixed' && !TABLE) { TABLE = newTable(); saveTable(); } renderReads(); });
+  const hi = $('s-hands'); hi.value = SET.hands || ''; const ph = () => { const r = parseHands(hi.value); HANDS = r.list; $('s-hands-msg').textContent = hi.value.trim() ? (r.list.length ? r.list.length + ' manos' : 'No reconozco esas manos') + (r.bad.length ? ' · no entiendo: ' + r.bad.join(' ') : '') : ''; };
+  ph(); hi.addEventListener('change', () => { SET.hands = hi.value; store.set('set', SET); ph(); startHand(); });
+  Object.entries(map).forEach(([id, k]) => { const e = $(id); e.value = String(SET[k]); e.addEventListener('change', () => { SET[k] = e.value; store.set('set', SET); if (k === 'ctx') loadLib(); else startHand(); }); });
+  $('s-easy').checked = SET.easy; $('s-easy').addEventListener('change', e => { SET.easy = e.target.checked; store.set('set', SET); });
+  $('s-range').checked = SET.range; $('s-range').addEventListener('change', e => { SET.range = e.target.checked; store.set('set', SET); if (!SET.range) $('rangebox').hidden = true; });
+}
+window.addEventListener('resize', () => { if (G) render(); });
+// keyboard: 1-9 pick an action, Enter or space for the next hand
+document.addEventListener('keydown', e => {
+  if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  const bs = [...document.querySelectorAll('#actions button')]; if (!bs.length) return;
+  if (/^[1-9]$/.test(e.key) && bs[+e.key - 1] && bs[0].textContent !== 'Siguiente mano') { e.preventDefault(); bs[+e.key - 1].click(); }
+  else if ((e.key === 'Enter' || e.key === ' ') && bs[0].textContent === 'Siguiente mano') { e.preventDefault(); bs[0].click(); }
+});
+bindSettings(); renderSess();
+fetch('../data/model.json').then(r => r.json()).then(d => { M = d; prepModel(); prepProfiles(); renderPrinciples(); renderSess(); setFocus(SET.focus); if (SET.table === 'fixed' && !TABLE) { TABLE = newTable(); saveTable(); } renderReads(); loadLib(); }).catch(() => { $('coach').innerHTML = '<p>No he podido cargar el modelo de rivales. Recarga la página.</p>'; });
+window.SIM = { g: () => G, cal: () => CAL, model: () => M, genPlayer, prePolicy, CMB, solverCore, solverCall, COMBOS, NC, dbg: () => { const cls = new Float32Array(169); let tot = 0; for (let i = 0; i < NC; i++) { cls[COMBOS[i][2]] += G.vw[i]; tot += G.vw[i]; } const top = [...cls.keys()].filter(k => cls[k] > 0).sort((a, b) => cls[b] - cls[a]).slice(0, 25).map(k => N[k] + ':' + cls[k].toFixed(1)); return { key: G.sc.key, now: G.key, hero: G.seats[G.hp].cards.map(ctext).join(''), board: G.board.map(ctext).join(''), vill: POS[G.vill] + ' ' + G.seats[G.vill].type, tot: tot.toFixed(1), top, three: G.threeBetPot, iso: G.isoPot, limp: G.limpPot, aggr: G.aggr }; }, start: () => startHand(), get G() { return G; }, evalCards, ev2, heroOptions, act: i => { const b = $('actions').querySelectorAll('button'); if (b[i]) b[i].click(); } };
+})();
+</script>
+
+<div class="wrap"><div class="ad" data-slot="sim-1">Publicidad</div></div>
+<script src="../assets/site.js" data-root="../"></script><script>FP.chrome('simulador');</script>
+<div class="fp-welcome" id="fp-welcome" hidden role="dialog" aria-label="Bienvenida"><div class="fpw-card">
+<div class="eyebrow">Bienvenido al simulador</div><h2 style="margin:.2em 0 .5em">Así funciona</h2>
+<ol><li><b>Ajusta tu práctica</b> (arriba): formato del torneo, stack, rivales y qué quieres entrenar.</li>
+<li><b>Decide en la mesa</b> con los botones o con las teclas 1-4.</li>
+<li><b>Lee la corrección</b> a la derecha: nota, EV que pierde cada opción frente al GTO y por qué, y cómo juega ese rival.</li>
+<li><b>Repite tus fallos</b>: en «Qué practicar» elige «Mis fugas» y saldrán más los spots que te cuestan.</li></ol>
+<button class="btn pri" type="button" id="fp-welcome-ok">Empezar</button></div></div>
+<style>.fp-welcome{position:fixed;inset:0;z-index:60;background:rgba(10,20,16,.55);display:grid;place-items:center;padding:16px}.fpw-card{background:var(--panel,#fff);color:var(--ink);border-radius:16px;max-width:520px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.35)}.fpw-card h2{font-family:'Fraunces',Georgia,serif;font-size:1.8rem}.fpw-card li{margin-bottom:8px}</style>
+<script>(function(){try{if(localStorage.getItem('fp.welcome'))return;}catch(e){}var w=document.getElementById('fp-welcome');w.hidden=false;document.getElementById('fp-welcome-ok').addEventListener('click',function(){w.hidden=true;try{localStorage.setItem('fp.welcome','1');}catch(e){}});})();</script>
+</body></html>

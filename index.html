@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forja Póker — entrenador GTO de torneos gratis</title>
+<meta name="description" content="Entrena torneos de póker gratis: simulador con corrección GTO en cada decisión, tablas preflop para ChipEV, ICM y PKO, calculadoras de equity e ICM. En español.">
+<meta name="google-site-verification" content="6n5uc1S0AmFdtetoz-giflUgl79UyptjAyrwNz95n-Q" />
+<script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+<link rel="canonical" href="https://pokerefx.netlify.app/">
+<meta property="og:title" content="Forja Póker — entrenador GTO de torneos gratis">
+<meta property="og:description" content="Simulador que te corrige cada decisión con un solver GTO, tablas preflop de torneo y calculadoras. Gratis y en español.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#17584c">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Forja Póker","applicationCategory":"GameApplication","operatingSystem":"Web","inLanguage":"es","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Entrenador de torneos de póker con solver GTO, tablas preflop y calculadoras."}</script>
+<style>
+.hero-art { position: relative; aspect-ratio: 1.15; max-width: 460px; justify-self: center; width: 100% }
+.hero-art .table { position: absolute; inset: 8% 2%; border-radius: 999px; background: radial-gradient(ellipse at 50% 35%, #23806d, #0c3a32 75%); border: 10px solid #2a3330; box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), 0 30px 60px rgba(0,0,0,.35) }
+.hero-art .cards { position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%); display: flex; gap: 6px }
+.hero-art .verdict { position: absolute; right: 0; bottom: 4%; background: var(--card); color: var(--ink); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); font-size: 13.5px; max-width: 250px }
+.hero-art .verdict b.ok { display: inline-block; background: #d7f0df; color: #1d5b35; border-radius: 6px; padding: 2px 8px; font-family: var(--display); margin-bottom: 4px }
+.hero-art .chip { position: absolute; left: 4%; top: 6%; background: #f0cf7e; color: #2a1d05; border-radius: 999px; padding: 7px 12px; font: 700 13px var(--body); box-shadow: var(--shadow) }
+.feature h3 { display: flex; gap: 10px; align-items: center }
+.feature .ico { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--bg2); font-size: 19px; flex: none }
+.steps { counter-reset: s; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)) }
+.steps li { list-style: none; counter-increment: s; position: relative; padding-left: 46px }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: -2px; width: 32px; height: 32px; border-radius: 50%; background: var(--brass); color: var(--brass-ink); display: grid; place-items: center; font: 700 15px var(--display) }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 16px }
+.cta-band { background: var(--bg2); border-radius: 20px; padding: 32px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between }
+</style>
+</head>
+<body>
+<main>
+  <section class="fp-hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">Entrenador de torneos · gratis</div>
+        <h1>Juega mano a mano contra rivales reales. <em>El solver te corrige.</em></h1>
+        <p>Un simulador de MTT 6-max donde cada decisión se compara con el equilibrio GTO y con lo que de verdad hacen los rivales: regulares, agresivos, maníacos y recreativos medidos en miles de manos reales.</p>
+        <div class="row" style="margin-top:22px">
+          <a class="btn pri" href="simulador/index.html">Empezar a entrenar</a>
+          <a class="btn" style="background:transparent;color:var(--on-felt);border-color:rgba(255,255,255,.35)" href="tablas/index.html">Ver tablas preflop</a>
+        </div>
+        <p class="small" style="color:rgba(238,246,242,.7);margin-top:14px">Sin registro para empezar. Tu progreso se guarda en tu navegador.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="table"></div>
+        <div class="chip">PKO · 25 bb · BTN</div>
+        <div class="cards"><span class="pc h">A<small>♥</small></span><span class="pc">K<small>♠</small></span><span class="pc d">7<small>♦</small></span></div>
+        <div class="verdict"><b class="ok">Correcto</b><br>Con tu mano el equilibrio apuesta 33 % el 71 %. Contra este regular, que foldea el 41 %, es aún mejor.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow">Qué tienes aquí</div>
+      <h2>Todo lo que necesitas para mejorar en torneos</h2>
+      <div class="grid" style="margin-top:18px">
+        <div class="box feature"><h3><span class="ico">♠</span>Simulador con solver</h3><p>Preflop, flop, turn y river. Un solver GTO (CFR descontado) calcula el equilibrio de cada calle y te dice cuánto EV pierde tu jugada frente a la mejor, con tu mano exacta.</p><a href="simulador/index.html">Abrir el simulador →</a></div>
+        <div class="box feature"><h3><span class="ico">▦</span>Tablas preflop de torneo</h3><p>Once librerías: ChipEV, burbuja, ITM, ICM medio, mesa final y PKO, cubriendo y cubierto, de 1 a 100 ciegas. Con la pérdida en bb de cada acción.</p><a href="tablas/index.html">Ver las tablas →</a></div>
+        <div class="box feature"><h3><span class="ico">∑</span>Calculadoras</h3><p>Equity de mano o rango contra rangos (exacta cuando se puede), ICM de Malmuth-Harville para premios, pot odds y frecuencia mínima de defensa.</p><a href="calculadoras/index.html">Calcular →</a></div>
+        <div class="box feature"><h3><span class="ico">◎</span>Laboratorio de rivales</h3><p>Más de 14.000 manos reales convertidas en respuestas: a quién farolear, con qué tamaño, en qué flops y cuándo pagar en el river. Interactivo.</p><a href="laboratorio/index.html">Explorar los datos →</a></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="ad" data-slot="home-1">Publicidad</div></div>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow">Cómo se entrena</div>
+      <h2>Tres pasos, cada día</h2>
+      <ol class="steps" style="padding:0;margin-top:20px">
+        <li><b>Elige tu formato.</b> ChipEV, PKO, burbuja, mesa final… y tu stack. El simulador reparte una situación real de esa mesa.</li>
+        <li><b>Decide.</b> Al instante ves la nota: correcto, imprecisión o error, cuánto pierdes en bb y por qué, con el rango del rival.</li>
+        <li><b>Repite tus fallos.</b> El modo «Mis fugas» te pone más a menudo lo que fallas, hasta que deje de costarte.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="stats">
+        <div class="box kpi"><b>11</b><span>librerías preflop de torneo</span></div>
+        <div class="box kpi"><b>1–100 bb</b><span>todas las profundidades de stack</span></div>
+        <div class="box kpi"><b>3 calles</b><span>resueltas por el solver en tu navegador</span></div>
+        <div class="box kpi"><b>0 €</b><span>para siempre en lo esencial</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="eyebrow">Rangos más buscados</div>
+      <h2>Tablas listas para consultar</h2>
+      <p>Cientos de tablas preflop de torneo, una por posición, stack y situación. <a href="rangos/">Ver todas →</a></p>
+      <div class="row" style="gap:8px"><a class="btn" href="rangos/open-btn-20bb/">Open BTN 20 bb</a><a class="btn" href="rangos/open-co-25bb/">Open CO 25 bb</a><a class="btn" href="rangos/bb-vs-open-btn-20bb/">BB contra BTN 20 bb</a><a class="btn" href="rangos/bb-vs-all-in-sb-10bb/">BB call contra push SB 10 bb</a><a class="btn" href="rangos/open-btn-10bb/">Push/fold BTN 10 bb</a><a class="btn" href="rangos/bb-vs-limp-sb-25bb/">BB contra limp SB 25 bb</a><a class="btn" href="rangos/sb-limp-vs-subida-bb-20bb/">SB limp y la BB sube 20 bb</a><a class="btn" href="rangos/open-utg-40bb/">Open UTG 40 bb</a><a class="btn" href="rangos/bb-vs-open-co-100bb/">BB contra CO 100 bb</a></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="cta-band">
+        <div><h2 style="margin:0 0 6px">¿Listo para tu próxima sesión?</h2><p style="margin:0">Diez minutos de simulador antes de jugar valen más que una hora de vídeos.</p></div>
+        <a class="btn pri" href="simulador/index.html">Entrenar ahora</a>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="assets/site.js" data-root=""></script>
+<script>FP.chrome('');</script>
+</body>
+</html>

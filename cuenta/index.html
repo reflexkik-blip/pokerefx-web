@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi cuenta y progreso — Forja Póker</title>
+<meta name="description" content="Tu progreso en Forja Póker: decisiones, acierto y EV perdido por calle, exportar e importar tus datos.">
+<link rel="canonical" href="https://pokerefx.netlify.app/cuenta/">
+<script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+
+<meta property="og:title" content="Mi cuenta y progreso — Forja Póker"><meta property="og:description" content="Tu progreso en Forja Póker: decisiones, acierto y EV perdido por calle, exportar e importar tus datos."><meta property="og:type" content="website">
+<meta name="theme-color" content="#17584c">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+
+
+</head>
+<body>
+<main>
+<section><div class="wrap"><div class="eyebrow">Mi cuenta</div><h1>Tu progreso</h1>
+<p>Sin registro, tu progreso vive en este navegador. Exporta una copia para llevarlo a otro dispositivo. Las cuentas en la nube (registro con email y sincronización) llegan pronto.</p>
+<div class="grid" id="acc-kpi" style="margin-top:16px"></div>
+<div class="box" style="margin-top:16px"><h2 style="font-size:1.3rem">Por calle</h2><div class="tw" id="acc-st"></div></div>
+<div class="box" style="margin-top:16px"><h2 style="font-size:1.3rem">Tus datos</h2>
+<div class="row"><label class="f" style="flex:1 1 220px">Tu nombre en la web<input type="text" id="acc-name" maxlength="40" autocomplete="nickname"></label>
+<button class="btn" type="button" id="acc-exp">Exportar progreso</button><label class="btn" style="cursor:pointer">Importar progreso<input type="file" id="acc-imp" accept="application/json" hidden></label>
+<button class="btn" type="button" id="acc-del">Borrar todo</button></div><p class="small" id="acc-msg" style="margin-top:8px"></p></div>
+</div></section>
+</main>
+<script src="../assets/site.js" data-root="../"></script>
+<script>FP.chrome('cuenta');</script>
+<script src="../assets/cuenta.js"></script>
+</body>
+</html>
