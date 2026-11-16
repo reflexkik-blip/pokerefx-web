@@ -45,7 +45,7 @@
     const item = x => { const [h, c] = heat(x.id); return '<button type="button" class="di' + (cur && cur.id === x.id ? ' on' : '') + '" data-id="' + x.id + '"><span class="dot" style="background:' + c + '"></span><span>' + x.t + ' <small>' + x.S + ' bb</small></span><em>' + h + '</em></button>'; };
     $('e-today').innerHTML = (dd.concat(fresh)).map(item).join('') || '<p class="small">Nada pendiente hoy. Elige cualquier rango abajo.</p>';
     const groups = [...new Set(D.map(x => x.g))];
-    $('e-all').innerHTML = groups.map(g => '<details' + (g === 'Open' ? ' open' : '') + '><summary>' + g + '</summary>' + D.filter(x => x.g === g).map(item).join('') + '</details>').join('');
+    $('e-all').innerHTML = groups.map(g => '<details><summary>' + g + '</summary>' + D.filter(x => x.g === g).map(item).join('') + '</details>').join('');
     document.querySelectorAll('.di').forEach(b => b.addEventListener('click', () => open(D.find(x => x.id === b.dataset.id))));
   }
 
