@@ -15,22 +15,24 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..700&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="../assets/site.css">
 
-
+<style>.plans{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}.plan h3{margin:0}.plan .price{font:700 28px var(--display);margin:6px 0 10px}.plan ul{padding-left:18px;margin:0 0 14px}.plan.hot{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass) inset}</style>
 </head>
 <body>
 <main>
 <section><div class="wrap"><div class="eyebrow">Mi cuenta</div><h1>Tu progreso</h1>
-<p>Sin registro, tu progreso vive en este navegador. Exporta una copia para llevarlo a otro dispositivo. Las cuentas en la nube (registro con email y sincronización) llegan pronto.</p>
+<p>Tu progreso vive en este navegador; con una cuenta lo tienes en todos tus dispositivos.</p>
+<div class="box" style="margin-top:16px"><h2 style="font-size:1.3rem">Cuenta</h2><div id="acc-cloud"></div></div>
 <div class="grid" id="acc-kpi" style="margin-top:16px"></div>
 <div class="box" style="margin-top:16px"><h2 style="font-size:1.3rem">Por calle</h2><div class="tw" id="acc-st"></div></div>
 <div class="box" style="margin-top:16px"><h2 style="font-size:1.3rem">Tus datos</h2>
 <div class="row"><label class="f" style="flex:1 1 220px">Tu nombre en la web<input type="text" id="acc-name" maxlength="40" autocomplete="nickname"></label>
 <button class="btn" type="button" id="acc-exp">Exportar progreso</button><label class="btn" style="cursor:pointer">Importar progreso<input type="file" id="acc-imp" accept="application/json" hidden></label>
 <button class="btn" type="button" id="acc-del">Borrar todo</button></div><p class="small" id="acc-msg" style="margin-top:8px"></p></div>
+<h2 style="margin-top:32px" id="planes">Planes</h2><div class="plans" id="acc-plans"></div>
 </div></section>
 </main>
 <script src="../assets/site.js" data-root="../"></script>
 <script>FP.chrome('cuenta');</script>
-<script src="../assets/cuenta.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="../assets/cuenta.js"></script><script src="../assets/auth.js"></script>
 </body>
 </html>
