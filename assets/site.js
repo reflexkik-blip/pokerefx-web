@@ -19,7 +19,7 @@
     h.innerHTML = '<div class="fp-wrap"><a class="brand" href="' + root + 'index.html">' + LOGO + 'Forja Póker</a>' +
       '<button class="navbtn" type="button" aria-expanded="false" aria-controls="nav">Menú</button>' +
       '<nav class="nav" id="nav">' + NAV.map(([p, l]) => '<a href="' + root + p + '/index.html"' + (p === active ? ' aria-current="page"' : '') + '>' + l + '</a>').join('') +
-      '<button class="theme" type="button" title="Tema claro u oscuro" aria-label="Cambiar tema">◐</button></nav></div>';
+      '<button class="theme" type="button" title="Tema claro u oscuro" aria-label="Cambiar tema"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></nav></div>';
     document.body.prepend(h);
     const nb = h.querySelector('.navbtn'), nav = h.querySelector('.nav');
     nb.addEventListener('click', () => { const o = nav.classList.toggle('open'); nb.setAttribute('aria-expanded', o); });
