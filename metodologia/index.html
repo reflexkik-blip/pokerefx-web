@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cómo calculamos y verificamos las tablas de póker | Forja Póker</title>
+<meta name="description" content="Modelo, solver y verificación de las tablas preflop de Forja Póker: comparación con tablas Nash push/fold publicadas y auditoría de coherencia de 375 rangos.">
+<link rel="canonical" href="https://pokerefx.netlify.app/metodologia/">
+<script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+
+<meta property="og:title" content="Cómo calculamos y verificamos las tablas de póker | Forja Póker"><meta property="og:description" content="Modelo, solver y verificación de las tablas preflop de Forja Póker: comparación con tablas Nash push/fold publicadas y auditoría de coherencia de 375 rangos."><meta property="og:type" content="website"><meta property="og:url" content="https://pokerefx.netlify.app/metodologia/"><meta property="og:image" content="https://pokerefx.netlify.app/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="es_ES"><meta property="og:site_name" content="Forja Póker"><meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#17584c">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+
+
+</head>
+<body>
+<main>
+<section><div class="wrap prose"><div class="eyebrow">Transparencia</div><h1>Cómo calculamos las tablas y cómo las verificamos</h1>
+<p>Una tabla solo sirve si te puedes fiar de ella. Aquí explicamos qué modelo usamos, qué supuestos hay detrás y cómo comprobamos que los números cuadran con fuentes independientes.</p>
+<h2>El modelo</h2>
+<ul><li><b>Formato:</b> torneo 6-max, ante de 1 bb pagado por la ciega grande (big blind ante), stacks iguales.</li>
+<li><b>Equity:</b> enumeración exacta de las 1.326 combinaciones de cada mano contra cada mano, con los bloqueos de cartas.</li>
+<li><b>Solver:</b> minimización del arrepentimiento contrafactual (CFR) sobre el árbol preflop completo: open, limp, 3-bet, 4-bet, all-in, squeeze y botes limpeados. Las estrategias se resuelven hasta que ninguna mano puede ganar más de unas centésimas de ciega cambiando de acción.</li>
+<li><b>Postflop:</b> el valor de llegar al flop se estima con un modelo de realización de equity calibrado con más de 14.000 manos reales de torneo. Es la principal aproximación del modelo: en spots con mucho juego postflop (stacks profundos) los rangos son buenos puntos de partida, no verdades exactas.</li>
+<li><b>ICM y PKO:</b> los formatos de burbuja, ITM, mesa final y PKO usan el modelo de Malmuth-Harville o el valor de las recompensas sobre el mismo árbol.</li></ul>
+<h2>Verificación 1: push/fold heads-up contra una tabla Nash publicada</h2>
+<p>Con nuestro mismo motor de equity resolvemos el push/fold de ciega pequeña contra ciega grande sin ante y lo comparamos con la tabla Nash publicada por <a href="https://www.pokerstrategy.com/strategy/sit-and-go/1779/" rel="noopener">PokerStrategy</a>:</p>
+<div class="tw"><table class="t"><tr><th>Stack</th><th>SB push (nuestro)</th><th>SB push (publicado)</th><th>BB call (nuestro)</th><th>BB call (publicado)</th></tr><tr><td>5 bb</td><td>71,5 %</td><td>74,1 %</td><td>62,0 %</td><td>68,6 %</td></tr><tr><td>8 bb</td><td>61,9 %</td><td>62,6 %</td><td>45,0 %</td><td>48,4 %</td></tr><tr><td>10 bb</td><td>58,3 %</td><td>56,6 %</td><td>37,4 %</td><td>38,5 %</td></tr><tr><td>12 bb</td><td>53,4 %</td><td>51,4 %</td><td>33,0 %</td><td>33,0 %</td></tr><tr><td>15 bb</td><td>45,7 %</td><td>45,7 %</td><td>28,6 %</td><td>28,4 %</td></tr><tr><td>20 bb</td><td>40,3 %</td><td>40,9 %</td><td>21,7 %</td><td>21,7 %</td></tr></table></div>
+<p>De 8 a 20 ciegas las diferencias son de 0 a 2 puntos, que es lo que varían entre sí los distintos calculadores (la tabla publicada redondea los rangos a escalones de manos). Con 5 ciegas la diferencia es algo mayor: ahí casi cualquier mano es un push y pequeñas diferencias en cómo se ordenan las manos marginales mueven el porcentaje.</p>
+<h2>Verificación 2: coherencia interna</h2>
+<p>Revisamos automáticamente las 375 tablas de open y de call contra all-in buscando «huecos»: una mano que se juega mientras otra estrictamente mejor de la misma forma se foldea. Solo aparecen 3 casos, y los tres son A5o jugándose antes que A6o, un patrón conocido del equilibrio (el 5 forma escalera con A-2-3-4 y bloquea manos del rival).</p>
+<h2>Verificación 3: tamaño de la subida de la SB</h2>
+<p>Comparamos cinco estrategias para la ciega pequeña (limp + subida de 2,5, 3 o 3,5 bb, y subir sin limp). El tamaño apenas cambia el EV y el limp aporta entre 0,05 y 0,11 bb por mano a partir de 14 ciegas: <a href="../aprende/ciega-pequena-limp-o-subir.html">ver los números</a>.</p>
+<h2>Límites</h2>
+<p>Ningún modelo es perfecto. Si ves una tabla que no te cuadra, escríbenos: la revisamos y, si hace falta, la recalculamos. Seguimos ampliando el árbol (más tamaños de subida, respuestas al squeeze, cold 4-bet) y recalculando con más iteraciones.</p>
+</div></section>
+</main>
+<script src="../assets/site.js" data-root="../"></script>
+<script>FP.chrome('tablas');</script>
+
+</body>
+</html>
