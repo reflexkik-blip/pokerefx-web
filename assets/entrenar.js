@@ -9,7 +9,7 @@
   const N = []; for (let i = 0; i < 13; i++) for (let j = 0; j < 13; j++) N.push(i === j ? RK[i] + RK[j] : i < j ? RK[i] + RK[j] + 's' : RK[j] + RK[i] + 'o');
   const CMB = N.map(h => h.length === 2 ? 6 : h[2] === 's' ? 4 : 12);
   const kind = c => c === 'F' ? 'F' : c === 'C' ? 'C' : c === 'L' ? 'L' : c === 'A' ? 'A' : 'R';
-  const name = c => ({ F: 'Fold', C: 'Pagar', L: 'Limp', A: 'All-in' })[c] || 'Subir ' + c.slice(1).replace('.', ',');
+  const name = c => ({ F: 'Fold', C: 'Pagar', L: 'Limp', A: 'All-in' })[c] || (c.length > 1 ? 'Subir ' + c.slice(1).replace('.', ',') : 'Subir');
   const COL = { F: 'var(--fold)', C: 'var(--call)', L: 'var(--limp)', A: 'var(--allin)', R: 'var(--raise)' };
   const DAY = 864e5, today = () => Math.floor(Date.now() / DAY);
   const st = (() => { try { return JSON.parse(localStorage.getItem('fp.srs')) || {}; } catch (e) { return {}; } })();
