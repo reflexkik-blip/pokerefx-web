@@ -5,7 +5,7 @@
   'use strict';
   const CFG = window.FP_CFG = Object.assign({
     supabaseUrl: 'https://mbbjgprfkmmysjhpyjas.supabase.co', supabaseKey: 'sb_publishable_WybvVuZs_IGCGV1IzgX6uQ_hbfUSTXa',
-    google: false,                     // true once the Google provider is enabled in Supabase
+    google: true,                      // true once the Google provider is enabled in Supabase
     payPlus: '', payPremium: '',        // Stripe Payment Links
   }, window.FP_CFG || {});
   const KEYS = /^(sim|fp)\./;
