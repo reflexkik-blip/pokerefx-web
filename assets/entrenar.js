@@ -94,7 +94,7 @@
     const dd = due(), fresh = D.filter(x => !st.cards[x.id]).slice(0, Math.max(0, 3 - dd.length));
     const mast = D.filter(x => (st.cards[x.id] || {}).best >= .97).length;
     $('e-kpi').innerHTML = '<div><b>' + streak() + '</b><span>días seguidos</span></div><div><b>' + mast + '/' + D.length + '</b><span>rangos dominados</span></div><div><b>' + dd.length + '</b><span>por repasar hoy</span></div>';
-    const item = x => { const [h, c] = heat(x.id); return '<button type="button" class="di' + (cur && cur.id === x.id ? ' on' : '') + '" data-id="' + x.id + '"><span class="dot" style="background:' + c + '"></span><span>' + x.t + ' <small>' + x.S + ' bb</small></span><em>' + h + '</em></button>'; };
+    const item = x => { const [h, c] = heat(x.id); return '<button type="button" class="di' + (cur && cur.id === x.id ? ' on' : '') + '" data-id="' + x.id + '"><span class="dot" style="background:' + c + '"></span><span>' + esc(x.t) + (x.S ? ' <small>' + x.S + ' bb</small>' : '') + '</span><em>' + h + '</em></button>'; };
     $('e-today').innerHTML = (dd.concat(fresh)).map(item).join('') || '<p class="small">Nada pendiente hoy. Elige cualquier rango abajo.</p>';
     const groups = [...new Set(D.map(x => x.g))];
     $('e-all').innerHTML = groups.map(g => '<details><summary>' + g + '</summary>' + D.filter(x => x.g === g).map(item).join('') + '</details>').join('');
