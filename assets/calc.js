@@ -8,10 +8,10 @@
   // tabs
   document.querySelectorAll('#tabs [data-tab]').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('#tabs [data-tab]').forEach(x => x.className = 'btn' + (x === b ? ' felt' : ''));
-    ['eq', 'icm', 'odds'].forEach(t => { $('tab-' + t).hidden = t !== b.dataset.tab; });
+    ['eq', 'icm', 'odds', 'var'].forEach(t => { $('tab-' + t).hidden = t !== b.dataset.tab; });
     try { history.replaceState(null, '', '#' + b.dataset.tab); } catch (e) { /* ignore */ }
   }));
-  const h0 = (location.hash || '').slice(1); if (['eq', 'icm', 'odds'].includes(h0)) document.querySelector('#tabs [data-tab="' + h0 + '"]').click();
+  const h0 = (location.hash || '').slice(1); if (['eq', 'icm', 'odds', 'var'].includes(h0)) document.querySelector('#tabs [data-tab="' + h0 + '"]').click();
 
   // ---- equity
   const COLORS = ['var(--brass)', 'var(--felt)', 'var(--raise)', 'var(--allin)', 'var(--call)', 'var(--limp)'];
@@ -72,4 +72,59 @@
       '<p class="small" style="margin-top:10px">Pagas ' + f2(B) + ' bb para ganar un bote de ' + f2(P + 2 * B) + ' bb.</p>';
   }
   ['o-pot', 'o-bet'].forEach(i => $(i).addEventListener('input', odds)); odds();
+  // ---- variance & bankroll (Monte Carlo over a typical MTT payout table)
+  function payouts(N, pool) {
+    const M = Math.max(1, Math.round(N * 0.15)), w = []; let s = 0;
+    for (let i = 1; i <= M; i++) { const x = Math.pow(i, -1.05); w.push(x); s += x; }
+    const pr = w.map(x => x / s * pool);
+    const minc = pool / N * 1.7;                       // min-cash about 1.7 buy-ins (net of rake)
+    for (let i = 0; i < M; i++) pr[i] = Math.max(pr[i], minc);
+    const t = pr.reduce((a, b) => a + b, 0); return pr.map(x => x * pool / t);
+  }
+  function simulate() {
+    const N = Math.max(10, +$('v-n').value | 0), BI = Math.max(.1, +$('v-bi').value), rake = Math.min(.3, Math.max(0, +$('v-rake').value / 100));
+    const roi = +$('v-roi').value / 100, T = Math.min(10000, Math.max(10, +$('v-t').value | 0)), R = 2000;
+    const cost = BI * (1 + rake), pool = BI * N, pr = payouts(N, pool);
+    // each paid place gets probability (1/N)*k; k chosen so the expected return equals cost*(1+roi)
+    const base = pr.reduce((a, b) => a + b, 0) / N, k = Math.max(0, cost * (1 + roi) / base);
+    let p = pr.map(() => k / N); const pin = p.reduce((a, b) => a + b, 0);
+    if (pin > .95) { const f = .95 / pin; p = p.map(x => x * f); }
+    const cum = []; let acc = 0; p.forEach(x => { acc += x; cum.push(acc); });
+    const STEP = Math.max(1, Math.round(T / 120)), pts = Math.floor(T / STEP);
+    const paths = new Float64Array(R * (pts + 1)), dd = new Float64Array(R), fin = new Float64Array(R);
+    for (let r = 0; r < R; r++) {
+      let bank = 0, peak = 0, mdd = 0;
+      for (let t = 1; t <= T; t++) {
+        const u = Math.random(); let win = 0;
+        if (u < acc) { let lo = 0, hi = cum.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (cum[m] < u) lo = m + 1; else hi = m; } win = pr[lo]; }
+        bank += win - cost; if (bank > peak) peak = bank; if (peak - bank > mdd) mdd = peak - bank;
+        if (t % STEP === 0) paths[r * (pts + 1) + t / STEP] = bank;
+      }
+      dd[r] = mdd; fin[r] = bank;
+    }
+    const q = (arr, x) => { const a = Float64Array.from(arr).sort(); return a[Math.min(a.length - 1, Math.floor(x * a.length))]; };
+    const bands = [.05, .25, .5, .75, .95].map(x => { const o = []; for (let i = 0; i <= pts; i++) { const col = new Float64Array(R); for (let r = 0; r < R; r++) col[r] = paths[r * (pts + 1) + i]; o.push(q(col, x)); } return o; });
+    const lose = fin.filter(x => x < 0).length / R, ev = T * cost * roi;
+    const eur = x => (x < 0 ? '−' : '') + Math.abs(Math.round(x)).toLocaleString('es-ES') + ' €';
+    const W = 640, H = 300, P = 44, lo = Math.min(...bands[0]), hi = Math.max(...bands[4]);
+    const X = i => P + (W - P - 10) * i / pts, Y = v => 12 + (H - 40) * (1 - (v - lo) / Math.max(1e-9, hi - lo));
+    const line = (arr) => arr.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join('');
+    const area = (a, b) => line(a) + b.map((v, i) => [i, v]).reverse().map(([i, v]) => 'L' + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join('') + 'Z';
+    const ticks = [lo, 0, hi].filter((v, i, A) => v >= lo && v <= hi && A.indexOf(v) === i);
+    $('v-out').innerHTML = '<div class="grid">' +
+      '<div class="box kpi"><b>' + eur(ev) + '</b><span>beneficio esperado en ' + T.toLocaleString('es-ES') + ' torneos</span></div>' +
+      '<div class="box kpi"><b>' + pc(lose) + '</b><span>probabilidad de acabar en pérdidas</span></div>' +
+      '<div class="box kpi"><b>' + eur(q(dd, .5)) + '</b><span>bache máximo típico (mediana)</span></div>' +
+      '<div class="box kpi"><b>' + Math.ceil(q(dd, .95) / cost) + ' buy-ins</b><span>bankroll para no arruinarte en el 95 % de los casos (' + eur(q(dd, .95)) + ')</span></div></div>' +
+      '<figure style="margin:18px 0 0"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Rango de resultados por número de torneos" style="width:100%;height:auto;display:block">' +
+      ticks.map(v => '<line x1="' + P + '" x2="' + (W - 10) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--line)" ' + (v === 0 ? 'stroke-width="1.5"' : 'stroke-dasharray="3 4"') + '/><text x="' + (P - 6) + '" y="' + (Y(v) + 4) + '" text-anchor="end" font-size="11" fill="var(--muted)">' + eur(v) + '</text>').join('') +
+      '<path d="' + area(bands[0], bands[4]) + '" fill="var(--felt)" opacity=".15"/><path d="' + area(bands[1], bands[3]) + '" fill="var(--felt)" opacity=".3"/>' +
+      '<path d="' + line(bands[2]) + '" fill="none" stroke="var(--brass)" stroke-width="2"/>' +
+      '<line x1="' + X(0) + '" y1="' + Y(0) + '" x2="' + X(pts) + '" y2="' + Y(ev) + '" stroke="var(--ink2)" stroke-dasharray="5 4" stroke-width="1.5"/>' +
+      '<text x="' + P + '" y="' + (H - 8) + '" font-size="11" fill="var(--muted)">0</text><text x="' + (W - 10) + '" y="' + (H - 8) + '" font-size="11" fill="var(--muted)" text-anchor="end">' + T.toLocaleString('es-ES') + ' torneos</text></svg>' +
+      '<figcaption class="small" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:6px"><span><i style="display:inline-block;width:18px;height:3px;background:var(--brass);vertical-align:middle"></i> resultado mediano</span><span><i style="display:inline-block;width:12px;height:12px;background:var(--felt);opacity:.45;vertical-align:-1px"></i> 50 % de las carreras</span><span><i style="display:inline-block;width:12px;height:12px;background:var(--felt);opacity:.2;vertical-align:-1px"></i> 90 % de las carreras</span><span><i style="display:inline-block;width:18px;border-top:2px dashed var(--ink2);vertical-align:middle"></i> lo esperado (EV)</span></figcaption></figure>' +
+      '<p class="small" style="margin-top:10px">' + R.toLocaleString('es-ES') + ' carreras simuladas. Con ROI ' + Math.round(roi * 100) + ' % cobras en el ' + (100 * Math.min(.95, pin)).toFixed(1).replace('.', ',') + ' % de los torneos. En la mitad de las carreras acabas entre ' + eur(bands[1][pts]) + ' y ' + eur(bands[3][pts]) + '.</p>';
+  }
+  $('v-go').addEventListener('click', () => { $('v-out').innerHTML = '<p class="small">Simulando…</p>'; setTimeout(simulate, 30); });
+
 })();
