@@ -19,6 +19,20 @@
 <link rel="stylesheet" href="assets/site.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Forja Póker","applicationCategory":"GameApplication","operatingSystem":"Web","inLanguage":"es","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Entrenador de torneos de póker con solver GTO, tablas preflop y calculadoras."}</script>
 <style>
+.demo { background: rgba(8,30,26,.55); border: 1px solid rgba(255,255,255,.14); border-radius: 18px; padding: 20px; backdrop-filter: blur(6px); box-shadow: 0 30px 60px rgba(0,0,0,.3); animation: rise .5s ease both; min-width: 0 }
+.demo h3 { color: #fff; margin: 10px 0 2px; font-size: 1.45rem }
+.small2 { font-size: 13.5px; color: rgba(238,246,242,.72); margin: 0 }
+.dh { display: flex; justify-content: space-between; align-items: center; gap: 10px }
+.chip2 { background: #f0cf7e; color: #2a1d05; border-radius: 999px; padding: 5px 11px; font: 700 12.5px var(--body) }
+.dc { display: flex; gap: 8px; margin: 14px 0 16px } .dc .pc { width: 58px; height: 80px; font-size: 28px; animation: flip .45s ease both } .dc .pc:nth-child(2) { animation-delay: .08s }
+.btn.act { background: color-mix(in srgb, var(--c) 22%, transparent); border-color: color-mix(in srgb, var(--c) 70%, transparent); color: #fff }
+.btn.act:hover { background: color-mix(in srgb, var(--c) 40%, transparent) }
+.btn.ghost { background: transparent; color: var(--on-felt); border-color: rgba(255,255,255,.35) }
+.dv { border-radius: 10px; padding: 10px 12px; font-size: 14px; color: #fff; animation: rise .3s ease both } .dv.ok { background: rgba(46,125,79,.55) } .dv.mx { background: rgba(183,121,31,.55) } .dv.ko { background: rgba(180,55,43,.6) }
+.dg { display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; margin-top: 10px; max-width: 260px } .dg i { aspect-ratio: 1; border-radius: 2px }
+@keyframes rise { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+@keyframes flip { from { opacity: 0; transform: rotateY(80deg) } to { opacity: 1; transform: none } }
+@media (prefers-reduced-motion: reduce) { .demo, .dc .pc, .dv { animation: none } }
 .hero-art { position: relative; aspect-ratio: 1.15; max-width: 460px; justify-self: center; width: 100% }
 .hero-art .table { position: absolute; inset: 8% 2%; border-radius: 999px; background: radial-gradient(ellipse at 50% 35%, #23806d, #0c3a32 75%); border: 10px solid #2a3330; box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), 0 30px 60px rgba(0,0,0,.35) }
 .hero-art .cards { position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%); display: flex; gap: 6px }
@@ -48,12 +62,8 @@
         </div>
         <p class="small" style="color:rgba(238,246,242,.7);margin-top:14px">Sin registro para empezar. Tu progreso se guarda en tu navegador.</p>
       </div>
-      <div class="hero-art" aria-hidden="true">
-        <div class="table"></div>
-        <div class="chip">PKO · 25 bb · BTN</div>
-        <div class="cards"><span class="pc h">A<small>♥</small></span><span class="pc">K<small>♠</small></span><span class="pc d">7<small>♦</small></span></div>
-        <div class="verdict"><b class="ok">Correcto</b><br>Con tu mano el equilibrio apuesta 33 % el 71 %. Contra este regular, que foldea el 41 %, es aún mejor.</div>
-      </div>
+      <div class="demo" id="demo" aria-live="polite"><p class="small2">Cargando una mano…</p></div>
+    </div>
     </div>
   </section>
 
@@ -115,5 +125,6 @@
 </main>
 <script src="assets/site.js" data-root=""></script>
 <script>FP.chrome('');</script>
+<script src="assets/home.js"></script>
 </body>
 </html>
