@@ -42,7 +42,8 @@
 
   function lib() { return LIB[S.ctx]; }
   function stacks() { return Object.keys(lib()).map(Number).sort((a, b) => a - b); }
-  function keysAt(s) { return Object.keys(lib()[s] || {}); }
+  let UNR = {}; fetch('../data/unreached.json').then(r => r.json()).then(u => { UNR = u; try { draw(); } catch (e) { /* not ready */ } }).catch(() => {});
+  function keysAt(s) { const bad = new Set(((UNR[S.ctx] || {})[s]) || []); return Object.keys(lib()[s] || {}).filter(k => !bad.has(k)); }
   function parts(k) { const [h, p, v] = k.split('|'); return [h, +p, (v || '').split(',').filter(x => x !== '').map(Number)]; }
   function famKeys(s) { const f = FAM.find(x => x[0] === S.fam); return keysAt(s).filter(k => f[2](parts(k))); }
 
