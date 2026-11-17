@@ -5,3 +5,10 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Frame-Options: DENY
+
+/data/*
+  Cache-Control: public, max-age=86400
+/assets/*
+  Cache-Control: public, max-age=3600
+/rangos/*
+  Cache-Control: public, max-age=3600
