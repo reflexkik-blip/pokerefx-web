@@ -37,7 +37,7 @@
   const actName = c => c === 'F' ? 'Fold' : c === 'C' ? 'Pagar' : c === 'L' ? 'Limp' : c === 'A' ? 'All-in' : 'Subir a ' + c.slice(1).replace('.', ',') + ' bb';
   const COLOR = { F: 'var(--fold)', C: 'var(--call)', L: 'var(--limp)', A: 'var(--allin)', R: 'var(--raise)' };
   const st = FP.store, LIB = {};
-  const S = Object.assign({ ctx: 'chipev-eq', stack: 25, fam: 'open', hero: 3, vil: null, key: null, filter: null }, st.get('tablas2', {}));
+  const S = Object.assign({ ctx: 'chipev-eq', stack: 25, fam: 'open', hero: 3, vil: null, key: null, filter: null, pure: false }, st.get('tablas2', {}));
   let sp = null, quiz = null, playing = null;
 
   function lib() { return LIB[S.ctx]; }
@@ -94,15 +94,16 @@
   function draw() {
     sp = decode(lib()[S.stack][S.key]);
     const tot = sp.ac.map(() => 0); let all = 0;
-    for (let k = 0; k < 169; k++) { const w = sp.W[k] * CMB[k]; all += w; sp.F[k].forEach((f, a) => tot[a] += f * w); }
+    for (let k = 0; k < 169; k++) { const w = sp.W[k] * CMB[k]; all += w; if (S.pure) tot[main(k)] += w; else sp.F[k].forEach((f, a) => tot[a] += f * w); }
     $('t-title').textContent = keyName(S.key) + ' · ' + S.stack + ' bb';
     $('t-sub').textContent = CTX.find(c => c[0] === S.ctx)[1] + ' · ' + Math.round(100 * (1 - (sp.ac.includes('F') ? tot[sp.ac.indexOf('F')] / all : 0))) + ' % de las manos juegan';
     if (S.filter != null && !sp.ac.some(c => kind(c) === S.filter)) S.filter = null;
     $('t-legend').innerHTML = sp.ac.map((c, a) => '<button type="button" class="lg' + (S.filter === kind(c) ? ' on' : '') + '" data-k="' + kind(c) + '"><i style="background:' + COLOR[kind(c)] + '"></i>' + actName(c) + ' <b>' + (all ? Math.round(100 * tot[a] / all) : 0) + ' %</b></button>').join('') +
-      (S.filter ? '<button type="button" class="lg" data-k="">Ver todas</button>' : '');
-    $('t-legend').onclick = e => { const b = e.target.closest('[data-k]'); if (!b) return; S.filter = b.dataset.k || null; if (S.filter === b.dataset.k && b.classList.contains('on')) S.filter = null; draw(); };
+      (S.filter ? '<button type="button" class="lg" data-k="">Ver todas</button>' : '') +
+      '<span class="pmode" role="group" aria-label="Modo de la tabla"><button type="button" class="lg' + (S.pure ? '' : ' on') + '" data-p="0" title="Frecuencias exactas del equilibrio">GTO</button><button type="button" class="lg' + (S.pure ? ' on' : '') + '" data-p="1" title="Cada mano hace siempre su acción más frecuente">Estrategia pura</button></span>';
+    $('t-legend').onclick = e => { const p = e.target.closest('[data-p]'); if (p) { S.pure = p.dataset.p === '1'; st.set('tablas2', S); draw(); return; } const b = e.target.closest('[data-k]'); if (!b) return; S.filter = b.dataset.k || null; if (S.filter === b.dataset.k && b.classList.contains('on')) S.filter = null; draw(); };
     $('t-grid').innerHTML = '<div class="g13" role="group" aria-label="169 manos">' + N.map((h, k) => {
-      const m = main(k), c = kind(sp.ac[m]), f = sp.F[k][m], mixed = f < 0.85 && f > 0.15, sec = mixed ? sp.F[k].map((x, a) => [x, a]).filter(x => x[1] !== m).sort((a, b) => b[0] - a[0])[0][1] : -1;
+      const m = main(k), c = kind(sp.ac[m]), f = S.pure ? 1 : sp.F[k][m], mixed = !S.pure && f < 0.85 && f > 0.15, sec = mixed ? sp.F[k].map((x, a) => [x, a]).filter(x => x[1] !== m).sort((a, b) => b[0] - a[0])[0][1] : -1;
       const dim = (S.filter && !sp.F[k].some((x, a) => x > 0.15 && kind(sp.ac[a]) === S.filter)) || sp.W[k] < 0.05;
       return '<button type="button" class="cell' + (dim ? ' dim' : '') + (c === 'F' ? ' fold' : c === 'L' ? ' limp' : '') + '" data-k="' + k + '" style="--c:' + COLOR[c] + ';--o:' + (0.72 + 0.28 * f).toFixed(2) + '"' + ' aria-label="' + h + ': ' + actName(sp.ac[m]) + ' ' + Math.round(100 * f) + ' %">' +
         h + (mixed ? '<i style="background:' + COLOR[kind(sp.ac[sec])] + '"></i>' : '') + '</button>';
@@ -142,7 +143,7 @@
     $('t-qbox').querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => answer(+b.dataset.a)));
   }
   function answer(a) {
-    const k = quiz.k, best = sp.L.length ? Math.min(...sp.L[k]) : 0, loss = sp.L.length ? sp.L[k][a] - best : (a === main(k) ? 0 : 1), good = loss < 0.1 || sp.F[k][a] >= 0.25;
+    const k = quiz.k, best = sp.L.length ? Math.min(...sp.L[k]) : 0, loss = sp.L.length ? sp.L[k][a] - best : (a === main(k) ? 0 : 1), good = S.pure ? a === main(k) || sp.F[k][a] >= sp.F[k][main(k)] - 0.02 : loss < 0.1 || sp.F[k][a] >= 0.25;
     quiz.n++; if (good) quiz.ok++;
     $('t-qbox').innerHTML = '<p style="margin:0 0 8px"><b class="' + (good ? 'okc' : 'badc') + '">' + (good ? '¡Bien!' : 'No.') + '</b> Con ' + N[k] + ' la tabla hace ' + sp.ac.map((c, j) => sp.F[k][j] > 0.02 ? actName(c) + ' ' + Math.round(100 * sp.F[k][j]) + ' %' : '').filter(Boolean).join(', ') + '.' +
       (good ? '' : ' Tu jugada pierde ' + loss.toFixed(1).replace('.', ',') + ' bb.') + '</p><div class="row"><button type="button" class="btn pri" id="t-qnext">Siguiente mano</button><span class="small">' + quiz.ok + ' de ' + quiz.n + ' bien (' + Math.round(100 * quiz.ok / quiz.n) + ' %)</span></div>';
