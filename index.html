@@ -146,7 +146,7 @@
     <div class="wrap">
       <div class="box" style="max-width:720px">
         <div class="eyebrow">Contacto</div><h2 style="margin-top:6px">¿Una idea, un fallo o una tabla que no te cuadra?</h2>
-        <form name="contacto" method="POST" data-netlify="true" netlify-honeypot="web" id="contact">
+        <form name="contacto" id="contact">
           <input type="hidden" name="form-name" value="contacto"><p hidden><label>No rellenar <input name="web"></label></p>
           <div class="row"><label class="f" style="flex:1 1 220px">Nombre<input type="text" name="nombre" required maxlength="80" autocomplete="name"></label>
           <label class="f" style="flex:1 1 220px">Email<input type="email" name="email" required maxlength="120" autocomplete="email"></label>
@@ -157,7 +157,9 @@
       </div>
     </div>
   </section>
-<script>document.getElementById('contact').addEventListener('submit',function(e){e.preventDefault();const f=e.target,m=document.getElementById('contact-msg');m.textContent='Enviando…';fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(f)).toString()}).then(r=>{if(!r.ok)throw 0;f.reset();m.textContent='¡Gracias! Te responderemos lo antes posible.';}).catch(()=>{m.textContent='No se pudo enviar. Inténtalo de nuevo en un rato.';});});</script>
+<script>document.getElementById('contact').addEventListener('submit',function(e){e.preventDefault();const f=e.target,m=document.getElementById('contact-msg'),d=new FormData(f);if(d.get('web'))return;m.textContent='Enviando…';
+fetch('https://mbbjgprfkmmysjhpyjas.supabase.co/rest/v1/contact',{method:'POST',headers:{'apikey':'sb_publishable_WybvVuZs_IGCGV1IzgX6uQ_hbfUSTXa','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({nombre:d.get('nombre'),email:d.get('email'),asunto:d.get('asunto'),mensaje:d.get('mensaje')})})
+.then(r=>{if(!r.ok)throw 0;f.reset();m.textContent='¡Gracias! Te responderemos lo antes posible.';}).catch(()=>{m.textContent='No se pudo enviar. Inténtalo de nuevo en un rato.';});});</script>
 
   <section>
     <div class="wrap">
