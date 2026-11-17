@@ -29,7 +29,7 @@
     });
     const f = document.createElement('div'); f.setAttribute('role', 'contentinfo'); f.className = 'fp-foot';
     f.innerHTML = '<div class="fp-wrap"><div><b>PokerEFX</b> · entrenamiento de torneos con teoría GTO y rivales reales.<br>Solo para mayores de 18 años. Esto es formación: no se juega dinero aquí. Juega con responsabilidad (<a href="https://www.jugarbien.es" rel="noopener">jugarbien.es</a>).</div>' +
-      '<div><a href="' + root + 'rangos/">Todos los rangos</a> · <a href="' + root + 'metodologia/">Cómo calculamos</a> · <a href="' + root + 'legal/privacidad.html">Privacidad</a> · <a href="' + root + 'legal/cookies.html">Cookies</a> · <a href="' + root + 'legal/aviso-legal.html">Aviso legal</a> · <a href="#" id="fp-cookies">Preferencias de cookies</a></div></div>';
+      '<div><a href="' + root + 'rangos/">Todos los rangos</a> · <a href="' + root + 'metodologia/">Cómo calculamos</a> · <a href="' + root + 'replayer/">Replayer de manos</a> · <a href="' + root + 'legal/privacidad.html">Privacidad</a> · <a href="' + root + 'legal/cookies.html">Cookies</a> · <a href="' + root + 'legal/aviso-legal.html">Aviso legal</a> · <a href="#" id="fp-cookies">Preferencias de cookies</a></div></div>';
     document.body.appendChild(f);
     f.querySelector('#fp-cookies').addEventListener('click', e => { e.preventDefault(); consentBanner(true); });
     consentBanner(false); ads();
