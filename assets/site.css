@@ -82,3 +82,7 @@ select, input[type=text], input[type=number], input[type=email], input[type=pass
 .pk-g span { display: grid; place-items: center; border-radius: 3px; background: var(--bg2); font: 600 clamp(7.5px, 2.1vw, 11.5px)/1 var(--body); color: var(--ink2); cursor: pointer; min-width: 0; overflow: hidden }
 .pk-g span.on { background: var(--felt); color: var(--on-felt) }
 .pk input[type=range] { accent-color: var(--brass) }
+.fp-foot .fcols { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 24px }
+.fp-foot nav { display: flex; flex-direction: column; gap: 7px } .fp-foot nav b, .fbrand b { color: var(--ink); font: 700 15px var(--display); margin-bottom: 4px }
+.fp-foot nav a { text-decoration: none } .fp-foot nav a:hover { text-decoration: underline } .fbrand p { margin: 6px 0 }
+@media (max-width: 760px) { .fp-foot .fcols { grid-template-columns: 1fr 1fr } .fbrand { grid-column: 1 / -1 } }

@@ -48,6 +48,9 @@
 .hero-art .verdict { position: absolute; right: 0; bottom: 4%; background: var(--card); color: var(--ink); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); font-size: 13.5px; max-width: 250px }
 .hero-art .verdict b.ok { display: inline-block; background: #d7f0df; color: #1d5b35; border-radius: 6px; padding: 2px 8px; font-family: var(--display); margin-bottom: 4px }
 .hero-art .chip { position: absolute; left: 4%; top: 6%; background: #f0cf7e; color: #2a1d05; border-radius: 999px; padding: 7px 12px; font: 700 13px var(--body); box-shadow: var(--shadow) }
+.trust { background: var(--felt2); color: var(--on-felt); border-top: 1px solid rgba(255,255,255,.08) }
+.trust .wrap { display: flex; flex-wrap: wrap; gap: 10px 34px; justify-content: center; padding-block: 14px; font-size: 14.5px; color: rgba(238,246,242,.8) }
+.trust b { color: #f0cf7e; font: 700 17px var(--display); margin-right: 4px }
 .feature h3 { display: flex; gap: 10px; align-items: center }
 .feature .ico { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--bg2); font-size: 19px; flex: none }
 .steps { counter-reset: s; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)) }
@@ -62,9 +65,9 @@
   <section class="fp-hero">
     <div class="wrap">
       <div>
-        <div class="eyebrow">Entrenador de torneos · gratis</div>
-        <h1>Juega mano a mano contra rivales reales. <em>El solver te corrige.</em></h1>
-        <p>Un simulador de MTT 6-max donde cada decisión se compara con el equilibrio GTO y con lo que de verdad hacen los rivales: regulares, agresivos, maníacos y recreativos medidos en miles de manos reales.</p>
+        <div class="eyebrow">Estudiar póker · gratis · en español</div>
+        <h1>Estudia póker como un profesional. <em>Gratis y con un solver detrás.</em></h1>
+        <p>Memoriza tus rangos, practica manos contra rivales reales y revisa tus errores. Cada decisión se compara con nuestro solver GTO de torneos y con cómo juegan de verdad los rivales, medido en más de 14.000 manos.</p>
         <div class="row" style="margin-top:22px">
           <a class="btn pri" href="simulador/index.html">Empezar a entrenar</a>
           <a class="btn" style="background:transparent;color:var(--on-felt);border-color:rgba(255,255,255,.35)" href="entrenar/">Memorizar rangos</a>
@@ -75,6 +78,7 @@
     </div>
     </div>
   </section>
+  <div class="trust"><div class="wrap"><span><b>1.190</b> rangos GTO</span><span><b>11</b> formatos: ChipEV, PKO, ICM…</span><span><b>Verificado</b> contra tablas Nash</span><span><b>0 €</b> sin registro</span></div></div>
 
   <section style="padding-bottom:0">
     <div class="wrap">
@@ -92,6 +96,8 @@
         <div class="box feature"><h3><span class="ico">▦</span>Tablas preflop de torneo</h3><p>Once librerías: ChipEV, burbuja, ITM, ICM medio, mesa final y PKO, cubriendo y cubierto, de 1 a 100 ciegas. Con la pérdida en bb de cada acción.</p><a href="tablas/index.html">Ver las tablas →</a></div>
         <div class="box feature"><h3><span class="ico">∑</span>Calculadoras</h3><p>Equity de mano o rango contra rangos (exacta cuando se puede), ICM de Malmuth-Harville para premios, pot odds y frecuencia mínima de defensa.</p><a href="calculadoras/index.html">Calcular →</a></div>
         <div class="box feature"><h3><span class="ico">◎</span>Laboratorio de rivales</h3><p>Más de 14.000 manos reales convertidas en respuestas: a quién farolear, con qué tamaño, en qué flops y cuándo pagar en el river. Interactivo.</p><a href="laboratorio/index.html">Explorar los datos →</a></div>
+        <div class="box feature"><h3><span class="ico">⏵</span>Replayer de manos</h3><p>Pega tu historial de Winamax o PokerStars y revive cada mano con bote, stacks y equity. Gratis y sin subir nada.</p><a href="replayer/">Revivir mis manos →</a></div>
+        <div class="box feature"><h3><span class="ico">〰</span>Varianza y bankroll</h3><p>Simula miles de carreras con tu ROI: cuántos buy-ins necesitas y cómo de largos pueden ser los baches.</p><a href="calculadoras/#var">Simular →</a></div>
       </div>
     </div>
   </section>
@@ -107,17 +113,6 @@
         <li><b>Decide.</b> Al instante ves la nota: correcto, imprecisión o error, cuánto pierdes en bb y por qué, con el rango del rival.</li>
         <li><b>Repite tus fallos.</b> El modo «Mis fugas» te pone más a menudo lo que fallas, hasta que deje de costarte.</li>
       </ol>
-    </div>
-  </section>
-
-  <section style="padding-top:0">
-    <div class="wrap">
-      <div class="stats">
-        <div class="box kpi"><b>11</b><span>librerías preflop de torneo</span></div>
-        <div class="box kpi"><b>1–100 bb</b><span>todas las profundidades de stack</span></div>
-        <div class="box kpi"><b>3 calles</b><span>resueltas por el solver en tu navegador</span></div>
-        <div class="box kpi"><b>0 €</b><span>para siempre en lo esencial</span></div>
-      </div>
     </div>
   </section>
 
