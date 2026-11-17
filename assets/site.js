@@ -9,14 +9,14 @@
   };
   const root = document.currentScript ? (document.currentScript.getAttribute('data-root') || '') : '';
   const NAV = [['simulador', 'Simulador'], ['entrenar', 'Entrenar rangos'], ['tablas', 'Tablas preflop'], ['laboratorio', 'Laboratorio'], ['herramientas', 'Herramientas'], ['aprende', 'Aprende'], ['cuenta', 'Mi cuenta']];
-  const LOGO = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="5" width="18" height="24" rx="3" fill="#fffdf8" stroke="#b8862f" stroke-width="1.6" transform="rotate(-8 12 17)"/><rect x="11" y="3" width="18" height="24" rx="3" fill="#17584c" stroke="#b8862f" stroke-width="1.6" transform="rotate(7 20 15)"/><path d="M20 9l3.2 4.6-3.2 4.6-3.2-4.6z" fill="#e8c46e" transform="rotate(7 20 15)"/></svg>';
+  const LOGO = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="9" fill="#17584c"/><circle cx="16" cy="16" r="10.5" fill="none" stroke="#e8c46e" stroke-width="2" stroke-dasharray="4.2 2.4"/><path d="M16 8.6c3.2 3.1 6 5.1 6 7.9 0 2-1.6 3.4-3.3 3.4-1 0-1.8-.4-2.3-1.1l.9 4.6h-2.6l.9-4.6c-.5.7-1.3 1.1-2.3 1.1-1.7 0-3.3-1.4-3.3-3.4 0-2.8 2.8-4.8 6-7.9z" fill="#f6efe0"/></svg>';
 
   function theme(t) { if (t) document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
   theme(store.get('theme', null));
 
   function chrome(active) {
     const h = document.createElement('div'); h.setAttribute('role', 'banner'); h.className = 'fp-top';
-    h.innerHTML = '<div class="fp-wrap"><a class="brand" href="' + root + 'index.html">' + LOGO + 'PokerEFX</a>' +
+    h.innerHTML = '<div class="fp-wrap"><a class="brand" href="' + root + 'index.html">' + LOGO + '<span class="wm">Poker<b>EFX</b></span></a>' +
       '<button class="navbtn" type="button" aria-expanded="false" aria-controls="nav">Menú</button>' +
       '<nav class="nav" id="nav">' + NAV.map(([p, l]) => '<a href="' + root + p + '/index.html"' + (p === active ? ' aria-current="page"' : '') + '>' + l + '</a>').join('') +
       '<button class="theme" type="button" title="Tema claro u oscuro" aria-label="Cambiar tema"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></nav></div>';

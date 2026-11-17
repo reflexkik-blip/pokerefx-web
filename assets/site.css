@@ -86,3 +86,7 @@ select, input[type=text], input[type=number], input[type=email], input[type=pass
 .fp-foot nav { display: flex; flex-direction: column; gap: 7px } .fp-foot nav b, .fbrand b { color: var(--ink); font: 700 15px var(--display); margin-bottom: 4px }
 .fp-foot nav a { text-decoration: none } .fp-foot nav a:hover { text-decoration: underline } .fbrand p { margin: 6px 0 }
 @media (max-width: 760px) { .fp-foot .fcols { grid-template-columns: 1fr 1fr } .fbrand { grid-column: 1 / -1 } }
+.brand .wm { letter-spacing: -.01em } .brand .wm b { font-weight: 800; color: var(--brass-text); margin-left: 1px }
+/* internal pages: a soft header band so every page opens the same way */
+main > section:first-child:not(.fp-hero) { background: linear-gradient(180deg, var(--bg2) 0, var(--bg) 340px); }
+main > section:first-child:not(.fp-hero) h1 { font-size: clamp(2rem, 4.4vw, 3.1rem) }
