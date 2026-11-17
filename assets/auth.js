@@ -58,7 +58,7 @@
       ['free', 'Gratis', '0 €', ['Simulador, tablas, rangos y calculadoras', 'Progreso en este navegador', 'Con anuncios'], ''],
       ['plus', 'Plus', '2,99 €/mes', ['Todo lo de Gratis', 'Sin anuncios', 'Progreso sincronizado en todos tus dispositivos'], CFG.payPlus],
       ['premium', 'Premium', '5,99 €/mes', ['Todo lo de Plus', 'Estadísticas avanzadas de tus fugas', 'Acceso anticipado a las novedades del solver'], CFG.payPremium]];
-    box.innerHTML = P.map(([id, t, price, feats, link]) => '<div class="box plan' + (id === 'plus' ? ' hot' : '') + '"><h3>' + t + '</h3><div class="price">' + price + '</div><ul>' + feats.map(f => '<li>' + f + '</li>').join('') + '</ul>' +
+    box.innerHTML = P.map(([id, t, price, feats, link]) => '<div class="box plan' + (id === 'plus' ? ' hot' : '') + '">' + (id === 'plus' ? '<span class="rib">Recomendado</span>' : '') + '<h3>' + t + '</h3><div class="price">' + price.replace('/mes', '<small> /mes</small>') + '</div><ul>' + feats.map(f => '<li>' + f + '</li>').join('') + '</ul>' +
       (p === id ? '<span class="tag">Tu plan</span>' : id === 'free' ? '' : link && user ? '<a class="btn pri" href="' + link + '?prefilled_email=' + encodeURIComponent(user.email || '') + '&client_reference_id=' + user.id + '">Elegir ' + t + '</a>'
         : link ? '<span class="small">Entra con Google para suscribirte.</span>' : '<span class="small">Disponible muy pronto.</span>') + '</div>').join('');
   }
