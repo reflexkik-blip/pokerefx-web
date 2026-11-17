@@ -20,6 +20,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"PokerEFX","applicationCategory":"GameApplication","operatingSystem":"Web","inLanguage":"es","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Entrenador de torneos de póker con solver GTO, tablas preflop y calculadoras."}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿PokerEFX es gratis?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. El simulador, las tablas, los más de 1.100 rangos, el entrenador, el replayer y las calculadoras son gratis. Hay planes opcionales sin anuncios."}}, {"@type": "Question", "name": "¿Se puede usar sin registrarse?", "acceptedAnswer": {"@type": "Answer", "text": "Sí: todo funciona sin cuenta y tu progreso se guarda en tu navegador. Si entras con Google, se sincroniza entre tus dispositivos."}}, {"@type": "Question", "name": "¿De dónde salen los rangos?", "acceptedAnswer": {"@type": "Answer", "text": "De nuestro propio solver GTO para torneos 6-max (CFR sobre el árbol preflop completo), verificado contra tablas Nash publicadas. Lo explicamos en «Cómo calculamos»."}}, {"@type": "Question", "name": "¿Sirve para ICM, burbuja y PKO?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Las tablas interactivas tienen once formatos: ChipEV, PKO cubriendo y cubierto, burbuja, ITM, ICM medio y mesa final."}}, {"@type": "Question", "name": "¿Funciona en el móvil?", "acceptedAnswer": {"@type": "Answer", "text": "Sí, toda la web está pensada para móvil y puedes añadirla a tu pantalla de inicio como una app."}}, {"@type": "Question", "name": "¿Aquí se juega dinero real?", "acceptedAnswer": {"@type": "Answer", "text": "No. PokerEFX es una herramienta de formación: no hay apuestas ni depósitos. Contenido para mayores de 18 años."}}, {"@type": "Question", "name": "¿Puedo importar mis manos?", "acceptedAnswer": {"@type": "Answer", "text": "Sí: el replayer lee historiales de Winamax y PokerStars, y todo se procesa en tu navegador."}}, {"@type": "Question", "name": "¿Puedo entrenar mis propios rangos?", "acceptedAnswer": {"@type": "Answer", "text": "Sí: en «Entrenar rangos» puedes pintar o pegar tus rangos y memorizarlos con repetición espaciada."}}]}</script>
 <style>
+.daily { max-width: 720px; margin: 0 auto; border-color: var(--brass); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brass) 40%, transparent), var(--shadow) }
+.daily .dc .pc { width: 52px; height: 72px; font-size: 25px }
 .rcs { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr)); margin-top: 18px }
 .rc { display: flex; flex-direction: column; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; text-decoration: none; color: var(--ink); box-shadow: var(--shadow); transition: transform .18s ease, box-shadow .18s ease }
 .rc:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,.12) }
@@ -71,6 +73,12 @@
       </div>
       <div class="demo" id="demo" aria-live="polite"><p class="small2">Cargando una mano…</p></div>
     </div>
+    </div>
+  </section>
+
+  <section style="padding-bottom:0">
+    <div class="wrap">
+      <div class="box daily" id="daily" aria-live="polite"><p class="small">Cargando el reto del día…</p></div>
     </div>
   </section>
 
