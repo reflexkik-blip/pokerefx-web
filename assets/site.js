@@ -8,7 +8,7 @@
     set(k, v) { try { localStorage.setItem('fp.' + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
   };
   const root = document.currentScript ? (document.currentScript.getAttribute('data-root') || '') : '';
-  const NAV = [['simulador', 'Simulador'], ['entrenar', 'Entrenar rangos'], ['tablas', 'Tablas preflop'], ['laboratorio', 'Laboratorio'], ['calculadoras', 'Calculadoras'], ['aprende', 'Aprende'], ['cuenta', 'Mi cuenta']];
+  const NAV = [['simulador', 'Simulador'], ['entrenar', 'Entrenar rangos'], ['tablas', 'Tablas preflop'], ['laboratorio', 'Laboratorio'], ['herramientas', 'Herramientas'], ['aprende', 'Aprende'], ['cuenta', 'Mi cuenta']];
   const LOGO = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="5" width="18" height="24" rx="3" fill="#fffdf8" stroke="#b8862f" stroke-width="1.6" transform="rotate(-8 12 17)"/><rect x="11" y="3" width="18" height="24" rx="3" fill="#17584c" stroke="#b8862f" stroke-width="1.6" transform="rotate(7 20 15)"/><path d="M20 9l3.2 4.6-3.2 4.6-3.2-4.6z" fill="#e8c46e" transform="rotate(7 20 15)"/></svg>';
 
   function theme(t) { if (t) document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
