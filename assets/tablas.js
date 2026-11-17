@@ -100,10 +100,10 @@
     $('t-legend').innerHTML = sp.ac.map((c, a) => '<button type="button" class="lg' + (S.filter === kind(c) ? ' on' : '') + '" data-k="' + kind(c) + '"><i style="background:' + COLOR[kind(c)] + '"></i>' + actName(c) + ' <b>' + (all ? Math.round(100 * tot[a] / all) : 0) + ' %</b></button>').join('') +
       (S.filter ? '<button type="button" class="lg" data-k="">Ver todas</button>' : '');
     $('t-legend').onclick = e => { const b = e.target.closest('[data-k]'); if (!b) return; S.filter = b.dataset.k || null; if (S.filter === b.dataset.k && b.classList.contains('on')) S.filter = null; draw(); };
-    $('t-grid').innerHTML = '<div class="g13" role="grid" aria-label="169 manos">' + N.map((h, k) => {
+    $('t-grid').innerHTML = '<div class="g13" role="group" aria-label="169 manos">' + N.map((h, k) => {
       const m = main(k), c = kind(sp.ac[m]), f = sp.F[k][m], mixed = f < 0.85 && f > 0.15, sec = mixed ? sp.F[k].map((x, a) => [x, a]).filter(x => x[1] !== m).sort((a, b) => b[0] - a[0])[0][1] : -1;
       const dim = (S.filter && !sp.F[k].some((x, a) => x > 0.15 && kind(sp.ac[a]) === S.filter)) || sp.W[k] < 0.05;
-      return '<button type="button" class="cell' + (dim ? ' dim' : '') + (c === 'F' ? ' fold' : '') + '" data-k="' + k + '" style="--c:' + COLOR[c] + ';--o:' + (0.45 + 0.55 * f).toFixed(2) + '"' + ' aria-label="' + h + ': ' + actName(sp.ac[m]) + ' ' + Math.round(100 * f) + ' %">' +
+      return '<button type="button" class="cell' + (dim ? ' dim' : '') + (c === 'F' ? ' fold' : c === 'L' ? ' limp' : '') + '" data-k="' + k + '" style="--c:' + COLOR[c] + ';--o:' + (0.72 + 0.28 * f).toFixed(2) + '"' + ' aria-label="' + h + ': ' + actName(sp.ac[m]) + ' ' + Math.round(100 * f) + ' %">' +
         h + (mixed ? '<i style="background:' + COLOR[kind(sp.ac[sec])] + '"></i>' : '') + '</button>';
     }).join('') + '</div>';
     $('t-range').value = rangeText();

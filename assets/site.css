@@ -1,17 +1,17 @@
 /* PokerEFX — shared styles. Tokens first (light), dark redefinitions, then components. */
 :root {
-  --bg: #f6f3ec; --bg2: #ede8dd; --card: #fffdf8; --ink: #1d211f; --ink2: #4a514d; --muted: #7a807b; --line: #ddd6c7;
+  --bg: #f6f3ec; --bg2: #ede8dd; --card: #fffdf8; --ink: #1d211f; --ink2: #4a514d; --muted: #5f6661; --line: #ddd6c7;
   --felt: #17584c; --felt2: #0f3f37; --on-felt: #eef6f2; --brass: #b8862f; --brass-ink: #2a1d05; --accent: #17584c;
-  --raise: #c8553d; --call: #3b7d5c; --fold: #c9cfd6; --allin: #7a2e8c; --limp: #d6a23a; --good: #2e7d4f; --warn: #b7791f; --bad: #b4372b;
+  --raise: #b3442e; --call: #3b7d5c; --fold: #c9cfd6; --allin: #7a2e8c; --limp: #d6a23a; --good: #2e7d4f; --warn: #b7791f; --bad: #b4372b;
   --shadow: 0 1px 2px rgba(30, 25, 10, .06), 0 8px 24px rgba(30, 25, 10, .07);
   --display: 'Fraunces', Georgia, 'Times New Roman', serif; --body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --r: 14px; --max: 1180px; color-scheme: light;
+  --r: 14px; --max: 1180px; --brass-text: #8a6417; color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #111513; --bg2: #171c19; --card: #1b211e; --ink: #ecefe9; --ink2: #c3c9c3; --muted: #8d958f; --line: #2c3430;
-  --felt: #1d6b5c; --felt2: #0d332c; --brass: #d7a54a; --brass-ink: #1b1203; --accent: #4fb39a; --fold: #3b444b; --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35); color-scheme: dark } }
+  --felt: #1d6b5c; --felt2: #0d332c; --brass: #d7a54a; --brass-text: #d7a54a; --brass-ink: #1b1203; --accent: #4fb39a; --fold: #3b444b; --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35); color-scheme: dark } }
 :root[data-theme="dark"] { --bg: #111513; --bg2: #171c19; --card: #1b211e; --ink: #ecefe9; --ink2: #c3c9c3; --muted: #8d958f; --line: #2c3430;
-  --felt: #1d6b5c; --felt2: #0d332c; --brass: #d7a54a; --brass-ink: #1b1203; --accent: #4fb39a; --fold: #3b444b; --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35); color-scheme: dark }
+  --felt: #1d6b5c; --felt2: #0d332c; --brass: #d7a54a; --brass-text: #d7a54a; --brass-ink: #1b1203; --accent: #4fb39a; --fold: #3b444b; --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35); color-scheme: dark }
 * { box-sizing: border-box }
 html { -webkit-text-size-adjust: 100% }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
@@ -22,7 +22,7 @@ img { max-width: 100% }
 h1, h2, h3 { font-family: var(--display); font-weight: 650; line-height: 1.12; letter-spacing: -.01em; text-wrap: balance; margin: 0 0 .5em }
 h1 { font-size: clamp(2rem, 5vw, 3.4rem) } h2 { font-size: clamp(1.4rem, 3vw, 2rem) } h3 { font-size: 1.2rem }
 p { margin: 0 0 1em; max-width: 68ch }
-.eyebrow { font: 600 12px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--brass) }
+.eyebrow { font: 600 12px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--brass-text) }
 .small { font-size: 13.5px; color: var(--muted) }
 /* header */
 .fp-top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line) }
