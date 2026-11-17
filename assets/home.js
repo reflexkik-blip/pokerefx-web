@@ -65,7 +65,7 @@
     const ok = res.filter(Boolean).length, days = get('fp.dailydays', []);
     if (!days.includes(key)) { days.push(key); put('fp.dailydays', days.slice(-400)); }
     put('fp.daily', { key, res });
-    const sq = res.map(x => x ? '🟩' : '🟥').join(''), txt = 'PokerEFX · reto del ' + d.getDate() + '/' + (d.getMonth() + 1) + ': ' + ok + '/10 ' + sq + ' pokerefx.netlify.app';
+    const sq = res.map(x => x ? '🟩' : '🟥').join(''), txt = 'PokerEFX · reto del ' + d.getDate() + '/' + (d.getMonth() + 1) + ': ' + ok + '/10 ' + sq + ' pokerefx.com';
     box.innerHTML = '<h3>Reto del día completado</h3><p style="font-size:26px;margin:4px 0">' + sq + '</p><p><b>' + ok + '/10</b> · racha de <b>' + streak() + '</b> día' + (streak() === 1 ? '' : 's') + '. Vuelve mañana: cada día hay 10 manos nuevas, iguales para todos.</p>' +
       '<div class="row" style="gap:8px"><button class="btn pri" type="button" id="dl-share">Copiar resultado</button><a class="btn" href="entrenar/">Entrenar los rangos</a></div><p class="small" id="dl-msg"></p>';
     document.getElementById('dl-share').addEventListener('click', () => {
