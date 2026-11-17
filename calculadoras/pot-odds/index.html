@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.google.com https://*.gstatic.com https://*.doubleclick.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net; frame-src https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Calculadora de pot odds y MDF | PokerEFX</title>
+<meta name="description" content="Equity necesaria para pagar, frecuencia mínima de defensa (MDF) y frecuencia de farol, al instante.">
+<link rel="canonical" href="https://pokerefx.com/calculadoras/pot-odds/">
+<script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+
+<meta property="og:title" content="Calculadoras de póker: equity, ICM y pot odds — PokerEFX"><meta property="og:description" content="Calculadora de equity de póker (mano o rango contra rangos), calculadora ICM, pot odds con MDF y simulador de varianza y bankroll para torneos. Gratis y…"><meta property="og:type" content="website"><meta property="og:url" content="https://pokerefx.com/calculadoras/pot-odds/"><meta property="og:image" content="https://pokerefx.com/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="es_ES"><meta property="og:site_name" content="PokerEFX"><meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#17584c">
+<link rel="icon" href="../../assets/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../../assets/icon-180.png"><link rel="manifest" href="../../manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../assets/site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Calculadoras de póker", "url": "https://pokerefx.com/calculadoras/", "applicationCategory": "GameApplication", "operatingSystem": "Web", "inLanguage": "es", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@type": "Organization", "name": "PokerEFX", "url": "https://pokerefx.com/"}}</script>
+
+</head>
+<body>
+<main>
+<section><div class="wrap">
+<div class="eyebrow">Calculadoras</div><h1>Calculadora de pot odds y MDF</h1>
+<p>Equity exacta cuando se puede enumerar, Monte Carlo con decenas de miles de muestras cuando hay rangos. Todo se calcula en tu navegador. ¿Quieres revivir tus manos? Prueba el <a href="../../replayer/">replayer de manos de Winamax y PokerStars</a>.</p>
+<div class="row" style="margin:18px 0 6px" id="tabs">
+<button class="btn felt" data-tab="eq" type="button">Equity</button><button class="btn" data-tab="icm" type="button">ICM</button><button class="btn" data-tab="odds" type="button">Pot odds y MDF</button><button class="btn" data-tab="var" type="button">Varianza y bankroll</button></div>
+
+<div class="box" id="tab-eq" style="margin-top:12px">
+<h2>Equity: manos y rangos</h2>
+<p class="small">Cada jugador puede ser una mano (<code>AhKd</code>) o un rango (<code>QQ+, AKs, AQo, 77-99, A5s-A2s</code>, o un porcentaje como <code>12%</code>). Mesa opcional (<code>Ah7d2c</code>).</p>
+<div id="eq-players" style="display:flex;flex-direction:column;gap:10px"></div>
+<div class="row" style="margin-top:12px"><label class="f" style="flex:1 1 220px">Mesa<input type="text" id="eq-board" placeholder="vacía = preflop" autocomplete="off"></label>
+<button class="btn" type="button" id="eq-add">+ Jugador</button><button class="btn pri" type="button" id="eq-go">Calcular</button></div>
+<div id="eq-out" style="margin-top:16px"></div>
+</div>
+
+<div class="box" id="tab-icm" style="margin-top:12px" hidden>
+<h2>ICM: cuánto valen tus fichas en dinero</h2>
+<p class="small">Modelo de Malmuth-Harville: la probabilidad de acabar en cada puesto es proporcional a las fichas. Exacto hasta 11 jugadores.</p>
+<div class="row"><label class="f" style="flex:1 1 280px">Stacks (separados por comas)<input type="text" id="icm-stacks" value="5000, 3000, 2000, 1500"></label>
+<label class="f" style="flex:1 1 280px">Premios (1.º, 2.º…)<input type="text" id="icm-prizes" value="50, 30, 20"></label>
+<button class="btn pri" type="button" id="icm-go">Calcular</button></div>
+<div id="icm-out" class="tw" style="margin-top:16px"></div>
+</div>
+
+<div class="box" id="tab-odds" style="margin-top:12px" hidden>
+<h2>Pot odds, MDF y faroles</h2>
+<div class="row"><label class="f">Bote antes de la apuesta (bb)<input type="number" id="o-pot" value="10" min="0" step="0.5"></label>
+<label class="f">Apuesta del rival (bb)<input type="number" id="o-bet" value="7.5" min="0" step="0.5"></label></div>
+<div id="odds-out" style="margin-top:16px"></div>
+</div>
+
+<div class="box" id="tab-var" style="margin-top:12px" hidden>
+<h2>Varianza de torneos y bankroll</h2>
+<p class="small">Simula miles de carreras de torneos con tu ROI y mira lo que puede pasar: el rango normal de resultados, los peores baches y cuánto bankroll necesitas para no arruinarte. Estructura de premios típica de MTT (cobra ~15 % del campo).</p>
+<div class="row"><label class="f">Jugadores por torneo<input type="number" id="v-n" value="500" min="10" max="20000" step="10"></label>
+<label class="f">Buy-in (€)<input type="number" id="v-bi" value="10" min="0.1" step="0.5"></label>
+<label class="f">Rake (%)<input type="number" id="v-rake" value="10" min="0" max="30" step="1"></label>
+<label class="f">Tu ROI (%)<input type="number" id="v-roi" value="15" min="-50" max="200" step="1"></label>
+<label class="f">Torneos<input type="number" id="v-t" value="1000" min="10" max="10000" step="50"></label>
+<button class="btn pri" type="button" id="v-go">Simular</button></div>
+<div id="v-out" style="margin-top:16px"></div>
+</div>
+</div></section>
+<div class="wrap"><div class="ad" data-slot="calc-1">Publicidad</div></div>
+<section style="padding-top:0"><div class="wrap prose">
+<h2>Cómo leer los resultados</h2>
+<p><b>Equity</b> es la parte del bote que te llevas de media si nadie apuesta más: victorias más la mitad de los empates. Contra un rango, el resultado pondera cada combinación por su peso (las combinaciones bloqueadas por tus cartas o la mesa no cuentan).</p>
+<p><b>ICM</b> convierte fichas en dinero. En la burbuja y la mesa final, perder fichas cuesta más de lo que vale ganarlas: por eso las tablas de ICM foldean manos que en ChipEV irían all-in.</p>
+<p><b>Pot odds</b> es la equity mínima para pagar sin perder dinero. <b>MDF</b> (frecuencia mínima de defensa) es cuánto de tu rango debes continuar para que un farol del rival no gane automáticamente.</p>
+</div></section>
+</main>
+<script src="../../assets/site.js" data-root="../../"></script>
+<script>FP.chrome('calculadoras');</script>
+<script src="../../assets/engine.js"></script><script src="../../assets/calc.js"></script>
+<script>(function(){var b=document.querySelector('#tabs [data-tab="odds"]');if(b)b.click();document.getElementById("tabs").hidden=true;})();</script></body>
+</html>
