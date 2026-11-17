@@ -75,3 +75,10 @@ select, input[type=text], input[type=number], input[type=email], input[type=pass
 .pc small { font-size: 16px } .pc.h, .pc.d { color: #c0392b } .pc.d { color: #1f62c9 } .pc.c { color: #1d7a3e }
 .prose { max-width: 72ch } .prose h2 { margin-top: 1.4em } .prose li { margin-bottom: .4em }
 .kpi { display: flex; flex-direction: column; gap: 2px } .kpi b { font: 700 28px/1.1 var(--display) } .kpi span { color: var(--muted); font-size: 13px }
+/* range picker */
+.pk-ov { position: fixed; inset: 0; z-index: 70; background: rgba(10, 20, 16, .55); display: grid; place-items: center; padding: 16px }
+.pk { background: var(--card); color: var(--ink); border-radius: 16px; padding: 18px; width: min(560px, 100%); max-height: 100%; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,.35) }
+.pk-g { display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; aspect-ratio: 1; margin: 12px 0; touch-action: none; user-select: none; -webkit-user-select: none }
+.pk-g span { display: grid; place-items: center; border-radius: 3px; background: var(--bg2); font: 600 clamp(7.5px, 2.1vw, 11.5px)/1 var(--body); color: var(--ink2); cursor: pointer; min-width: 0; overflow: hidden }
+.pk-g span.on { background: var(--felt); color: var(--on-felt) }
+.pk input[type=range] { accent-color: var(--brass) }

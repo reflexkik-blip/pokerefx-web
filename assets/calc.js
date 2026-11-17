@@ -18,11 +18,49 @@
   function addPlayer(v) {
     const n = $('eq-players').children.length; if (n >= 6) return;
     const r = document.createElement('div'); r.className = 'row';
-    r.innerHTML = '<label class="f" style="flex:1 1 260px">Jugador ' + (n + 1) + '<input type="text" autocomplete="off" placeholder="AhKd o QQ+, AKs, 10%" value="' + (v || '') + '"></label>' + (n >= 2 ? '<button class="btn" type="button" aria-label="Quitar">✕</button>' : '');
-    const x = r.querySelector('button'); if (x) x.addEventListener('click', () => { r.remove(); renum(); });
+    r.innerHTML = '<label class="f" style="flex:1 1 260px">Jugador ' + (n + 1) + '<input type="text" autocomplete="off" placeholder="AhKd o QQ+, AKs, 10%" value="' + (v || '') + '"></label>' + '<button class="btn" type="button" data-pick aria-label="Elegir rango en la tabla" title="Elegir en la tabla 13×13">▦</button>' + (n >= 2 ? '<button class="btn" type="button" data-del aria-label="Quitar">✕</button>' : '');
+    const x = r.querySelector('[data-del]'); if (x) x.addEventListener('click', () => { r.remove(); renum(); });
+    r.querySelector('[data-pick]').addEventListener('click', () => picker(r.querySelector('input')));
     $('eq-players').appendChild(r);
   }
   function renum() { [...$('eq-players').children].forEach((r, i) => { r.querySelector('label').firstChild.textContent = 'Jugador ' + (i + 1); }); }
+
+  // ---- 13x13 range picker
+  const RKD = 'AKQJT98765432', GN = []; for (let i = 0; i < 13; i++) for (let j = 0; j < 13; j++) GN.push(i === j ? RKD[i] + RKD[j] : i < j ? RKD[i] + RKD[j] + 's' : RKD[j] + RKD[i] + 'o');
+  const GC = h => h.length === 2 ? 6 : h[2] === 's' ? 4 : 12;
+  const ORD = Array.isArray(E.ORDER) ? E.ORDER : String(E.ORDER).split(/\s+/).filter(Boolean);
+  function compress(set) {
+    const out = [], runs = arr => { const r = []; arr.forEach(x => { if (r.length && r[r.length - 1][r[r.length - 1].length - 1] === x - 1) r[r.length - 1].push(x); else r.push([x]); }); return r; };
+    runs([...Array(13).keys()].filter(i => set.has(RKD[i] + RKD[i]))).forEach(r => { const a = RKD[r[0]] + RKD[r[0]], b = RKD[r[r.length - 1]] + RKD[r[r.length - 1]]; out.push(r[0] === 0 && r.length > 1 ? b + '+' : r.length === 1 ? a : a + '-' + b); });
+    ['s', 'o'].forEach(sf => { for (let i = 0; i < 12; i++) runs([...Array(13).keys()].filter(j => j > i && set.has(RKD[i] + RKD[j] + sf))).forEach(r => { const a = RKD[i] + RKD[r[0]] + sf, b = RKD[i] + RKD[r[r.length - 1]] + sf; out.push(r[0] === i + 1 && r.length > 1 ? b + '+' : r.length === 1 ? a : a + '-' + b); }); });
+    return out.join(', ');
+  }
+  function picker(input) {
+    const sel = new Set(); const w = E.parseRange(input.value);
+    if (!/^([2-9TJQKA][shdc]){2}$/i.test(input.value.replace(/\s/g, ''))) E.COMBOS.forEach(([a, b], i) => { if (w[i] > 0) sel.add(E.classOf(a, b)); });
+    const ov = document.createElement('div'); ov.className = 'pk-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'Elegir rango');
+    ov.innerHTML = '<div class="pk"><div class="row" style="justify-content:space-between;align-items:center"><b>Elige el rango</b><span class="small" id="pk-n"></span></div>' +
+      '<div class="pk-g" id="pk-g">' + GN.map(h => '<span data-h="' + h + '">' + h + '</span>').join('') + '</div>' +
+      '<label class="f">Mejores manos: <b id="pk-pv">—</b><input type="range" id="pk-p" min="0" max="100" step="1" value="0"></label>' +
+      '<div class="row" style="gap:8px;margin-top:10px"><button class="btn pri" type="button" id="pk-ok">Usar este rango</button><button class="btn" type="button" id="pk-clr">Vaciar</button><button class="btn" type="button" id="pk-x">Cancelar</button></div></div>';
+    document.body.appendChild(ov);
+    const g = ov.querySelector('#pk-g');
+    const paint = () => { g.querySelectorAll('span').forEach(el => el.classList.toggle('on', sel.has(el.dataset.h))); const c = [...sel].reduce((a, h) => a + GC(h), 0); ov.querySelector('#pk-n').textContent = c + ' combos · ' + (100 * c / 1326).toFixed(1).replace('.', ',') + ' %'; };
+    let drag = null;
+    const hit = e => { const t = document.elementFromPoint(e.clientX, e.clientY); return t && t.dataset && t.dataset.h && g.contains(t) ? t : null; };
+    g.addEventListener('pointerdown', e => { const t = hit(e); if (!t) return; drag = !sel.has(t.dataset.h); g.setPointerCapture(e.pointerId); drag ? sel.add(t.dataset.h) : sel.delete(t.dataset.h); paint(); e.preventDefault(); });
+    g.addEventListener('pointermove', e => { if (drag === null) return; const t = hit(e); if (!t) return; drag ? sel.add(t.dataset.h) : sel.delete(t.dataset.h); paint(); });
+    g.addEventListener('pointerup', () => { drag = null; });
+    ov.querySelector('#pk-p').addEventListener('input', e => { const p = +e.target.value; sel.clear(); let c = 0; for (const h of ORD) { if (c >= p / 100 * 1326 - 1e-9) break; sel.add(h); c += GC(h); } ov.querySelector('#pk-pv').textContent = p + ' %'; paint(); });
+    const close = () => { ov.remove(); document.removeEventListener('keydown', esc1); };
+    const esc1 = e => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', esc1);
+    ov.querySelector('#pk-x').addEventListener('click', close);
+    ov.addEventListener('click', e => { if (e.target === ov) close(); });
+    ov.querySelector('#pk-clr').addEventListener('click', () => { sel.clear(); paint(); });
+    ov.querySelector('#pk-ok').addEventListener('click', () => { input.value = compress(sel); close(); input.focus(); });
+    paint();
+  }
   addPlayer('AhKh'); addPlayer('QQ+, AKs, AQs, KQs, JTs');
   $('eq-add').addEventListener('click', () => addPlayer(''));
   function parsePlayer(t) {
