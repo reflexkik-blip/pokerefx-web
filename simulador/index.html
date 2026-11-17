@@ -189,6 +189,11 @@ ul.why li::marker { color: var(--chip) }
           <option value="post">Solo después del flop</option>
           <option value="leaks">Mis fugas (más de lo que fallo)</option>
         </select></label>
+      <label>Cómo corregir
+        <select id="s-strat">
+          <option value="gto">GTO: las mezclas del equilibrio cuentan como correctas</option>
+          <option value="pure">Estrategia pura: solo la acción más frecuente es correcta</option>
+        </select></label>
       <label class="check"><input type="checkbox" id="s-easy"> Incluir folds fáciles</label>
       <label class="check"><input type="checkbox" id="s-range" checked> Enseñar el rango del rival al corregir</label>
     </div>
@@ -329,7 +334,7 @@ const STACKS = () => Object.keys(LIB[LIBKEY] || {}).map(Number).sort((a, b) => a
 
 // ------------------------------------------------------------------ settings and stored practice
 const store = { get(k, d) { try { const v = localStorage.getItem('sim.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem('sim.' + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } } };
-const SET = Object.assign({ ctx: 'pko-cubierto', stack: 'all', stackx: 'auto', pos: -1, hands: '', mix: 'real', mode: 'full', easy: false, range: true, focus: '', table: 'new', hud: 'real' }, store.get('set', {}));
+const SET = Object.assign({ ctx: 'pko-cubierto', stack: 'all', stackx: 'auto', pos: -1, hands: '', mix: 'real', mode: 'full', strat: 'gto', easy: false, range: true, focus: '', table: 'new', hud: 'real' }, store.get('set', {}));
 let HIST = store.get('hist', []);
 
 // ------------------------------------------------------------------ opponent models: rates from the hero's tables, shrunk to the population when few hands
@@ -1143,7 +1148,9 @@ function spotTitle(key) {
 function gradePre(sp, k, i) {
   const L = sp.L[k] || null, F = sp.F[k];
   const loss = L ? L[i] : (F[i] >= 0.1 ? 0 : 0.5);
-  const v = loss <= 0.05 ? 'ok' : loss <= 0.3 ? 'meh' : 'bad';
+  let v = loss <= 0.05 ? 'ok' : loss <= 0.3 ? 'meh' : 'bad';
+  // pure strategy: only the equilibrium's most frequent action is right (a near-tie, within 2 points, also counts)
+  if (SET.strat === 'pure') { const top = Math.max(...F); if (F[i] < top - 0.02) v = loss <= 0.3 ? 'meh' : 'bad'; else v = 'ok'; }
   return { loss, v };
 }
 function setHeroRange(sp, i) {
@@ -1837,6 +1844,7 @@ function coachPre(sp, k, i, g) {
   const why = [];
   const mixed = F.filter(x => x >= 0.1).length > 1;
   why.push('Con <b>' + N[k] + '</b> la tabla ' + (mixed ? 'mezcla: ' + sp.ac.map((c, a) => F[a] >= 0.1 ? acLabel(c, sp).replace(/ \d.*$/, '') + ' ' + pc(F[a]) : '').filter(Boolean).join(', ') : 'hace siempre <b>' + acLabel(sp.ac[bestI], sp) + '</b>') + '.');
+  if (SET.strat === 'pure' && mixed) { const ti = F.indexOf(Math.max(...F)); why.push('En estrategia pura juegas siempre la opción más frecuente: <b>' + acLabel(sp.ac[ti], sp) + '</b>. Pierdes poco frente a la mezcla y es mucho más fácil de aplicar en la mesa.'); }
   const vsx = (G.key.split('|')[2] || '').split(',').filter(x => x !== '').map(Number);
   if (vsx.length) { const vv = G.seats[vsx[0]].st; why.push('Este rival (' + TNAME(G.seats[vsx[0]].type) + '): VPIP ' + Math.round(vv.vpip) + ' · PFR ' + Math.round(vv.pfr) + ' · limp ' + Math.round(vv.limp) + ' · 3-bet ' + Math.round(vv.three) + ' · foldea al 3-bet ' + Math.round(vv.f3) + ' %.'); }
   preTips(sp, k).forEach(x => why.push(x));
@@ -1922,6 +1930,7 @@ function gradeGTO(rec, q, op, P) {
   const T = { flop: [0.1, 0.03, 0.4, 0.08], turn: [0.07, 0.02, 0.35, 0.07], river: [0.05, 0.015, 0.3, 0.06] }[rec.street] || [0.05, 0.015, 0.3, 0.06];
   const okT = Math.max(T[0], T[1] * P);   // the EV decides; a frequent action in the equilibrium only gets some extra tolerance for the solver's noise
   rec.v = rec.loss <= okT || (mine.f >= 0.25 && rec.loss <= 2 * okT) ? 'ok' : rec.loss <= Math.max(T[2], T[3] * P) ? 'meh' : 'bad';
+  if (SET.strat === 'pure') { const top = Math.max(...q.acts.map(a => a.f)); rec.v = mine.f >= top - 0.02 ? 'ok' : rec.loss <= Math.max(T[2], T[3] * P) ? 'meh' : 'bad'; }
 }
 const ACTN = (a, P) => a.name === 'check' ? 'Check' : a.name === 'fold' ? 'Fold' : a.name === 'call' ? 'Pagar' : a.name === 'bet' ? (a.allin ? 'All-in' : 'Apostar ' + Math.round(100 * a.size) + ' %') : (a.allin ? 'Subir all-in' : 'Subir');
 function gtoHead(rec, q, op, st, board, P, xbest) {
@@ -2168,7 +2177,8 @@ function startReal() {
 function realAnswer(sp, i, lab, potNow) {
   const a = sp.acts[i], P = sp.pot, loss = Math.max(0, -a[2]);
   const T = { flop: [0.1, 0.03, 0.4, 0.08], turn: [0.07, 0.02, 0.35, 0.07], river: [0.05, 0.015, 0.3, 0.06] }[sp.st], okT = Math.max(T[0], T[1] * P);
-  const v = loss <= okT || (a[1] >= 0.25 && loss <= 2 * okT) ? 'ok' : loss <= Math.max(T[2], T[3] * P) ? 'meh' : 'bad';
+  let v = loss <= okT || (a[1] >= 0.25 && loss <= 2 * okT) ? 'ok' : loss <= Math.max(T[2], T[3] * P) ? 'meh' : 'bad';
+  if (SET.strat === 'pure') { const top = Math.max(...sp.acts.map(x => x[1])); v = a[1] >= top - 0.02 ? 'ok' : loss <= Math.max(T[2], T[3] * P) ? 'meh' : 'bad'; }
   const done = store.get('real', {}); done[sp.id] = [a[0], +loss.toFixed(2), v]; store.set('real', done);
   const bi = sp.acts.findIndex(x => x[2] === 0), ri = sp.acts.findIndex(x => x[0] === sp.did), mixed = sp.acts.filter(x => x[1] >= 0.15);
   const rows = sp.acts.map((x, j) => '<tr class="' + (j === bi ? 'best ' : '') + (j === i ? 'mine' : '') + '"><td>' + lab(x) + (j === ri ? ' <span class="small">· lo que jugaste</span>' : '') + '</td><td>' + pc(x[1]) + '</td><td>' + (j === bi ? 'mejor' : '−' + f1(-x[2])) + '</td></tr>').join('');
@@ -2189,7 +2199,7 @@ function bindSettings() {
   const hi = $('s-hands'); hi.value = SET.hands || ''; const ph = () => { const r = parseHands(hi.value); HANDS = r.list; $('s-hands-msg').textContent = hi.value.trim() ? (r.list.length ? r.list.length + ' manos' : 'No reconozco esas manos') + (r.bad.length ? ' · no entiendo: ' + r.bad.join(' ') : '') : ''; };
   ph(); hi.addEventListener('change', () => { SET.hands = hi.value; store.set('set', SET); ph(); startHand(); });
   Object.entries(map).forEach(([id, k]) => { const e = $(id); e.value = String(SET[k]); e.addEventListener('change', () => { SET[k] = e.value; store.set('set', SET); if (k === 'ctx') loadLib(); else startHand(); }); });
-  $('s-easy').checked = SET.easy; $('s-easy').addEventListener('change', e => { SET.easy = e.target.checked; store.set('set', SET); });
+  $('s-strat').value = SET.strat || 'gto'; $('s-strat').addEventListener('change', e => { SET.strat = e.target.value; store.set('set', SET); }); $('s-easy').checked = SET.easy; $('s-easy').addEventListener('change', e => { SET.easy = e.target.checked; store.set('set', SET); });
   $('s-range').checked = SET.range; $('s-range').addEventListener('change', e => { SET.range = e.target.checked; store.set('set', SET); if (!SET.range) $('rangebox').hidden = true; });
 }
 window.addEventListener('resize', () => { if (G) render(); });
