@@ -1074,7 +1074,8 @@ function keyName(key) {
   return ({ '': 'Abrir desde ' + P, R: P + ' contra open de ' + vs[0], ROL: P + ' contra limp de ' + vs[0], L: 'BB contra limp de SB', S: P + ' contra all-in de ' + vs[0],
     SQZ: P + ' contra open de ' + vs[0] + ' y call de ' + vs[1], OVC: P + ' contra all-in de ' + vs[0] + ' y call de ' + vs[1], R3: P + ' contra 3-bet de ' + vs[0], RJ: P + ' contra 3-bet all-in de ' + vs[0],
     R34: P + ' contra 4-bet de ' + vs[0], R3J: P + ' contra 4-bet all-in de ' + vs[0], R34J: P + ' contra 5-bet all-in de ' + vs[0], ROL3: P + ' contra limp-resubida de ' + vs[0], ROLJ: P + ' contra limp y all-in de ' + vs[0],
-    LR: 'SB: limp y la BB sube', LJ: 'SB: limp y la BB va all-in', LRJ: 'BB: subes el limp y la SB va all-in', LR3: 'BB: subes el limp y la SB resube', LR3J: 'SB: resubes y la BB va all-in' })[h] || key;
+    LR: 'SB: limp y la BB sube', LJ: 'SB: limp y la BB va all-in', LRJ: 'BB: subes el limp y la SB va all-in', LR3: 'BB: subes el limp y la SB resube', LR3J: 'SB: resubes y la BB va all-in',
+    SQR: P + ' contra squeeze de ' + vs[0] + ' (abriste y pagó ' + vs[1] + ')', SQRJ: P + ' contra squeeze all-in de ' + vs[0] + ' (abriste y pagó ' + vs[1] + ')', SQC: P + ' contra squeeze de ' + vs[0] + ' (pagaste el open de ' + vs[1] + ')', SQCJ: P + ' contra squeeze all-in de ' + vs[0] + ' (pagaste el open de ' + vs[1] + ')' })[h] || key;
 }
 function setFocus(key) {
   SET.focus = key || ''; store.set('set', SET);
@@ -1143,7 +1144,8 @@ function spotTitle(key) {
     SQZ: 'Open de ' + (vs.length ? T(vs[0]) : '') + ' y call de ' + (vs.length > 1 ? T(vs[1]) : ''), OVC: 'All-in de ' + (vs.length ? T(vs[0]) : '') + ' y call de ' + (vs.length > 1 ? T(vs[1]) : ''),
     R3: 'Te hacen 3-bet: ' + (vs.length ? T(vs[0]) : ''), RJ: 'Te hacen 3-bet all-in: ' + (vs.length ? T(vs[0]) : ''), R34: 'Te hacen 4-bet: ' + (vs.length ? T(vs[0]) : ''), R3J: 'Te hacen 4-bet all-in: ' + (vs.length ? T(vs[0]) : ''),
     R34J: '5-bet all-in de ' + (vs.length ? T(vs[0]) : ''), ROL3: 'El limper resube: ' + (vs.length ? T(vs[0]) : ''), ROLJ: 'El limper va all-in: ' + (vs.length ? T(vs[0]) : ''), LR: 'Hiciste limp y la BB sube', LJ: 'Hiciste limp y la BB va all-in',
-    LRJ: 'Subiste el limp y la SB va all-in', LR3: 'Subiste el limp y la SB resube', LR3J: 'Resubiste y la BB va all-in' })[h] || key;
+    LRJ: 'Subiste el limp y la SB va all-in', LR3: 'Subiste el limp y la SB resube', LR3J: 'Resubiste y la BB va all-in',
+    SQR: 'Squeeze de ' + (vs.length ? T(vs[0]) : ''), SQRJ: 'Squeeze all-in de ' + (vs.length ? T(vs[0]) : ''), SQC: 'Squeeze de ' + (vs.length ? T(vs[0]) : '') + ' (el que abrió foldea)', SQCJ: 'Squeeze all-in de ' + (vs.length ? T(vs[0]) : '') + ' (el que abrió foldea)' })[h] || key;
 }
 function gradePre(sp, k, i) {
   const L = sp.L[k] || null, F = sp.F[k];
@@ -1201,7 +1203,10 @@ function continuePre(code) {
       if (isShove) { applyPre(s, 'call', S); return allinShowdown(); }
       if (a === 'call') {
         applyPre(s, 'call', size);
-        const q = overcall(order.slice(order.indexOf(p) + 1).filter(x => !(x < hp && x !== 4 && x !== 5)), hp, size);
+        const behindP = order.slice(order.indexOf(p) + 1).filter(x => !(x < hp && x !== 4 && x !== 5));
+        const sq = squeezeBehind(behindP, hp, p);
+        if (sq) { foldOthers([hp, p, sq.q]); return nextSpot(sq.key); }
+        const q = overcall(behindP, hp, size);
         if (q != null) return mwPre([p, q], [prePolicy(s, 'vsopen', { j: p, o: hp, S }).call, overRange(q, hp)], hp);
         foldRest(p); return toFlop();
       }
@@ -1224,6 +1229,18 @@ function continuePre(code) {
     }
     if (code === 'C') {                           // you call the open: the players behind you may call too
       const size = G.seats[o].inv, behind = [...Array(6).keys()].map(i => (hp + 1 + i) % 6).filter(x => x !== hp && x !== o && (x === 4 || x === 5 || x > hp) && !G.seats[x].folded && !G.seats[x].hero);
+      if (G.mode !== 'post') {
+        const sq = squeezeBehind(behind, o, hp);
+        if (sq) {                                 // the opener answers first (in the solver's model the caller acts only if he folds)
+          foldOthers([hp, o, sq.q]);
+          const so = G.seats[o], ko = so.k, ro = lib(G.S, (sq.allin ? 'SQRJ|' : 'SQR|') + o + '|' + sq.q + ',' + hp), ao = ro ? libAct(ro, ko) : 'F';
+          if (ao === 'F') { applyPre(so, 'fold'); return nextSpot((sq.allin ? 'SQCJ|' : 'SQC|') + hp + '|' + sq.q + ',' + o); }
+          if (ao === 'A' || sq.allin) { applyPre(so, sq.allin ? 'call' : 'shove', G.S); }
+          else applyPre(so, 'call', G.seats[sq.q].inv);
+          log('Con el que abrió dentro, el modelo del solver te deja fuera: foldeas.', 'st'); applyPre(G.seats[hp], 'fold');
+          return endHand(who(so) + ' sigue en la mano contra el squeeze; tu call del open queda sin opciones.', false, true);
+        }
+      }
       const q = overcall(behind, o, size);
       if (q != null) return mwPre([o, q], [prePolicy(G.seats[o], 'open', { p: o, S: G.S }).raise, overRange(q, o)], o);
       foldRestBehind(); return toFlop();
@@ -1260,6 +1277,7 @@ function continuePre(code) {
     if (G.S <= 30 || !r3) { applyPre(s, 'shove'); return nextSpot('ROLJ|' + hp + '|' + lp); }
     applyPre(s, 'raise', parseFloat(r3.sz.slice(1))); return nextSpot('ROL3|' + hp + '|' + lp);
   }
+  if (['SQR', 'SQRJ', 'SQC', 'SQCJ'].includes(hist)) return answerSqueeze(hist, code);
   if (['S', 'OVC', 'RJ', 'R3J', 'R34J', 'ROLJ', 'LJ', 'LRJ', 'LR3J'].includes(hist)) {
     const v = +G.key.split('|')[2].split(',')[0]; G.vill = v; if (!(code === 'C' && hist === 'OVC')) foldRestBehind();
     if (code === 'C' && hist === 'OVC') {        // all-in, a call and you call: three-way showdown with side pots
@@ -1281,9 +1299,59 @@ function continuePre(code) {
   }
   endHand('Fin de la mano.', false, true);
 }
+// squeezes from the players behind (17-nov): each one squeezes with the library's SQZ frequency for his hand, scaled
+// by how much he 3-bets compared with a regular (maniacs more, nits less); the answers come from the mw_resp.py tables.
+function libAct(sp, k) { let x = rnd(); for (let a = 0; a < sp.ac.length; a++) { x -= sp.F[k][a]; if (x < 0) return sp.ac[a][0] === 'R' ? 'R' : sp.ac[a]; } return 'F'; }
+function squeezeBehind(players, opener, caller) {
+  for (const q of players) {
+    const s = G.seats[q]; if (s.folded || s.hero) continue;
+    const sp = lib(G.S, 'SQZ|' + q + '|' + opener + ',' + caller); if (!sp) continue;
+    const f = sp.F[s.k], adj = Math.min(2.5, Math.max(0.4, ((s.st && s.st.three) || 7) / 7));
+    let pr = 0, pa = 0; sp.ac.forEach((c, a) => { if (c === 'A') pa += f[a]; else if (c[0] === 'R') pr += f[a]; });
+    const x = rnd();
+    const okR = pr * adj, okA = pa * adj;
+    if (x < okR && lib(G.S, 'SQR|' + opener + '|' + q + ',' + caller)) {
+      const code = sp.ac.find(c => c[0] === 'R'); applyPre(s, 'raise', parseFloat(code.slice(1)));
+      return { q, allin: false, key: 'SQR|' + opener + '|' + q + ',' + caller };
+    }
+    if (x < okR + okA && lib(G.S, 'SQRJ|' + opener + '|' + q + ',' + caller)) { applyPre(s, 'shove'); return { q, allin: true, key: 'SQRJ|' + opener + '|' + q + ',' + caller }; }
+  }
+  return null;
+}
+function foldOthers(keepL) { const keep = new Set(keepL); G.seats.forEach(x => { if (!keep.has(x.pos) && !x.folded) { x.folded = true; if (!x.bubble) { x.bubble = 'Fold'; log(who(x) + ' foldea'); } } }); render(); }
+function answerSqueeze(hist, code) {
+  const [, p, v] = G.key.split('|'); const hp = +p, [q, other] = v.split(',').map(Number), sq = G.seats[q], so = G.seats[other];
+  G.vill = q;
+  if (code === 'F') return endHand('Has foldeado al squeeze.');
+  if (hist === 'SQRJ' || hist === 'SQCJ') {        // you call the squeeze all-in; the other player (still in) answers from his table
+    applyPre(G.seats[hp], 'call', Math.min(G.seats[hp].stack, sq.inv));
+    if (hist === 'SQRJ' && !so.folded) { const t = lib(G.S, 'SQCJ|' + other + '|' + q + ',' + hp); if (t && libAct(t, so.k) === 'C') { applyPre(so, 'call', Math.min(so.stack, sq.inv)); G.mw = { ps: [hp, q, other], w: {}, reveal: true }; G.vill = null; G.street = 'allin'; G.board = G.runout.slice(0, 5); log('All-in a tres. Mesa: ' + G.board.map(ctext).join(' '), 'st'); render(); return mwShowdown(); } applyPre(so, 'fold'); }
+    return allinShowdown();
+  }
+  if (code === 'A') {                               // you 4-bet all-in over the squeeze
+    if (!so.folded) applyPre(so, 'fold');
+    const sqR = (() => { const t = lib(G.S, 'SQZ|' + q + '|' + (hist === 'SQR' ? hp + ',' + other : other + ',' + hp)); const r = new Float32Array(169); if (t) for (let k = 0; k < 169; k++) t.ac.forEach((c, a) => { if (c[0] === 'R') r[k] += t.F[k][a]; }); return r.some(x => x > 0) ? r : new Float32Array(169).fill(0.1); })();
+    const a = actOf(prePolicy(sq, 'vs4bet', { range: sqR }), sq.k);
+    if (a === 'call') { applyPre(sq, 'call', G.S); return allinShowdown(); }
+    applyPre(sq, 'fold'); return endHand('Foldea a tu all-in.', true);
+  }
+  // you call the squeeze
+  applyPre(G.seats[hp], 'call', sq.inv);
+  if (hist === 'SQR' && !so.folded) {               // the caller of your open answers the squeeze too
+    const t = lib(G.S, 'SQC|' + other + '|' + q + ',' + hp), a = t ? libAct(t, so.k) : 'F';
+    if (a === 'C') { applyPre(so, 'call', sq.inv); if (G.mode === 'pre') return endHand('Fin del preflop (en este modo no se juega el resto).', false, true);
+      const col = (sp, f) => { const r = new Float32Array(169); if (sp) for (let k = 0; k < 169; k++) sp.ac.forEach((c, a) => { if (f(c)) r[k] += sp.F[k][a] * (sp.W ? sp.W[k] : 1); }); return r; };
+      let sqR = col(lib(G.S, 'SQZ|' + q + '|' + hp + ',' + other), c => c[0] === 'R'), cR = col(t, c => c === 'C');
+      if (!sqR.some(x => x > 0)) sqR = new Float32Array(169).fill(0.15); if (!cR.some(x => x > 0)) cR = new Float32Array(169).fill(0.3);
+      return mwStart([q, other], [sqR, cR], q); }
+    applyPre(so, 'fold');
+  }
+  if (G.mode === 'pre') return endHand('Fin del preflop (en este modo no se juega el resto).', false, true);
+  return toFlop();
+}
 // overcalls: after a call, each player behind may also call the open. Measured in your 11.700 hands: after an open and a
 // call, the others call 18,1 % (cold-call without a caller 16,4 %, ratio 1,10) and the BB 49,3 % (53,1 %, ratio 0,93).
-// Squeezes are left out.
+// Squeezes: see squeezeBehind.
 const OVC = { bb: 0.93, other: 1.1 };
 function overcall(players, opener, size) {
   for (const q of players) {
