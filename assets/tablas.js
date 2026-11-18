@@ -15,7 +15,7 @@
     ['vs3', 'Contra 3-bet', k => ['R3', 'RJ'].includes(k[0]), 'Abriste y te resuben.'],
     ['vs4', 'Contra 4-bet', k => ['R34', 'R3J', 'R34J'].includes(k[0]), 'Resubiste y te vuelven a subir.'],
     ['vsshove', 'Contra all-in', k => ['S', 'OVC'].includes(k[0]), 'Un rival va all-in (y a veces otro paga).'],
-    ['squeeze', 'Squeeze', k => k[0] === 'SQZ', 'Un open y un call antes que tú.'],
+    ['squeeze', 'Squeeze', k => ['SQZ', 'SQR', 'SQRJ', 'SQC', 'SQCJ'].includes(k[0]), 'Hacer squeeze, o responder a uno si abriste o pagaste.'],
     ['limp', 'Limps', k => ['ROL', 'L', 'LR', 'LJ', 'LRJ', 'LR3', 'LR3J', 'ROL3', 'ROLJ'].includes(k[0]), 'Botes con limp.'],
   ];
   function keyName(key) {
@@ -23,7 +23,8 @@
     return ({ '': 'Abrir desde ' + P, R: P + ' contra open de ' + vs[0], ROL: P + ' contra limp de ' + vs[0], L: 'BB contra limp de la SB', S: P + ' contra all-in de ' + vs[0],
       SQZ: P + ' contra open de ' + vs[0] + ' y call de ' + vs[1], OVC: P + ' contra all-in de ' + vs[0] + ' y call de ' + vs[1], R3: P + ' contra 3-bet de ' + vs[0], RJ: P + ' contra 3-bet all-in de ' + vs[0],
       R34: P + ' contra 4-bet de ' + vs[0], R3J: P + ' contra 4-bet all-in de ' + vs[0], R34J: P + ' contra 5-bet all-in de ' + vs[0], ROL3: P + ' contra limp-resubida de ' + vs[0], ROLJ: P + ' contra limp y all-in de ' + vs[0],
-      LR: 'SB: limp y la BB sube', LJ: 'SB: limp y la BB va all-in', LRJ: 'BB: subes el limp y la SB va all-in', LR3: 'BB: subes el limp y la SB resube', LR3J: 'SB: resubes y la BB va all-in' })[h] || key;
+      LR: 'SB: limp y la BB sube', LJ: 'SB: limp y la BB va all-in', LRJ: 'BB: subes el limp y la SB va all-in', LR3: 'BB: subes el limp y la SB resube', LR3J: 'SB: resubes y la BB va all-in',
+      SQR: P + ' contra squeeze de ' + vs[0] + ' (abriste y pagó ' + vs[1] + ')', SQRJ: P + ' contra squeeze all-in de ' + vs[0] + ' (abriste y pagó ' + vs[1] + ')', SQC: P + ' contra squeeze de ' + vs[0] + ' (pagaste el open de ' + vs[1] + ')', SQCJ: P + ' contra squeeze all-in de ' + vs[0] + ' (pagaste el open de ' + vs[1] + ')' })[h] || key;
   }
   function decode(sp) {
     if (sp.F) return sp; const A = sp.ac.length, q = sp.q, s = sp.f;
