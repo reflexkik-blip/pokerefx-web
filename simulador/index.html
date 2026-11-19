@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.google.com https://*.gstatic.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; frame-src https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<html lang="es"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.google.com https://*.gstatic.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://pokerefx.goatcounter.com https://*.supabase.co wss://*.supabase.co https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; frame-src https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><script data-goatcounter="https://pokerefx.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Simulador de torneos de póker gratis: juega manos 6-max contra rivales realistas y recibe la corrección GTO de un solver en cada decisión, preflop y postflop.">
 <link rel="canonical" href="https://pokerefx.com/simulador/"><script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
@@ -96,6 +96,12 @@ input[type=text] { background: var(--bg); color: var(--ink); border: 1px solid v
 .actions { display: flex; flex-wrap: wrap; gap: 8px; min-height: 44px; align-items: center }
 .btn { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 9px; padding: 9px 14px; font-weight: 600; cursor: pointer; font-variant-numeric: tabular-nums }
 .btn:hover { border-color: var(--accent) }
+.pick { background: var(--panel, transparent); border: 1px solid var(--line, #ccc); border-radius: 9px; padding: 6px 10px; margin-bottom: 8px; font-size: 13px }
+.pick summary { cursor: pointer; font-weight: 600 }
+.pickrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin-top: 8px }
+.pickrow label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; min-width: 0 }
+.pickrow select { max-width: 100% }
+.pick p { margin: 6px 0 0 }
 .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 .btn.pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
 .btn.fold { color: var(--ink2) }
@@ -201,6 +207,18 @@ ul.why li::marker { color: var(--chip) }
 
   <div class="main">
     <div class="tablebox">
+      <details class="pick" id="pick"><summary>Elegir spot</summary>
+        <div class="pickrow">
+          <label>Formato<select id="p-ctx"></select></label>
+          <label>Situación<select id="p-type"></select></label>
+          <label id="p-v1l"><span id="p-v1t">Rival</span><select id="p-v1"></select></label>
+          <label id="p-v2l"><span id="p-v2t">Paga</span><select id="p-v2"></select></label>
+          <label>Tú<select id="p-hero"></select></label>
+          <label>Stack<select id="p-stack"></select></label>
+          <button class="btn pri" type="button" id="p-go">Practicar este spot</button>
+        </div>
+        <p class="small" id="p-msg"></p>
+      </details>
       <div class="focus" id="focus" hidden></div>
       <div class="stake" id="stake"></div>
       <div class="table" id="table" aria-label="Mesa de póker">
@@ -969,12 +987,27 @@ function makeScenario(seed, isSub) {
     let S = SET.stackx !== 'auto' && STACKS().includes(+SET.stackx) ? +SET.stackx : stackChoice(), hp = SET.pos >= 0 ? +SET.pos : Math.floor(rnd() * 6);
     const FP = fixedPlayers();
     if (FP && SET.pos < 0) hp = REPLAY && REPLAY.cfg && REPLAY.cfg.thp != null ? REPLAY.cfg.thp : TABLE.hp;
-    if (focus) { hp = +focus.split('|')[1]; if (!fStacks.includes(S)) S = pick(fStacks.length ? fStacks : STACKS()); }
+    if (focus) { hp = +focus.split('|')[1]; if (fStacks.includes(+SET.fstack)) S = +SET.fstack; else if (!fStacks.includes(S)) S = pick(fStacks.length ? fStacks : STACKS()); }
     const mw = mixWeights();
     const seats = newSeats(); const dead = {};
     const hc = heroCards(dead);
     seats.forEach(s => { s.hero = s.pos === hp; if (s.hero) { s.type = 'hero'; s.cards = hc; } else { const g = FP ? FP[(s.pos - hp + 6) % 6 - 1] : genPlayer(); s.type = g.type; s.st = g.st; s.m = g.m; s.prof = g.st; s.pid = g.id || null; s.cards = deal(2, dead); } s.k = classOf(s.cards[0], s.cards[1]); s.stack = S; });
     const acts = []; let opener = null, limper = null, shover = null, caller = null, bad = false, openSize = null;
+    if (focus && ['', 'R', 'SQZ', 'ROL', 'L', 'S', 'OVC'].includes(focus.split('|')[0])) {
+      // a spot chosen in «Elegir spot»: the players before the hero make exactly that line, with cards drawn from the
+      // range the library gives them for it (so their hand at showdown fits what they did)
+      const [fh, , fv] = focus.split('|'), vs = (fv || '').split(',').filter(x => x !== '').map(Number);
+      const fit = (s, key, ok) => { const sp0 = lib(S, key); if (!sp0) return; for (let t = 0; t < 300; t++) { const k = classOf(s.cards[0], s.cards[1]); let f = 0; sp0.ac.forEach((c, a) => { if (ok(c)) f += sp0.F[k][a]; }); if (rnd() < f) break; s.cards.forEach(c => delete dead[c]); s.cards = deal(2, dead); } s.k = classOf(s.cards[0], s.cards[1]); };
+      for (let p = 0; p < hp; p++) {
+        const s = seats[p];
+        if ((fh === 'R' || fh === 'SQZ') && p === vs[0]) { opener = p; openSize = libSize(S, '|' + p + '|', 'R') || 2.2; fit(s, '|' + p + '|', c => c[0] === 'R'); acts.push([p, 'raise', openSize]); }
+        else if (fh === 'SQZ' && p === vs[1]) { caller = p; fit(s, 'R|' + p + '|' + vs[0], c => c === 'C'); acts.push([p, 'call', openSize]); }
+        else if ((fh === 'S' || fh === 'OVC') && p === vs[0]) { shover = p; fit(s, '|' + p + '|', c => c === 'A'); acts.push([p, 'shove', S]); }
+        else if (fh === 'OVC' && p === vs[1]) { caller = p; fit(s, 'S|' + p + '|' + vs[0], c => c === 'C'); acts.push([p, 'call', S]); }
+        else if ((fh === 'ROL' || fh === 'L') && p === vs[0]) { limper = p; acts.push([p, 'limp', 1]); }
+        else acts.push([p, 'fold']);
+      }
+    } else
     for (let p = 0; p < hp; p++) {
       const s = seats[p], t = s.type;
       if (opener == null && limper == null && shover == null) {
@@ -1078,7 +1111,7 @@ function keyName(key) {
     SQR: P + ' contra squeeze de ' + vs[0] + ' (abriste y pagó ' + vs[1] + ')', SQRJ: P + ' contra squeeze all-in de ' + vs[0] + ' (abriste y pagó ' + vs[1] + ')', SQC: P + ' contra squeeze de ' + vs[0] + ' (pagaste el open de ' + vs[1] + ')', SQCJ: P + ' contra squeeze all-in de ' + vs[0] + ' (pagaste el open de ' + vs[1] + ')' })[h] || key;
 }
 function setFocus(key) {
-  SET.focus = key || ''; store.set('set', SET);
+  SET.focus = key || ''; if (!SET.focus) SET.fstack = ''; store.set('set', SET);
   const f = $('focus'); f.hidden = !SET.focus;
   if (SET.focus) { f.innerHTML = '<span>Practicando solo: <b>' + keyName(SET.focus) + '</b></span>'; const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.style.padding = '3px 10px'; b.textContent = 'Volver a manos normales'; b.addEventListener('click', () => { setFocus(''); startHand(); }); f.appendChild(b); }
 }
@@ -1096,7 +1129,7 @@ function startHand(seed, isSub) {
   const sc = makeScenario(seed, !!isSub);
   if (!sc) { setActions([{ label: 'Probar otra vez', cls: 'pri', fn: startHand }], 'No he encontrado una situación con estos ajustes. Prueba otro stack o contexto.'); return; }
   G = { S: sc.S, hp: sc.hp, seats: sc.seats, key: sc.key, street: 'pre', board: [], log: [], decs: [], dead: 0, vill: null, reveal: null, turn: sc.hp, sc, seed: sc.sub, runout: sc.runout, replay: !!REPLAY,
-    mode: SET.mode, cfg: { ctx: LIBKEY, stack: SET.stack, stackx: SET.stackx, pos: SET.pos, hands: SET.hands, mix: SET.mix, mode: SET.mode, easy: SET.easy, focus: SET.focus || '' } };
+    mode: SET.mode, cfg: { ctx: LIBKEY, stack: SET.stack, stackx: SET.stackx, pos: SET.pos, hands: SET.hands, mix: SET.mix, mode: SET.mode, easy: SET.easy, focus: SET.focus || '', fstack: SET.fstack || '' } };
   G.ctxName = $('s-ctx').querySelector('option[value="' + LIBKEY + '"]').textContent + ' · ' + sc.S + ' bb';
   if (SET.table === 'fixed' && !REPLAY && TABLE) { G.cfg.tp = TABLE.players.map(p => ({ id: p.id, type: p.type, st: p.st, m: p.m })); G.cfg.thp = sc.hp; G.fixed = true; if (SET.pos < 0 && !SET.focus) TABLE.hp = (sc.hp + 5) % 6; TABLE.hands++; saveTable(); }
   const lv = pick([[100, 200], [150, 300], [200, 400], [250, 500], [300, 600], [400, 800], [500, 1000], [600, 1200], [800, 1600], [1000, 2000], [1500, 3000]]);
@@ -2170,6 +2203,42 @@ function renderPrinciples() {
   }
   $('princ-body').innerHTML = groups.map(([t, xs]) => '<h2 style="margin-top:10px">' + t + '</h2><ul class="why">' + xs.map(x => '<li>' + x + '</li>').join('') + '</ul>').join('');
 }
+// «Elegir spot»: pick the exact first decision to practise (who did what before you, your seat, the stack, the format).
+// Only spots the loaded library has are offered; the choice becomes SET.focus (the library key) and SET.fstack.
+const PTYPES = [['', 'Abrir (nadie ha entrado)'], ['R', 'Contra un open'], ['SQZ', 'Squeeze: open y call delante'], ['ROL', 'Contra un limp'], ['S', 'Contra un all-in'], ['OVC', 'Contra all-in y call']];
+function pickKeys() { const d = LIB[LIBKEY] || {}, out = {}; STACKS().forEach(x => { const t = d[x]; if (!t || x < 3) return; for (const k in t) { const h = k.split('|')[0]; if (PTYPES.some(p => p[0] === h) || h === 'L') (out[k] = out[k] || []).push(x); } }); return out; }
+function pickBuild(keep) {
+  const K = pickKeys(), ty = $('p-type'), v1 = $('p-v1'), v2 = $('p-v2'), he = $('p-hero'), st = $('p-stack');
+  if (keep && SET.focus && !K[SET.focus] && PTYPES.concat([['L']]).some(p => p[0] === SET.focus.split('|')[0])) setFocus('');
+  const cur = keep && SET.focus && K[SET.focus] ? SET.focus.split('|') : null;
+  const tyOf = k => k.split('|')[0] === 'L' ? 'ROL' : k.split('|')[0];
+  const keys = Object.keys(K);
+  ty.innerHTML = PTYPES.filter(p => keys.some(k => tyOf(k) === p[0])).map(p => '<option value="' + p[0] + '">' + p[1] + '</option>').join('');
+  if (cur) ty.value = cur[0] === 'L' ? 'ROL' : cur[0];
+  const opts = (sel, vals, val) => { sel.innerHTML = vals.map(v => '<option value="' + v + '">' + POS[v] + '</option>').join(''); if (vals.includes(+val)) sel.value = val; };
+  const sub = (lvl) => {
+    const T = ty.value, ks = keys.filter(k => tyOf(k) === T).map(k => { const [, h, v] = k.split('|'); const vs = (v || '').split(',').filter(x => x !== '').map(Number); return { k, h: +h, a: vs[0], b: vs[1] }; });
+    const two = T === 'SQZ' || T === 'OVC', one = T !== '';
+    $('p-v1l').hidden = !one; $('p-v2l').hidden = !two;
+    $('p-v1t').textContent = { R: 'Abre', SQZ: 'Abre', ROL: 'Hace limp', S: 'All-in', OVC: 'All-in' }[T] || 'Rival';
+    let ok = ks;
+    if (one) { if (lvl <= 1) opts(v1, [...new Set(ks.map(o => o.a))].sort(), cur && lvl === 0 ? cur[2].split(',')[0] : v1.value); ok = ok.filter(o => o.a === +v1.value); }
+    if (two) { if (lvl <= 2) opts(v2, [...new Set(ok.map(o => o.b))].sort(), cur && lvl === 0 ? cur[2].split(',')[1] : v2.value); ok = ok.filter(o => o.b === +v2.value); }
+    if (lvl <= 3) opts(he, [...new Set(ok.map(o => o.h))].sort(), cur && lvl === 0 ? cur[1] : he.value);
+    ok = ok.filter(o => o.h === +he.value);
+    const k = ok[0] && ok[0].k, ss = k ? K[k] : [], sv = lvl === 0 ? String(SET.fstack || '') : st.value;
+    st.innerHTML = '<option value="">Al azar (' + (ss.length ? ss[0] + '–' + ss[ss.length - 1] + ' bb' : '—') + ')</option>' + ss.map(x => '<option value="' + x + '">' + x + ' bb</option>').join(''); st.value = ss.includes(+sv) ? sv : '';
+    $('p-go').disabled = !k; $('p-go').dataset.key = k || '';
+    $('p-msg').textContent = k ? keyName(k) + ' · ' + $('p-ctx').selectedOptions[0].textContent : 'Esa combinación no está en la librería de este formato.';
+  };
+  ty.onchange = () => sub(1); v1.onchange = () => sub(2); v2.onchange = () => sub(3); he.onchange = () => sub(4); st.onchange = () => sub(5);
+  sub(0);
+}
+function pickInit() {
+  const pc_ = $('p-ctx'); pc_.innerHTML = $('s-ctx').innerHTML; pc_.value = SET.ctx;
+  pc_.addEventListener('change', () => { SET.ctx = pc_.value; $('s-ctx').value = pc_.value; store.set('set', SET); setFocus(''); loadLib(); });
+  $('p-go').addEventListener('click', () => { const k = $('p-go').dataset.key; if (!k) return; SET.fstack = $('p-stack').value; if (SET.mode === 'real' || SET.mode === 'leaks') { SET.mode = 'full'; $('s-mode').value = 'full'; } setFocus(k); startHand(); });
+}
 // play a past hand again: same settings and seed, so the seats, cards and board are the same
 function replay(d) {
   REPLAY = d; const keep = Object.assign({}, SET); Object.assign(SET, { focus: '' }, d.cfg, { ctx: d.cfg.ctx });
@@ -2179,9 +2248,10 @@ function replay(d) {
 }
 function loadLib() {
   LIBKEY = SET.ctx;
-  if (LIB[LIBKEY]) { fillStacks(); startHand(); return; }
+  $('p-ctx').value = LIBKEY;
+  if (LIB[LIBKEY]) { fillStacks(); pickBuild(true); startHand(); return; }
   setActions([], 'Cargando las tablas de ' + $('s-ctx').selectedOptions[0].textContent + '…');
-  fetch('../data/lib-' + LIBKEY + '.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => { LIB[LIBKEY] = d; fillStacks(); startHand(); })
+  fetch('../data/lib-' + LIBKEY + '.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => { LIB[LIBKEY] = d; fillStacks(); pickBuild(true); startHand(); })
     .catch(() => setActions([{ label: 'Reintentar', cls: 'pri', fn: loadLib }], 'No he podido cargar las tablas. Reintenta.'));
 }
 // ------------------------------------------------------------------ your real hands as exercises
@@ -2278,7 +2348,7 @@ document.addEventListener('keydown', e => {
   if (/^[1-9]$/.test(e.key) && bs[+e.key - 1] && bs[0].textContent !== 'Siguiente mano') { e.preventDefault(); bs[+e.key - 1].click(); }
   else if ((e.key === 'Enter' || e.key === ' ') && bs[0].textContent === 'Siguiente mano') { e.preventDefault(); bs[0].click(); }
 });
-bindSettings(); renderSess();
+bindSettings(); pickInit(); renderSess();
 fetch('../data/model.json').then(r => r.json()).then(d => { M = d; prepModel(); prepProfiles(); renderPrinciples(); renderSess(); setFocus(SET.focus); if (SET.table === 'fixed' && !TABLE) { TABLE = newTable(); saveTable(); } renderReads(); loadLib(); }).catch(() => { $('coach').innerHTML = '<p>No he podido cargar el modelo de rivales. Recarga la página.</p>'; });
 window.SIM = { g: () => G, cal: () => CAL, model: () => M, genPlayer, prePolicy, CMB, solverCore, solverCall, COMBOS, NC, dbg: () => { const cls = new Float32Array(169); let tot = 0; for (let i = 0; i < NC; i++) { cls[COMBOS[i][2]] += G.vw[i]; tot += G.vw[i]; } const top = [...cls.keys()].filter(k => cls[k] > 0).sort((a, b) => cls[b] - cls[a]).slice(0, 25).map(k => N[k] + ':' + cls[k].toFixed(1)); return { key: G.sc.key, now: G.key, hero: G.seats[G.hp].cards.map(ctext).join(''), board: G.board.map(ctext).join(''), vill: POS[G.vill] + ' ' + G.seats[G.vill].type, tot: tot.toFixed(1), top, three: G.threeBetPot, iso: G.isoPot, limp: G.limpPot, aggr: G.aggr }; }, start: () => startHand(), get G() { return G; }, evalCards, ev2, heroOptions, act: i => { const b = $('actions').querySelectorAll('button'); if (b[i]) b[i].click(); } };
 })();
