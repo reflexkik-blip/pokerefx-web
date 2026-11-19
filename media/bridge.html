@@ -1,0 +1,12 @@
+<!doctype html><meta charset=utf-8><title>PokerEFX media</title><meta name=robots content=noindex>
+<p id=s>Preparando archivo…</p>
+<script>
+(async () => {
+  const f = new URLSearchParams(location.search).get('f') || '';
+  if (!/^[a-z0-9_.-]+$/i.test(f)) { document.getElementById('s').textContent = 'Archivo no válido'; return; }
+  const r = await fetch(f); const buf = await r.arrayBuffer();
+  const send = () => { if (window.opener) window.opener.postMessage({ pokerefx: 1, name: f, type: r.headers.get('content-type'), buf }, '*', [buf]); };
+  send(); document.getElementById('s').textContent = 'Enviado: ' + f + ' (' + buf.byteLength + ' bytes). Puedes cerrar esta pestaña.';
+  setTimeout(() => window.close(), 1500);
+})();
+</script>
