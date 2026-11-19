@@ -1049,7 +1049,7 @@ function render() {
   $('pot').textContent = 'Bote ' + f1(potNow()) + ' bb';
   $('board').innerHTML = (G.board || []).map(c => cardHTML(c)).join('');
 }
-function spent(s) { if (!G || G.street === 'pre' || G.street === 'allin' || G.vill == null) return s.inv; if (s.pos === G.hp) return s.stack - G.hStack + (G.hIn || 0); if (s.pos === G.vill) return s.stack - G.vStack + (G.vIn || 0); return s.inv; }
+function spent(s) { if (!G || G.street === 'pre' || G.street === 'allin' || G.vill == null) return s.inv; if (s.pos === G.hp && G.hStack != null) return s.stack - G.hStack + (G.hIn || 0); if (s.pos === G.vill && G.vStack != null) return s.stack - G.vStack + (G.vIn || 0); return s.inv; }   // hStack/vStack exist only once a flop is dealt (19-nov: NaN after a preflop all-in)
 function potNow() { return ANTE + G.seats.reduce((a, s) => a + s.inv, 0) + (G.dead || 0); }
 function log(t, cls) { G.log.push([t, cls || '']); $('log').innerHTML = G.log.map(([x, c]) => '<div class="' + c + '">' + x + '</div>').join(''); $('log').scrollTop = 1e6; }
 const who = s => s.hero ? 'Tú' : POS[s.pos] + ' (' + TNAME(s.type) + ')';
@@ -1237,7 +1237,7 @@ function continuePre(code) {
           if (ao === 'F') { applyPre(so, 'fold'); return nextSpot((sq.allin ? 'SQCJ|' : 'SQC|') + hp + '|' + sq.q + ',' + o); }
           if (ao === 'A' || sq.allin) { applyPre(so, sq.allin ? 'call' : 'shove', G.S); }
           else applyPre(so, 'call', G.seats[sq.q].inv);
-          log('Con el que abrió dentro, el modelo del solver te deja fuera: foldeas.', 'st'); applyPre(G.seats[hp], 'fold');
+          G.vill = o; log('Con el que abrió dentro, el modelo del solver te deja fuera: foldeas.', 'st'); applyPre(G.seats[hp], 'fold');
           return endHand(who(so) + ' sigue en la mano contra el squeeze; tu call del open queda sin opciones.', false, true);
         }
       }
