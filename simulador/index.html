@@ -2206,7 +2206,7 @@ function renderPrinciples() {
 // «Elegir spot»: pick the exact first decision to practise (who did what before you, your seat, the stack, the format).
 // Only spots the loaded library has are offered; the choice becomes SET.focus (the library key) and SET.fstack.
 const PTYPES = [['', 'Abrir (nadie ha entrado)'], ['R', 'Contra un open'], ['SQZ', 'Squeeze: open y call delante'], ['ROL', 'Contra un limp'], ['S', 'Contra un all-in'], ['OVC', 'Contra all-in y call']];
-function pickKeys() { const d = LIB[LIBKEY] || {}, out = {}; STACKS().forEach(x => { const t = d[x]; if (!t || x < 3) return; for (const k in t) { const h = k.split('|')[0]; if (PTYPES.some(p => p[0] === h) || h === 'L') (out[k] = out[k] || []).push(x); } }); return out; }
+function pickKeys() { const d = LIB[LIBKEY] || {}, out = {}; STACKS().forEach(x => { const t = d[x]; if (!t || x < 3) return; for (const k in t) { const h = k.split('|')[0]; if (k === 'ROL|5|4') continue; if (PTYPES.some(p => p[0] === h) || h === 'L') (out[k] = out[k] || []).push(x); } }); return out; }
 function pickBuild(keep) {
   const K = pickKeys(), ty = $('p-type'), v1 = $('p-v1'), v2 = $('p-v2'), he = $('p-hero'), st = $('p-stack');
   if (keep && SET.focus && !K[SET.focus] && PTYPES.concat([['L']]).some(p => p[0] === SET.focus.split('|')[0])) setFocus('');
@@ -2215,11 +2215,12 @@ function pickBuild(keep) {
   const keys = Object.keys(K);
   ty.innerHTML = PTYPES.filter(p => keys.some(k => tyOf(k) === p[0])).map(p => '<option value="' + p[0] + '">' + p[1] + '</option>').join('');
   if (cur) ty.value = cur[0] === 'L' ? 'ROL' : cur[0];
-  const opts = (sel, vals, val) => { sel.innerHTML = vals.map(v => '<option value="' + v + '">' + POS[v] + '</option>').join(''); if (vals.includes(+val)) sel.value = val; };
+  const opts = (sel, vals, val) => { sel.innerHTML = vals.map(v => '<option value="' + v + '">' + POS[v] + '</option>').join(''); if (val !== '' && val != null && vals.includes(+val)) sel.value = String(val); };
   const sub = (lvl) => {
     const T = ty.value, ks = keys.filter(k => tyOf(k) === T).map(k => { const [, h, v] = k.split('|'); const vs = (v || '').split(',').filter(x => x !== '').map(Number); return { k, h: +h, a: vs[0], b: vs[1] }; });
     const two = T === 'SQZ' || T === 'OVC', one = T !== '';
     $('p-v1l').hidden = !one; $('p-v2l').hidden = !two;
+    if (!one) v1.innerHTML = ''; if (!two) v2.innerHTML = '';
     $('p-v1t').textContent = { R: 'Abre', SQZ: 'Abre', ROL: 'Hace limp', S: 'All-in', OVC: 'All-in' }[T] || 'Rival';
     let ok = ks;
     if (one) { if (lvl <= 1) opts(v1, [...new Set(ks.map(o => o.a))].sort(), cur && lvl === 0 ? cur[2].split(',')[0] : v1.value); ok = ok.filter(o => o.a === +v1.value); }
