@@ -247,3 +247,18 @@ main > section:first-child:not(.fp-hero) h1 { letter-spacing: -.025em; line-heig
 .fp-hero h1 { font-size: clamp(2.5rem, 5vw, 4.3rem) }
 .hgrid { opacity: .78 }
 @media (max-width: 860px) { .fp-hero .wrap { grid-template-columns: 1fr } }
+/* simulator: same chrome as the rest, a real table under the lamp */
+body:has(header.top) > .fp-top { margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-top: -14px; margin-bottom: 26px }
+
+header.top h1 { font-family: 'Fraunces', Georgia, serif !important; font-weight: 650 !important; font-size: clamp(1.8rem, 3.4vw, 2.6rem) !important; letter-spacing: -.02em; line-height: 1.05; margin: 0 }
+body:has(header.top) h2 { font-family: 'Fraunces', Georgia, serif !important; text-transform: none !important; letter-spacing: -.005em !important; font-size: 1.12rem !important; font-weight: 650 !important; color: var(--ink) !important }
+.felt { overflow: hidden; box-shadow: inset 0 0 0 2px rgba(240,207,126,.22), inset 0 24px 70px rgba(0,0,0,.4), 0 30px 60px -24px rgba(0,0,0,.45) !important }
+.felt::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background-image: var(--felt-noise); opacity: .16; mix-blend-mode: overlay; pointer-events: none }
+.felt::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(55% 60% at 50% 35%, rgba(255,236,190,.14), transparent 70%); pointer-events: none }
+/* long-form guides: calmer headings than landing sections */
+.prose h2, article h2 { font-size: clamp(1.5rem, 2.6vw, 2rem) !important; letter-spacing: -.015em; margin-top: 1.6em }
+main > section:not(.fp-hero) > .wrap.prose > h2 { font-size: clamp(1.5rem, 2.6vw, 2rem) }
+
+header.top h1 small { font-family: var(--body); font-weight: 400; letter-spacing: 0 }
+body:has(header.top) h2#rangetitle, body:has(header.top) .card h2 { font-size: 1.05rem !important }
+body:has(header.top) .table { margin-top: 30px }
