@@ -108,7 +108,7 @@
   function tr(seg) {
     if (!seg) return seg;
     if (Object.prototype.hasOwnProperty.call(R.exact, seg)) return R.exact[seg];
-    if (!/[A-Za-zÁÉÍÓÚáéíóúñÑ¿¡]/.test(seg)) return ESNUM.test(seg) ? NUM(seg) : seg;
+    if (!/[A-Za-zÁÉÍÓÚáéíóúñÑ¿¡]/.test(seg)) return (ESNUM.test(seg) || /^\d+,\d+$/.test(seg)) ? NUM(seg) : seg;
     for (const [rx, rep] of R.tpl) { const m = seg.match(rx); if (m && m[0] === seg) return NUM(phr(seg.replace(rx, rep))); }
     if (ES.test(seg) || ESNUM.test(seg)) return NUM(phr(seg));
     return seg;
