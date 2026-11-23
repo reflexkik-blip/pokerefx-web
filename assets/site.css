@@ -1,17 +1,14 @@
 /* PokerEFX — shared styles. Tokens first (light), dark redefinitions, then components. */
 :root {
-  --bg: #f6f3ec; --bg2: #ede8dd; --card: #fffdf8; --ink: #1d211f; --ink2: #4a514d; --muted: #5f6661; --line: #ddd6c7;
-  --felt: #17584c; --felt2: #0f3f37; --on-felt: #eef6f2; --brass: #b8862f; --brass-ink: #2a1d05; --accent: #17584c;
-  --raise: #b3442e; --call: #3b7d5c; --fold: #c9cfd6; --allin: #7a2e8c; --limp: #d6a23a; --good: #2e7d4f; --warn: #b7791f; --bad: #b4372b;
-  --shadow: 0 1px 2px rgba(30, 25, 10, .06), 0 8px 24px rgba(30, 25, 10, .07);
-  --display: 'Fraunces', Georgia, 'Times New Roman', serif; --body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --r: 14px; --max: 1180px; --brass-text: #8a6417; color-scheme: light;
+  --bg: #0f0f0f; --bg2: #161616; --card: #1a1a1a; --ink: #ffffff; --ink2: #c9c9c9; --muted: #9a9a9a; --line: rgba(255, 255, 255, .12);
+  --felt: #1f4a3d; --felt2: #12261f; --on-felt: #eef6f2; --brass: #dafa9c; --brass-ink: #0f0f0f; --accent: #dafa9c; --brass-text: #dafa9c;
+  --raise: #e0573f; --call: #3fa36d; --fold: #34383a; --allin: #d6457f; --limp: #d9a93a; --good: #7fd49a; --warn: #e6b450; --bad: #ff8a7a;
+  --shadow: none;
+  --display: 'Host Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif; --body: 'Host Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif; --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --r: 12px; --max: 1280px; color-scheme: dark;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #111513; --bg2: #171c19; --card: #1b211e; --ink: #ecefe9; --ink2: #c3c9c3; --muted: #8d958f; --line: #2c3430;
-  --felt: #1d6b5c; --felt2: #0d332c; --brass: #d7a54a; --brass-text: #d7a54a; --brass-ink: #1b1203; --accent: #4fb39a; --fold: #3b444b; --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35); color-scheme: dark } }
-:root[data-theme="dark"] { --bg: #111513; --bg2: #171c19; --card: #1b211e; --ink: #ecefe9; --ink2: #c3c9c3; --muted: #8d958f; --line: #2c3430;
-  --felt: #1d6b5c; --felt2: #0d332c; --brass: #d7a54a; --brass-text: #d7a54a; --brass-ink: #1b1203; --accent: #4fb39a; --fold: #3b444b; --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35); color-scheme: dark }
+:root[data-theme="light"] { --bg: #ffffff; --bg2: #f4f4f4; --card: #ffffff; --ink: #111111; --ink2: #3d3d3d; --muted: #5f5f5f; --line: rgba(0, 0, 0, .12);
+  --brass: #111111; --brass-ink: #ffffff; --accent: #1a4be0; --brass-text: #1a4be0; --fold: #d9dcde; --good: #1f7a45; --warn: #9a6a12; --bad: #b4372b; color-scheme: light }
 * { box-sizing: border-box }
 html { -webkit-text-size-adjust: 100% }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
@@ -91,7 +88,8 @@ select, input[type=text], input[type=number], input[type=email], input[type=pass
 main > section:first-child:not(.fp-hero) { background: linear-gradient(180deg, var(--bg2) 0, var(--bg) 340px); }
 main > section:first-child:not(.fp-hero) h1 { font-size: clamp(2rem, 4.4vw, 3.1rem) }
 /* self-hosted fonts (23-nov): no third-party request, no layout shift */
-@font-face { font-family: 'Inter'; font-style: normal; font-display: swap; font-weight: 100 900; src: url('/assets/fonts/inter-latin-wght-normal.woff2') format('woff2') }
+@font-face { font-family: 'Host Grotesk'; font-style: normal; font-display: swap; font-weight: 300 800; src: url('/assets/fonts/host-grotesk-latin-wght-normal.woff2') format('woff2') }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-display: swap; font-weight: 100 800; src: url('/assets/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2') }
 @font-face { font-family: 'Fraunces'; font-style: normal; font-display: swap; font-weight: 100 900; src: url('/assets/fonts/fraunces-latin-wght-normal.woff2') format('woff2') }
 @font-face { font-family: 'Fraunces'; font-style: italic; font-display: swap; font-weight: 100 900; src: url('/assets/fonts/fraunces-latin-wght-italic.woff2') format('woff2') }
 /* 23-nov polish: no eyebrows, themed browser surfaces, bento features, one authored motion moment */
@@ -250,8 +248,8 @@ main > section:first-child:not(.fp-hero) h1 { letter-spacing: -.025em; line-heig
 /* simulator: same chrome as the rest, a real table under the lamp */
 body:has(header.top) > .fp-top { margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-top: -14px; margin-bottom: 26px }
 
-header.top h1 { font-family: 'Fraunces', Georgia, serif !important; font-weight: 650 !important; font-size: clamp(1.8rem, 3.4vw, 2.6rem) !important; letter-spacing: -.02em; line-height: 1.05; margin: 0 }
-body:has(header.top) h2 { font-family: 'Fraunces', Georgia, serif !important; text-transform: none !important; letter-spacing: -.005em !important; font-size: 1.12rem !important; font-weight: 650 !important; color: var(--ink) !important }
+header.top h1 { font-family: 'Host Grotesk', system-ui, sans-serif !important; font-weight: 500 !important; font-size: clamp(1.8rem, 3.4vw, 2.6rem) !important; letter-spacing: -.02em; line-height: 1.05; margin: 0 }
+body:has(header.top) h2 { font-family: 'Host Grotesk', system-ui, sans-serif !important; text-transform: none !important; letter-spacing: -.005em !important; font-size: 1.12rem !important; font-weight: 650 !important; color: var(--ink) !important }
 .felt { overflow: hidden; box-shadow: inset 0 0 0 2px rgba(240,207,126,.22), inset 0 24px 70px rgba(0,0,0,.4), 0 30px 60px -24px rgba(0,0,0,.45) !important }
 .felt::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background-image: var(--felt-noise); opacity: .16; mix-blend-mode: overlay; pointer-events: none }
 .felt::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(55% 60% at 50% 35%, rgba(255,236,190,.14), transparent 70%); pointer-events: none }
@@ -269,3 +267,141 @@ body:has(header.top) .table { margin-top: 30px }
 .fp-foot a { color: rgba(238,246,242,.86) } .fp-foot a:hover { color: #f0cf7e }
 .fp-foot nav b, .fp-foot .fbrand b { color: #fff !important }
 .fp-foot .small, .fp-foot p { color: rgba(238,246,242,.66) }
+
+/* ===== System v2 (23-nov): the same system as the home page (Impeccable + Taste Skill deal: soot ground, lime action, Host Grotesk) ===== */
+h1, h2, h3 { font-family: var(--display); font-weight: 500; letter-spacing: -.03em; line-height: 1.05 }
+h3 { letter-spacing: -.01em; line-height: 1.25 }
+main > section:first-child:not(.fp-hero) { background: var(--bg) !important }
+main > section:first-child:not(.fp-hero) h1 { font-size: clamp(2.3rem, 5vw, 4rem) !important; letter-spacing: -.04em; line-height: 1.02; font-weight: 500 }
+.fp-top { background: var(--bg) !important; backdrop-filter: none !important; border-bottom: 1px solid var(--line) }
+.fp-top .fp-wrap { height: 72px }
+.fp-top.scrolled { box-shadow: none }
+.brand { font: 500 20px/1 var(--display); letter-spacing: -.02em } .brand .wm b { color: var(--ink); font-weight: 500 }
+.nav a { color: var(--ink2); font-size: 15px; font-weight: 500 } .nav a:hover, .nav a[aria-current="page"] { background: transparent; color: var(--ink) }
+.nav a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0 }
+.btn { border-radius: 8px; min-height: 44px; font: 500 15px/1.2 var(--body); background: transparent; border-color: var(--line); color: var(--ink) }
+.btn:hover { border-color: var(--ink2) }
+.btn.pri { background: var(--brass); border-color: var(--brass); color: var(--brass-ink); box-shadow: none }
+.btn.pri:hover { filter: brightness(1.06); box-shadow: none }
+.btn.felt { background: var(--card); border-color: var(--line); color: var(--ink) }
+.box { background: var(--card); border-color: var(--line); box-shadow: none; border-radius: 12px }
+.small, .tag { color: var(--muted) }
+.tag { background: transparent; border: 1px solid var(--line); letter-spacing: 0; text-transform: none; font: 500 12.5px/1 var(--mono) }
+table, code, kbd, .mono { font-family: var(--mono) }
+a { color: var(--ink); text-decoration-color: color-mix(in srgb, var(--ink) 40%, transparent) }
+a:hover { text-decoration-color: var(--accent) }
+::selection { background: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--ink) }
+:focus-visible { outline-color: var(--accent) }
+.fp-foot { background: var(--bg) !important; border-top: 1px solid var(--line); color: var(--muted) }
+.fp-foot::before { display: none }
+.fp-foot a { color: var(--ink2) } .fp-foot a:hover { color: var(--ink) }
+.fp-foot nav b, .fp-foot .fbrand b { color: var(--ink) !important; font-weight: 500 }
+.consent { background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--ink) }
+.daily, .cta-band { border-radius: 20px !important }
+details.box > summary { font-weight: 500 }
+.gfeat { background: var(--card); border-color: var(--line) }
+.gfeat:hover, .gc:hover { box-shadow: none; border-color: var(--ink2) }
+.gtag, .gmore, .gmeta span { color: var(--accent) }
+.stk-band { background: transparent; border: 1px solid var(--line); color: var(--ink2) }
+.stk > summary:hover { background: var(--bg2) }
+.felt { background: radial-gradient(ellipse at 50% 40%, var(--felt), var(--felt2) 78%) !important }
+.felt::before, .felt::after { opacity: .5 }
+.fi { background: var(--bg2); color: var(--accent); border-color: var(--line) }
+.prose h2, article h2 { letter-spacing: -.025em }
+/* the simulator carries its own tokens: bring them onto the same system */
+html:root:not([data-theme="light"]):has(header.top) {
+  --bg: #0f0f0f; --panel: #1a1a1a; --card: #1f1f1f; --card-line: #333; --ink: #ffffff; --ink2: #c9c9c9; --muted: #9a9a9a; --line: rgba(255, 255, 255, .12);
+  --felt: #1f4a3d; --felt2: #12261f; --rail: #2a2a2a; --on-felt: #eef6f2; --on-felt2: #b9cfc6; --accent: #dafa9c; --accent-ink: #0f0f0f;
+  --good: #7fd49a; --warn: #e6b450; --bad: #ff8a7a; --good-bg: #17291e; --warn-bg: #2e2612; --bad-bg: #321a16;
+  --display: 'Host Grotesk', system-ui, sans-serif; --body: 'Host Grotesk', system-ui, sans-serif; color-scheme: dark;
+}
+
+/* ===== One system (taste-skill deal: soot-pale-lime, Host Grotesk, nav-centre, footer-columns, arrow buttons) =====
+   The inner pages carry the home page's header and footer, built by site.js with the same measures. */
+:root { --gut: 80px; --nav-h: 72px; --fp-ease: cubic-bezier(.2, .7, .2, 1) }
+@media (max-width: 1023px) { :root { --gut: 48px } }
+@media (max-width: 639px) { :root { --gut: 24px; --nav-h: 56px } }
+.wrap, .fp-wrap { width: min(100% - 2 * var(--gut), 1280px); max-width: none; padding-left: 0; padding-right: 0; margin-inline: auto }
+.fp-top { position: sticky; top: 0; z-index: 30; background: var(--bg) !important; backdrop-filter: none !important; border-bottom: 1px solid var(--line); box-shadow: none !important; view-transition-name: site-header }
+.fp-top .fp-bar { display: flex; align-items: center; gap: 64px; height: var(--nav-h) }
+.skip-link { position: absolute; left: -9999px; top: 12px; z-index: 40; background: var(--accent); color: #0f0f0f; padding: 10px 14px; border-radius: 8px; font-weight: 500; text-decoration: none }
+.skip-link:focus { left: var(--gut) }
+.fp-logo { display: inline-flex; align-items: center; gap: 8px; font: 500 22px/1 var(--display); letter-spacing: -.02em; color: var(--ink) !important; text-decoration: none; flex: none }
+.fp-logo img { width: 24px; height: 24px }
+.fp-links { display: flex; align-items: center; gap: 4px; margin-inline: auto }
+.fp-item { position: static }
+.fp-link { display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 12px; border-radius: 8px; font: 500 15px/1 var(--body); color: var(--ink) !important; text-decoration: none; position: relative; transition: background-color .2s var(--fp-ease) }
+.fp-link:hover { background: var(--bg2) }
+.fp-link[aria-current="page"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -18px; height: 2px; background: var(--ink) }
+.fp-link .chev { width: 12px; height: 12px; transition: transform .2s var(--fp-ease) }
+.fp-actions { display: flex; align-items: center; gap: 16px; flex: none }
+.fp-sheet-only { display: none }
+.btn--primary, .fp-cta { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 24px; border-radius: 8px; border: 1px solid transparent; background: var(--accent) !important; color: #0f0f0f !important; font: 500 15px/1 var(--body); text-decoration: none; transition: transform .18s var(--fp-ease), filter .2s }
+.btn--primary:hover, .fp-cta:hover { filter: brightness(1.06); transform: translateY(-1px) }
+.btn--primary:active, .fp-cta:active { transform: translateY(0) scale(.97) }
+.m-arrow { width: 12px; height: 12px; transition: transform .25s var(--fp-ease) }
+.fp-cta:hover .m-arrow { transform: translateX(3px) }
+.fp-toggle { display: none; width: 44px; height: 44px; margin-left: auto; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); place-items: center; cursor: pointer }
+/* mega menu: a flat full-width panel, opened on hover after 150ms */
+.fp-menu { position: absolute; left: 0; right: 0; top: calc(var(--nav-h) - 1px); background: var(--bg); border-bottom: 1px solid var(--line); padding: 48px 0 64px; opacity: 0; visibility: hidden; transition: opacity .18s var(--fp-ease), visibility 0s linear .18s }
+.fp-has:hover .fp-menu, .fp-has:focus-within .fp-menu { opacity: 1; visibility: visible; transition-delay: .15s, .15s }
+.fp-has:hover .chev { transform: rotate(180deg) }
+.fp-menu__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px }
+.fp-col p { margin: 0 0 8px; font: 500 13px/1.4 var(--body); color: var(--muted) }
+.fp-col a { display: grid; gap: 4px; padding: 8px 0; font: 500 16px/1.55 var(--body); color: var(--ink); text-decoration: none }
+.fp-col a span { font: 400 14px/1.55 var(--body); color: var(--muted) }
+.fp-col a:hover { color: var(--accent) }
+@media (max-width: 1023px) {
+  .fp-top .fp-bar { gap: 16px }
+  .fp-links { display: none }
+  .fp-actions { margin-left: auto } .fp-actions > .fp-link { display: none }
+  .fp-toggle { display: grid; margin-left: 0 }
+  .fp-top.open .fp-links { display: flex; position: fixed; inset: var(--nav-h) 0 0; flex-direction: column; align-items: stretch; gap: 0; background: var(--bg); padding: 8px var(--gut) 24px; overflow-y: auto; margin: 0 }
+  .fp-top.open .fp-link { height: 56px; font-size: 18px; padding: 0; border-bottom: 1px solid var(--line); border-radius: 0; width: 100% }
+  .fp-top.open .fp-link::after { display: none }
+  .fp-top.open .fp-menu { position: static; opacity: 1; visibility: visible; padding: 8px 0 16px; border: 0 }
+  .fp-top.open .fp-menu__grid { grid-template-columns: 1fr; gap: 8px; width: 100% }
+  .fp-top.open .fp-sheet-only { display: block }
+}
+@media (max-width: 639px) { .fp-actions .fp-cta { display: none } .fp-top.open .fp-links { padding-bottom: 96px } }
+/* footer: the close, then the directory */
+.fp-foot { margin-top: 96px; padding-block: 120px calc(72px + env(safe-area-inset-bottom, 0px)) !important; background: var(--bg) !important; border-top: 1px solid var(--line); color: var(--ink) }
+.fp-foot::before { display: none !important }
+.fp-close { display: grid; gap: 32px; padding-bottom: 96px }
+.fp-close h2 { font: 500 clamp(30px, 1.72vw + 23.3px, 48px)/1.1 var(--display); letter-spacing: -.035em; margin: 0 0 12px; max-width: 16ch }
+.fp-close p { margin: 0; color: var(--muted); font-size: 18px }
+.fp-cta--wide { width: 100%; justify-content: center; height: 64px; font-size: 18px }
+.fp-fgrid { display: grid; grid-template-columns: 4fr repeat(4, 2fr); gap: 24px }
+.fp-fbrand { display: grid; gap: 16px; align-content: start }
+.fp-lede { font: 500 20px/1.25 var(--display); letter-spacing: -.035em; color: var(--ink); margin: 0; max-width: 24ch }
+.fp-lede a { color: inherit }
+.fp-fcol h3 { font: 500 14px/1.4 var(--body); color: var(--muted); margin: 0 0 16px; letter-spacing: 0 }
+.fp-fcol ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px }
+.fp-fcol a { font-size: 14px; color: var(--ink) !important; text-decoration: none; background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px; padding-bottom: 2px; transition: background-size .25s var(--fp-ease) }
+.fp-fcol a:hover { background-size: 100% 1px }
+.fp-legal { display: flex; flex-wrap: wrap; gap: 16px 32px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted) }
+.fp-legal a { color: var(--muted) !important; text-decoration: none } .fp-legal a:hover { color: var(--ink) !important }
+@media (max-width: 1023px) { .fp-fgrid { grid-template-columns: repeat(2, minmax(0, 1fr)) } .fp-fbrand { grid-column: 1 / -1 } }
+@media (max-width: 639px) { .fp-foot { padding-block: 96px 48px !important } .fp-close { padding-bottom: 64px } }
+/* type on every page: the home page's display voice */
+h1, h2, h3 { font-weight: 500 !important; letter-spacing: -.035em }
+main > section:first-child:not(.fp-hero) h1 { font-size: clamp(38px, 3.24vw + 25.4px, 72px) !important; line-height: 1.02; letter-spacing: -.045em }
+main > section:first-child:not(.fp-hero) { background: var(--bg) !important; padding-top: 96px }
+.box, .gc, .gfeat, .stk, .rc { box-shadow: none !important }
+/* sentence case everywhere: labels at 13px/500, never tracked capitals */
+body * { text-transform: none !important }
+.lab, .lab2, .toc b, .plan .rib, .gtag, .tag, .eyebrow, .t-label { letter-spacing: 0 !important; font-weight: 500 !important; font-size: 13px !important }
+/* the links sit on the page axis, as on the home page */
+@media (min-width: 1024px) { .fp-top .fp-bar { display: grid; grid-template-columns: 1fr auto 1fr } .fp-links { margin: 0 } .fp-actions { justify-self: end } }
+.fp-menu__grid { width: min(100% - 2 * var(--gut), 1280px); margin-inline: auto }
+.fp-top .fp-menu__grid { display: grid; height: auto }
+.fp-foot .fp-wrap { display: block !important }
+.fp-foot .fp-legal { width: 100% }
+@media (max-width: 1023px) {
+  .fp-top.open .fp-menu__grid { width: 100%; grid-template-columns: 1fr 1fr !important; gap: 0 16px }
+  .fp-top.open .fp-col p { margin-top: 12px }
+  .fp-top.open .fp-col a span { display: none }
+  .fp-top.open .fp-col a { padding: 6px 0; font-size: 16px }
+  .fp-top.open .fp-has > .fp-link .chev { display: none }
+}
+.fp-foot .fp-lede { color: var(--ink) !important }

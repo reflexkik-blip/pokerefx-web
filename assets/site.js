@@ -12,26 +12,46 @@
   const LOGO = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="9" fill="#17584c"/><circle cx="16" cy="16" r="10.5" fill="none" stroke="#e8c46e" stroke-width="2" stroke-dasharray="4.2 2.4"/><path d="M16 8.6c3.2 3.1 6 5.1 6 7.9 0 2-1.6 3.4-3.3 3.4-1 0-1.8-.4-2.3-1.1l.9 4.6h-2.6l.9-4.6c-.5.7-1.3 1.1-2.3 1.1-1.7 0-3.3-1.4-3.3-3.4 0-2.8 2.8-4.8 6-7.9z" fill="#f6efe0"/></svg>';
 
   function theme(t) { if (t) document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
-  theme(store.get('theme', null));
+  theme(null); // one grade site-wide, as on the home page
 
   function chrome(active) {
-    const h = document.createElement('div'); h.setAttribute('role', 'banner'); h.className = 'fp-top';
-    h.innerHTML = '<div class="fp-wrap"><a class="brand" href="' + root + 'index.html">' + LOGO + '<span class="wm">Poker<b>EFX</b></span></a>' +
-      '<button class="navbtn" type="button" aria-expanded="false" aria-controls="nav">Menú</button>' +
-      '<nav class="nav" id="nav">' + NAV.map(([p, l]) => '<a href="' + root + p + '/index.html"' + (p === active ? ' aria-current="page"' : '') + '>' + l + '</a>').join('') +
-      '<button class="theme" type="button" title="Tema claro u oscuro" aria-label="Cambiar tema"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></nav></div>';
+    const R = root, A = (p, l, sub) => '<a href="' + R + p + '">' + l + (sub ? '<span>' + sub + '</span>' : '') + '</a>';
+    const cur = p => (p === active ? ' aria-current="page"' : '');
+    const CHEV = '<svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const ARROW = '<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const tools = ['simulador', 'entrenar', 'tablas', 'calculadoras', 'replayer', 'laboratorio', 'herramientas'].includes(active);
+    const h = document.createElement('header'); h.className = 'fp-top';
+    h.innerHTML = '<div class="fp-wrap fp-bar"><a class="skip-link" href="#fp-main">Ir al contenido</a>' +
+      '<a class="fp-logo" href="' + R + 'index.html"><img src="' + R + 'assets/icon.svg" alt="" width="24" height="24">PokerEFX</a>' +
+      '<nav class="fp-links" id="nav" aria-label="Principal">' +
+      '<div class="fp-item"><a class="fp-link" href="' + R + 'simulador/"' + cur('simulador') + '>Simulador</a></div>' +
+      '<div class="fp-item"><a class="fp-link" href="' + R + 'tablas/"' + cur('tablas') + '>Tablas</a></div>' +
+      '<div class="fp-item fp-has"><a class="fp-link" href="' + R + 'herramientas/"' + (tools && active !== 'simulador' && active !== 'tablas' ? ' aria-current="page"' : '') + '>Herramientas ' + CHEV + '</a>' +
+      '<div class="fp-menu"><div class="fp-menu__grid">' +
+      '<div class="fp-col"><p>Practicar</p>' + A('simulador/', 'Simulador', 'Juega y el solver te corrige') + A('entrenar/', 'Entrenar rangos', 'Memoriza con repetición espaciada') + A('tablas/', 'Tablas preflop', '11 formatos, de 5 a 100 ciegas') + '</div>' +
+      '<div class="fp-col"><p>Analizar</p>' + A('calculadoras/', 'Calculadoras', 'Equity, ICM, pot odds y varianza') + A('replayer/', 'Replayer', 'Revive tus manos de Winamax') + A('laboratorio/', 'Laboratorio', 'Cómo juegan los rivales reales') + '</div>' +
+      '<div class="fp-col"><p>Aprender</p>' + A('aprende/', 'Guías', '19 guías con números del solver') + A('rangos/', 'Todos los rangos', '1.061 tablas por stack') + A('aprende/glosario-poker.html', 'Glosario', 'Más de 70 términos explicados') + '</div>' +
+      '</div></div></div>' +
+      '<div class="fp-item"><a class="fp-link" href="' + R + 'aprende/"' + cur('aprende') + '>Aprende</a></div>' +
+      '<div class="fp-item fp-sheet-only"><a class="fp-link" href="' + R + 'cuenta/">Mi cuenta</a></div></nav>' +
+      '<div class="fp-actions"><a class="fp-link" href="' + R + 'cuenta/"' + cur('cuenta') + '>Mi cuenta</a><a class="btn btn--primary fp-cta" href="' + R + 'simulador/">Empezar a entrenar' + ARROW + '</a></div>' +
+      '<button class="fp-toggle navbtn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menú"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>';
     document.body.prepend(h);
-    const nb = h.querySelector('.navbtn'), nav = h.querySelector('.nav');
-    nb.addEventListener('click', () => { const o = nav.classList.toggle('open'); nb.setAttribute('aria-expanded', o); });
-    h.querySelector('.theme').addEventListener('click', () => {
-      const cur = document.documentElement.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      const next = cur === 'dark' ? 'light' : 'dark'; theme(next); store.set('theme', next);
-    });
-    const f = document.createElement('div'); f.setAttribute('role', 'contentinfo'); f.className = 'fp-foot';
-    f.innerHTML = '<div class="fp-wrap fcols"><div class="fbrand"><b>PokerEFX</b><p>Estudia póker de torneos con un solver GTO, gratis y en español.</p><p class="small">Solo para mayores de 18 años. Aquí no se juega dinero. Juega con responsabilidad (<a href="https://www.jugarbien.es" rel="noopener">jugarbien.es</a>).</p></div>' +
-      '<nav aria-label="Herramientas"><b>Herramientas</b><a href="' + root + 'simulador/">Simulador</a><a href="' + root + 'entrenar/">Entrenar rangos</a><a href="' + root + 'tablas/">Tablas preflop</a><a href="' + root + 'replayer/">Replayer de manos</a><a href="' + root + 'calculadoras/">Calculadoras</a><a href="' + root + 'herramientas/">Todas</a></nav>' +
-      '<nav aria-label="Aprende"><b>Aprende</b><a href="' + root + 'aprende/como-estudiar-poker.html">Cómo estudiar póker</a><a href="' + root + 'rangos/">Todos los rangos</a><a href="' + root + 'aprende/rangos-push-fold.html">Push/fold</a><a href="' + root + 'aprende/glosario-poker.html">Glosario</a><a href="' + root + 'metodologia/">Cómo calculamos</a></nav>' +
-      '<nav aria-label="Legal"><b>PokerEFX</b><a href="' + root + 'cuenta/">Mi cuenta y planes</a><a href="' + root + 'contacto/">Contacto</a><a href="' + root + 'legal/privacidad.html">Privacidad</a><a href="' + root + 'legal/cookies.html">Cookies</a><a href="' + root + 'legal/aviso-legal.html">Aviso legal</a><a href="#" id="fp-cookies">Preferencias de cookies</a></nav></div>';
+    const main = document.querySelector('main') || document.querySelector('.wrap'); if (main && !main.id) main.id = 'fp-main';
+    const nb = h.querySelector('.fp-toggle'), nav = h.querySelector('.fp-links');
+    nb.addEventListener('click', () => { const o = h.classList.toggle('open'); nb.setAttribute('aria-expanded', o); });
+    nav.addEventListener('click', e => { if (e.target.closest('a')) { h.classList.remove('open'); nb.setAttribute('aria-expanded', 'false'); } });
+    const col = (t, items) => '<div class="fp-fcol"><h3>' + t + '</h3><ul>' + items.map(([p, l]) => '<li><a href="' + (p.startsWith('http') ? p : R + p) + '"' + (p.startsWith('http') ? ' rel="noopener"' : '') + '>' + l + '</a></li>').join('') + '</ul></div>';
+    const f = document.createElement('footer'); f.className = 'fp-foot';
+    f.innerHTML = '<div class="fp-wrap">' +
+      (active === 'simulador' ? '' : '<div class="fp-close"><div><h2>Entrena antes de tu próximo torneo</h2><p>Diez minutos de simulador antes de jugar. Gratis y sin registro.</p></div><a class="btn btn--primary fp-cta fp-cta--wide" href="' + R + 'simulador/">Empezar a entrenar' + ARROW + '</a></div>') +
+      '<div class="fp-fgrid"><div class="fp-fbrand"><a class="fp-logo" href="' + R + 'index.html"><img src="' + R + 'assets/icon.svg" alt="" width="24" height="24">PokerEFX</a>' +
+      '<p class="fp-lede">Herramientas gratis para estudiar póker de torneos con un solver. Solo para mayores de 18 años; aquí no se juega dinero (<a href="https://www.jugarbien.es" rel="noopener">jugarbien.es</a>).</p></div>' +
+      col('Practicar', [['simulador/', 'Simulador'], ['entrenar/', 'Entrenar rangos'], ['tablas/', 'Tablas preflop']]) +
+      col('Analizar', [['calculadoras/', 'Calculadoras'], ['replayer/', 'Replayer'], ['laboratorio/', 'Laboratorio']]) +
+      col('Aprender', [['aprende/', 'Guías'], ['rangos/', 'Todos los rangos'], ['metodologia/', 'Cómo calculamos']]) +
+      col('PokerEFX', [['cuenta/', 'Mi cuenta'], ['contacto/', 'Contacto'], ['https://www.instagram.com/pokerefx/', 'Instagram'], ['https://www.youtube.com/@pokerefx', 'YouTube']]) + '</div>' +
+      '<div class="fp-legal"><span>&copy; 2026 PokerEFX</span><a href="' + R + 'legal/privacidad.html">Privacidad</a><a href="' + R + 'legal/cookies.html">Cookies</a><a href="' + R + 'legal/aviso-legal.html">Aviso legal</a><a href="' + R + 'legal/cookies.html" id="fp-cookies">Preferencias de cookies</a></div></div>';
     document.body.appendChild(f);
     f.querySelector('#fp-cookies').addEventListener('click', e => { e.preventDefault(); consentBanner(true); });
     consentBanner(false); ads();
@@ -45,7 +65,7 @@
     b.innerHTML = '<p>Usamos almacenamiento local para guardar tu progreso. Con tu permiso, también cookies de publicidad (Google) que mantienen la web gratis. <a href="' + root + 'legal/cookies.html">Más información</a></p>' +
       '<button class="btn btn--secondary" type="button" data-c="necessary">Solo necesarias</button><button class="btn pri btn--primary" type="button" data-c="all">Aceptar todo</button>';
     b.querySelectorAll('button').forEach(x => x.addEventListener('click', () => { const prev = store.get('consent', null); store.set('consent', x.dataset.c); b.remove(); if (prev && prev !== x.dataset.c) location.reload(); }));
-    const host = document.querySelector('.closing__links'); if (host) host.insertBefore(b, host.querySelector('.footer__legal')); else document.body.appendChild(b);
+    const host = document.querySelector('.closing__links') || document.querySelector('.fp-foot .fp-wrap'); if (host) host.insertBefore(b, host.querySelector('.footer__legal, .fp-legal')); else document.body.appendChild(b);
   }
   // AdSense loads from each page head (Auto ads place the units); without full consent it serves non-personalised ads.
   function ads() {
