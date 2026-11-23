@@ -262,3 +262,10 @@ main > section:not(.fp-hero) > .wrap.prose > h2 { font-size: clamp(1.5rem, 2.6vw
 header.top h1 small { font-family: var(--body); font-weight: 400; letter-spacing: 0 }
 body:has(header.top) h2#rangetitle, body:has(header.top) .card h2 { font-size: 1.05rem !important }
 body:has(header.top) .table { margin-top: 30px }
+/* footer: the page ends at the table */
+.fp-foot { position: relative; overflow: hidden; margin-top: 64px; border-top: 0; background: radial-gradient(90% 160% at 85% 0%, var(--felt) 0%, var(--felt2) 65%); color: rgba(238,246,242,.72); padding-block: 48px calc(36px + env(safe-area-inset-bottom, 0px)) }
+.fp-foot::before { content: ""; position: absolute; inset: 0; background-image: var(--felt-noise); opacity: .14; mix-blend-mode: overlay; pointer-events: none }
+.fp-foot > * { position: relative }
+.fp-foot a { color: rgba(238,246,242,.86) } .fp-foot a:hover { color: #f0cf7e }
+.fp-foot nav b, .fp-foot .fbrand b { color: #fff !important }
+.fp-foot .small, .fp-foot p { color: rgba(238,246,242,.66) }
