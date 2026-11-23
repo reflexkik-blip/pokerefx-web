@@ -15,5 +15,9 @@
 
 ## Datos clave
 - Precio: gratis (planes opcionales sin anuncios).
-- Idioma: español. Funciona en móvil como app (PWA).
+- Idioma: español e inglés (edición inglesa completa en https://pokerefx.com/en/, mismas herramientas). Funciona en móvil como app (PWA).
 - Redes: Instagram https://www.instagram.com/pokerefx/ · YouTube https://www.youtube.com/@pokerefx · X https://x.com/pokerefx
+
+
+## English
+PokerEFX is also fully available in English at https://pokerefx.com/en/ : free GTO preflop charts for tournaments (ChipEV, ICM, PKO, bubble), push/fold charts, a poker simulator with solver feedback on every decision, a spaced-repetition range trainer, ICM / equity / pot-odds calculators and a PokerStars/Winamax hand replayer. No sign-up.
