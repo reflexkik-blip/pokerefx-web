@@ -100,3 +100,32 @@
     show();
   }).catch(() => { box.hidden = true; });
 })();
+/* FX: the lamp follows the pointer, the demo card tilts with it, and a real solver range paints itself behind */
+(function () {
+  'use strict';
+  const hero = document.querySelector('.fp-hero'); if (!hero) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const src = document.querySelectorAll('#populares .rc .mg')[0];
+  if (src) {
+    const g = document.createElement('div'); g.className = 'hgrid'; g.setAttribute('aria-hidden', 'true');
+    const cells = src.querySelectorAll('i');
+    cells.forEach((c, k) => {
+      const i = document.createElement('i'), r = Math.floor(k / 13), q = k % 13, bg = c.getAttribute('style') || '';
+      const m = bg.match(/background:\s*([^;]+)/); const col = m ? m[1] : '';
+      if (col && !/fold/.test(col)) { i.className = 'on'; i.style.setProperty('--c', col); i.style.setProperty('--d', 300 + (r + q) * 55); }
+      g.appendChild(i);
+    });
+    hero.prepend(g);
+  }
+  if (reduce || !window.matchMedia('(pointer: fine)').matches) return;
+  const demo = document.getElementById('demo'); let raf = 0, px = .72, py = .3;
+  hero.addEventListener('pointermove', e => {
+    const r = hero.getBoundingClientRect(); px = (e.clientX - r.left) / r.width; py = (e.clientY - r.top) / r.height;
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0; hero.style.setProperty('--mx', (px * 100).toFixed(1) + '%'); hero.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+      if (demo) demo.style.transform = 'perspective(1100px) rotateY(' + ((px - .5) * 7).toFixed(2) + 'deg) rotateX(' + ((.5 - py) * 6).toFixed(2) + 'deg)';
+    });
+  });
+  hero.addEventListener('pointerleave', () => { if (demo) demo.style.transform = ''; });
+})();

@@ -54,3 +54,24 @@
 
   window.FP = { chrome, store, root };
 })();
+/* FX: header shadow once the page scrolls; numbers that count up when they come into view */
+(function () {
+  'use strict';
+  const top = () => document.querySelector('.fp-top');
+  let on = false;
+  const tick = () => { const t = top(); if (!t) return; const s = window.scrollY > 8; if (s !== on) { on = s; t.classList.toggle('scrolled', s); } };
+  window.addEventListener('scroll', tick, { passive: true }); document.addEventListener('DOMContentLoaded', tick);
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function count(el) {
+    const end = parseFloat(el.dataset.n), pre = el.dataset.pre || '', fmt = n => pre + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    if (reduce) { el.textContent = fmt(end); return; }
+    const t0 = performance.now(), d = 1400;
+    (function f(t) { const k = Math.min(1, (t - t0) / d), e = 1 - Math.pow(1 - k, 4); el.textContent = fmt(end * e); if (k < 1) requestAnimationFrame(f); })(t0);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const els = document.querySelectorAll('[data-n]'); if (!els.length) return;
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { io.unobserve(e.target); count(e.target); } }), { threshold: .6 });
+    els.forEach(e => io.observe(e));
+  });
+})();
