@@ -59,7 +59,7 @@
 <link rel="modulepreload" href="assets/kit/moments/word-highlight/moment.js">
 <style>
   /* the solver's action colours: data, not decoration (fold, raise, call, limp, all-in) */
-  :root { --k-F: #34383a; --k-R: #e0573f; --k-C: #3fa36d; --k-L: #d9a93a; --k-A: #d6457f; }
+  :root { --k-F: #34383a; --k-R: #c8432c; --k-C: #287f4f; --k-L: #d9a93a; --k-A: #c23a70; }
   .ground-inverse { --k-F: #d9dcde; }
   .ground-inverse .link { color: var(--ink); }
   /* playing cards inside the windows */
@@ -380,14 +380,13 @@
       </div>
       <div class="faq-side stack-4">
             <h3 class="faq-q">¿De dónde salen las tablas?</h3>
-            <p>De nuestro solver para torneos 6-max, calculado sobre el árbol preflop completo y comprobado contra tablas Nash de push/fold.</p>
+            <p>De nuestro solver para torneos 6-max, calculado sobre el árbol preflop completo y comprobado contra tablas Nash de push/fold. <a class="link" href="metodologia/">Leer cómo calculamos</a></p>
             <div class="win ui ui-nash nash" role="img" aria-label="Comprobación de la librería: el 98,2 % de 18.822 tablas pierde 0,05 ciegas o menos frente al equilibrio">
               <div class="win__bar"><i></i><i></i><i></i><span>comprobación · 18.822 tablas</span></div>
               <div class="nash__body"><p class="nash__n">98,2 %</p><p class="t-small muted">de las tablas pierde 0,05 ciegas o menos frente al equilibrio</p>
               <div class="nash__bars"><s style="--w:98.2%"></s><s style="--w:1.6%"></s><s style="--w:.2%"></s></div>
               <div class="key"><span style="--c:var(--accent)">≤ 0,05 bb</span><span style="--c:#8f8f8f">0,05 a 0,2</span><span style="--c:#ff8a7a">&gt; 0,2</span></div></div>
             </div>
-            <p><a class="link" href="metodologia/">Leer cómo calculamos</a></p>
             <div class="faq"><div class="faq__item"><h3>¿Funciona en el móvil?</h3><p>Sí, y puedes añadir PokerEFX a tu pantalla de inicio como una app.</p></div></div>
           </div>
     </div>
