@@ -4,16 +4,16 @@
 
 ## Qué incluye
 - [Tablas preflop de torneo](https://pokerefx.com/tablas/): rangos GTO interactivos por posición y stack (de 1 a 100 ciegas) en once formatos: ChipEV, PKO (cubriendo y cubierto), burbuja, ITM, ICM medio y mesa final. Open, defensa, 3-bet, 4-bet, squeeze, limp y push/fold.
-- [Más de 1.000 páginas de rangos](https://pokerefx.com/rangos/): una página por situación preflop (p. ej. abrir desde el botón con 20 ciegas, BB contra limp, push/fold).
+- [Más de 1.000 páginas de rangos](https://pokerefx.com/rangos/): una página por situación preflop (p. ej. abrir desde el botón con 20 ciegas, BB contra limp, push/fold), cada una con su análisis: cómo cambia el rango con el stack, manos frontera, folds que más cuestan y pot odds.
 - [Simulador de póker GTO](https://pokerefx.com/simulador/): reparte manos de torneo contra rivales con perfiles de mesas reales y corrige cada decisión (preflop, flop, turn y river) con el EV de cada opción en ciegas. Modo GTO (mezclas) y modo estrategia pura, práctica de fugas y elección de spot concreto.
 - [Entrenador de rangos](https://pokerefx.com/entrenar/): memoriza rangos con repetición espaciada; puedes pintar o pegar tus propios rangos.
 - [Calculadoras](https://pokerefx.com/calculadoras/): equity, ICM, pot odds y varianza.
 - [Replayer de manos](https://pokerefx.com/replayer/): reproduce historiales de Winamax y PokerStars en el navegador.
 - [Laboratorio](https://pokerefx.com/laboratorio/): estadísticas agregadas de cómo juegan de verdad los rivales de torneo (c-bets, river, faroles por tipo de jugador).
-- [Guías](https://pokerefx.com/aprende/): qué es GTO, push/fold con 10-20 ciegas, ICM y burbuja, PKO, defensa de la ciega grande, rangos de 3-bet, squeeze, c-bet según el flop.
+- [Guías](https://pokerefx.com/aprende/): qué es GTO, push/fold con 10-20 ciegas, ICM y burbuja, PKO, defensa de la ciega grande, rangos de 3-bet, squeeze, c-bet según el flop, [ranking de manos de póker](https://pokerefx.com/aprende/ranking-manos-poker.html) y [probabilidades de póker](https://pokerefx.com/aprende/probabilidades-poker.html) (outs, proyectos, regla del 2 y el 4).
 - [Cómo calculamos](https://pokerefx.com/metodologia/): el solver (CFR sobre el árbol preflop completo) y su verificación con Monte Carlo de un millón de manos.
 
 ## Datos clave
 - Precio: gratis (planes opcionales sin anuncios).
 - Idioma: español. Funciona en móvil como app (PWA).
-- Redes: Instagram https://www.instagram.com/pokerefx/
+- Redes: Instagram https://www.instagram.com/pokerefx/ · YouTube https://www.youtube.com/@pokerefx · X https://x.com/pokerefx
