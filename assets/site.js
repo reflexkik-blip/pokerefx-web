@@ -31,7 +31,7 @@
     f.innerHTML = '<div class="fp-wrap fcols"><div class="fbrand"><b>PokerEFX</b><p>Estudia póker de torneos con un solver GTO, gratis y en español.</p><p class="small">Solo para mayores de 18 años. Aquí no se juega dinero. Juega con responsabilidad (<a href="https://www.jugarbien.es" rel="noopener">jugarbien.es</a>).</p></div>' +
       '<nav aria-label="Herramientas"><b>Herramientas</b><a href="' + root + 'simulador/">Simulador</a><a href="' + root + 'entrenar/">Entrenar rangos</a><a href="' + root + 'tablas/">Tablas preflop</a><a href="' + root + 'replayer/">Replayer de manos</a><a href="' + root + 'calculadoras/">Calculadoras</a><a href="' + root + 'herramientas/">Todas</a></nav>' +
       '<nav aria-label="Aprende"><b>Aprende</b><a href="' + root + 'aprende/como-estudiar-poker.html">Cómo estudiar póker</a><a href="' + root + 'rangos/">Todos los rangos</a><a href="' + root + 'aprende/rangos-push-fold.html">Push/fold</a><a href="' + root + 'aprende/glosario-poker.html">Glosario</a><a href="' + root + 'metodologia/">Cómo calculamos</a></nav>' +
-      '<nav aria-label="Legal"><b>PokerEFX</b><a href="' + root + 'cuenta/">Mi cuenta y planes</a><a href="' + root + 'index.html#contacto">Contacto</a><a href="' + root + 'legal/privacidad.html">Privacidad</a><a href="' + root + 'legal/cookies.html">Cookies</a><a href="' + root + 'legal/aviso-legal.html">Aviso legal</a><a href="#" id="fp-cookies">Preferencias de cookies</a></nav></div>';
+      '<nav aria-label="Legal"><b>PokerEFX</b><a href="' + root + 'cuenta/">Mi cuenta y planes</a><a href="' + root + 'contacto/">Contacto</a><a href="' + root + 'legal/privacidad.html">Privacidad</a><a href="' + root + 'legal/cookies.html">Cookies</a><a href="' + root + 'legal/aviso-legal.html">Aviso legal</a><a href="#" id="fp-cookies">Preferencias de cookies</a></nav></div>';
     document.body.appendChild(f);
     f.querySelector('#fp-cookies').addEventListener('click', e => { e.preventDefault(); consentBanner(true); });
     consentBanner(false); ads();
@@ -43,16 +43,17 @@
     let b = document.querySelector('.consent'); if (b) b.remove();
     b = document.createElement('div'); b.className = 'consent'; b.setAttribute('role', 'dialog'); b.setAttribute('aria-label', 'Cookies');
     b.innerHTML = '<p>Usamos almacenamiento local para guardar tu progreso. Con tu permiso, también cookies de publicidad (Google) que mantienen la web gratis. <a href="' + root + 'legal/cookies.html">Más información</a></p>' +
-      '<button class="btn" type="button" data-c="necessary">Solo necesarias</button><button class="btn pri" type="button" data-c="all">Aceptar todo</button>';
+      '<button class="btn btn--secondary" type="button" data-c="necessary">Solo necesarias</button><button class="btn pri btn--primary" type="button" data-c="all">Aceptar todo</button>';
     b.querySelectorAll('button').forEach(x => x.addEventListener('click', () => { const prev = store.get('consent', null); store.set('consent', x.dataset.c); b.remove(); if (prev && prev !== x.dataset.c) location.reload(); }));
-    document.body.appendChild(b);
+    const host = document.querySelector('.closing__links'); if (host) host.insertBefore(b, host.querySelector('.footer__legal')); else document.body.appendChild(b);
   }
   // AdSense loads from each page head (Auto ads place the units); without full consent it serves non-personalised ads.
   function ads() {
     document.querySelectorAll('.ad').forEach(el => { if (ADSENSE_CLIENT) el.remove(); else el.textContent = 'Publicidad'; });
   }
 
-  window.FP = { chrome, store, root };
+  function consentOnly() { const c = document.getElementById('fp-cookies'); if (c) c.addEventListener('click', e => { e.preventDefault(); consentBanner(true); }); consentBanner(false); }
+  window.FP = { chrome, store, root, consentOnly };
 })();
 /* FX: header shadow once the page scrolls; numbers that count up when they come into view */
 (function () {

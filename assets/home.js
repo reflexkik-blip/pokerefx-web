@@ -7,7 +7,7 @@
   if (!box) return;
   const kind = c => c === 'F' ? 'F' : c === 'C' ? 'C' : c === 'L' ? 'L' : c === 'A' ? 'A' : 'R';
   const name = c => ({ F: 'Fold', C: 'Pagar', L: 'Limp', A: 'All-in' })[c] || 'Subir a ' + c.slice(1).replace('.', ',');
-  const COL = { F: 'var(--fold)', C: 'var(--call)', L: 'var(--limp)', A: 'var(--allin)', R: 'var(--raise)' };
+  const COL = { F: 'var(--k-F)', C: 'var(--k-C)', L: 'var(--k-L)', A: 'var(--k-A)', R: 'var(--k-R)' };
   let D = null, cur = null, score = [0, 0];
   const rnd = n => Math.floor(Math.random() * n);
 
@@ -24,8 +24,22 @@
   function card([r, s]) { return '<span class="pc ' + s[1] + '">' + (r === 'T' ? '10' : r) + '<small>' + s[0] + '</small></span>'; }
   function grid(sp, k) {
     let h = '<div class="dg" aria-hidden="true">';
-    for (let i = 0; i < 169; i++) { const f = sp.F[i]; const m = f.indexOf(Math.max(...f)); h += '<i style="background:' + COL[kind(sp.ac[m])] + (i === k ? ';outline:2px solid #fff;outline-offset:-1px;transform:scale(1.35);z-index:2;position:relative' : '') + '"></i>'; }
+    for (let i = 0; i < 169; i++) { const f = sp.F[i]; const m = f.indexOf(Math.max(...f)); h += '<i style="background:' + COL[kind(sp.ac[m])] + (i === k ? ';outline:2px solid var(--accent);outline-offset:-1px;transform:scale(1.35);z-index:2;position:relative' : '') + '"></i>'; }
     return h + '</div>';
+  }
+  const POS = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
+  function table(sp, cards) {
+    const m = sp.slug.match(/^(open|bb|sb|btn|co|hj|utg)-/), hero = (sp.slug.startsWith('open-') ? sp.slug.split('-')[1] : m[1]).toUpperCase();
+    const v = sp.slug.match(/vs-(open|all-in|limp)-([a-z]+)/), vil = v ? v[2].toUpperCase() : null, va = v ? { open: 'Sube 2', 'all-in': 'All-in', limp: 'Limp' }[v[1]] : '';
+    const h = POS.indexOf(hero), slots = ['s0', 's1', 's2', 's3', 's4', 's5'];
+    let seats = '', dslot = 0;
+    for (let i = 0; i < 6; i++) {
+      const p = POS[(h + i) % 6], pi = POS.indexOf(p); if (p === 'BTN') dslot = i;
+      let st = '', cls = 'seat ' + slots[i];
+      if (p === hero) { st = 'Tú'; cls += ' me'; } else if (p === vil) { st = va; cls += ' on'; } else if (pi < h && p !== 'SB' && p !== 'BB') { st = 'Fold'; cls += ' out'; } else if (p === 'SB' && pi < h) { st = 'Fold'; cls += ' out'; } else st = p === 'SB' ? '0,5' : p === 'BB' ? '1' : '';
+      seats += '<span class="' + cls + '"><b>' + p + '</b>' + (st ? '<em>' + st + '</em>' : '') + '</span>';
+    }
+    return '<div class="tbl" aria-hidden="true"><div class="felt"><span class="btnd">D</span><div class="dc">' + cards.map(card).join('') + '</div></div>' + seats + '</div>';
   }
   function render(choice) {
     const { sp, k, cards } = cur, f = sp.F[k];
@@ -36,11 +50,11 @@
       score[1]++; if (ok) score[0]++;
       v = '<div class="dv ' + (ok ? 'ok' : mix ? 'mx' : 'ko') + '"><b>' + (ok ? 'Correcto' : mix ? 'Aceptable' : 'Error') + '</b> — el solver con ' + N[k] + ': ' +
         sp.ac.map((c, a) => f[a] > .005 ? name(c) + ' ' + Math.round(100 * f[a]) + ' %' : '').filter(Boolean).join(' · ') + '</div>' +
-        grid(sp, k) + '<div class="row" style="gap:8px;margin-top:10px"><button class="btn pri" type="button" id="dnext">Otra mano</button><a class="btn ghost" href="rangos/' + sp.slug + '/">Ver la tabla</a></div>';
+        grid(sp, k) + '<div class="acts"><button class="btn btn--secondary" type="button" id="dnext">Repartir otra mano</button><a class="link" href="rangos/' + sp.slug + '/">Ver la tabla completa</a></div>';
     }
-    box.innerHTML = '<div class="dh"><span class="chip2">ChipEV · ' + sp.S + ' bb</span><span class="small2">' + (score[1] ? 'Aciertos ' + score[0] + '/' + score[1] : 'Prueba rápida') + '</span></div>' +
-      '<h3>' + sp.t + '</h3><p class="small2">' + sp.sub + ' ¿Qué haces?</p><div class="dc">' + cards.map(card).join('') + '</div>' +
-      (choice == null ? '<div class="row" style="gap:8px">' + sp.ac.map((c, a) => '<button class="btn act" type="button" data-a="' + a + '" style="--c:' + COL[kind(c)] + '">' + name(c) + '</button>').join('') + '</div>' : v);
+    box.innerHTML = '<div class="dh"><span class="chip2">ChipEV · ' + sp.S + ' bb</span><span class="small2">' + (score[1] ? 'Aciertos ' + score[0] + '/' + score[1] : 'Ciegas 0,5/1 · ante 1') + '</span></div>' +
+      table(sp, cards) + '<p class="dt">' + sp.t + '</p><p class="small2">' + sp.sub + ' ¿Qué haces?</p>' +
+      (choice == null ? '<div class="acts">' + sp.ac.map((c, a) => '<button class="act" type="button" data-a="' + a + '" style="--c:' + COL[kind(c)] + '">' + name(c) + '</button>').join('') + '</div>' : v);
     box.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => render(+b.dataset.a)));
     const nx = $('dnext'); if (nx) nx.addEventListener('click', deal);
   }
@@ -53,7 +67,7 @@
   const RK = 'AKQJT98765432', N = []; for (let i = 0; i < 13; i++) for (let j = 0; j < 13; j++) N.push(i === j ? RK[i] + RK[j] : i < j ? RK[i] + RK[j] + 's' : RK[j] + RK[i] + 'o');
   const kind = c => c === 'F' ? 'F' : c === 'C' ? 'C' : c === 'L' ? 'L' : c === 'A' ? 'A' : 'R';
   const name = c => ({ F: 'Fold', C: 'Pagar', L: 'Limp', A: 'All-in' })[c] || 'Subir a ' + c.slice(1).replace('.', ',');
-  const COL = { F: 'var(--fold)', C: 'var(--call)', L: 'var(--limp)', A: 'var(--allin)', R: 'var(--raise)' };
+  const COL = { F: 'var(--k-F)', C: 'var(--k-C)', L: 'var(--k-L)', A: 'var(--k-A)', R: 'var(--k-R)' };
   const d = new Date(), key = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
   let seed = key; const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
   const get = (k, v) => { try { const x = localStorage.getItem(k); return x == null ? v : JSON.parse(x); } catch (e) { return v; } };
@@ -67,7 +81,7 @@
     put('fp.daily', { key, res });
     const sq = res.map(x => x ? '🟩' : '🟥').join(''), txt = 'PokerEFX · reto del ' + d.getDate() + '/' + (d.getMonth() + 1) + ': ' + ok + '/10 ' + sq + ' pokerefx.com';
     box.innerHTML = '<h3>Reto del día completado</h3><p style="font-size:26px;margin:4px 0">' + sq + '</p><p><b>' + ok + '/10</b> · racha de <b>' + streak() + '</b> día' + (streak() === 1 ? '' : 's') + '. Vuelve mañana: cada día hay 10 manos nuevas, iguales para todos.</p>' +
-      '<div class="row" style="gap:8px"><button class="btn pri" type="button" id="dl-share">Copiar resultado</button><a class="btn" href="entrenar/">Entrenar los rangos</a></div><p class="small" id="dl-msg"></p>';
+      '<div class="row"><button class="btn btn--secondary" type="button" id="dl-share">Copiar resultado</button><a class="link" href="entrenar/">Entrenar los rangos</a></div><p class="small" id="dl-msg"></p>';
     document.getElementById('dl-share').addEventListener('click', () => {
       const m = document.getElementById('dl-msg');
       navigator.clipboard.writeText(txt).then(() => { m.textContent = 'Copiado. Pégalo en tu grupo de póker.'; }).catch(() => { m.textContent = txt; });
@@ -79,7 +93,7 @@
     box.innerHTML = '<div class="row" style="justify-content:space-between;align-items:center"><span class="tag">Reto del día · ' + (i + 1) + '/10</span><span class="small">' + res.map(x => x ? '🟩' : '🟥').join('') + '</span></div>' +
       '<h3 style="margin:10px 0 2px">' + sp.t + ' · ' + sp.S + ' bb</h3><p class="small" style="margin:0">' + sp.sub + '</p>' +
       '<div class="dc" style="margin:12px 0">' + c.map(([r, s]) => '<span class="pc ' + s[1] + '">' + (r === 'T' ? '10' : r) + '<small>' + s[0] + '</small></span>').join('') + '</div>' +
-      '<div class="row" style="gap:8px">' + sp.ac.map((a, j) => '<button class="btn" type="button" data-a="' + j + '" style="border-color:' + COL[kind(a)] + '">' + name(a) + '</button>').join('') + '</div><p class="small" id="dl-r" style="min-height:1.4em;margin-top:8px"></p>';
+      '<div class="row">' + sp.ac.map((a, j) => '<button class="act" type="button" data-a="' + j + '" style="--c:' + COL[kind(a)] + '">' + name(a) + '</button>').join('') + '</div><p class="small" id="dl-r" style="min-height:1.4em;margin-top:8px"></p>';
     box.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => {
       const f = sp.F[k], a = +b.dataset.a; let m = 0; f.forEach((v, j) => { if (v > f[m]) m = j; });
       const ok = f[a] >= .25 || a === m; res.push(ok);
@@ -99,33 +113,4 @@
     }
     show();
   }).catch(() => { box.hidden = true; });
-})();
-/* FX: the lamp follows the pointer, the demo card tilts with it, and a real solver range paints itself behind */
-(function () {
-  'use strict';
-  const hero = document.querySelector('.fp-hero'); if (!hero) return;
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const src = document.querySelectorAll('#populares .rc .mg')[0];
-  if (src) {
-    const g = document.createElement('div'); g.className = 'hgrid'; g.setAttribute('aria-hidden', 'true');
-    const cells = src.querySelectorAll('i');
-    cells.forEach((c, k) => {
-      const i = document.createElement('i'), r = Math.floor(k / 13), q = k % 13, bg = c.getAttribute('style') || '';
-      const m = bg.match(/background:\s*([^;]+)/); const col = m ? m[1] : '';
-      if (col && !/fold/.test(col)) { i.className = 'on'; i.style.setProperty('--c', col); i.style.setProperty('--d', 300 + (r + q) * 55); }
-      g.appendChild(i);
-    });
-    hero.prepend(g);
-  }
-  if (reduce || !window.matchMedia('(pointer: fine)').matches) return;
-  const demo = document.getElementById('demo'); let raf = 0, px = .72, py = .3;
-  hero.addEventListener('pointermove', e => {
-    const r = hero.getBoundingClientRect(); px = (e.clientX - r.left) / r.width; py = (e.clientY - r.top) / r.height;
-    if (raf) return;
-    raf = requestAnimationFrame(() => {
-      raf = 0; hero.style.setProperty('--mx', (px * 100).toFixed(1) + '%'); hero.style.setProperty('--my', (py * 100).toFixed(1) + '%');
-      if (demo) demo.style.transform = 'perspective(1100px) rotateY(' + ((px - .5) * 7).toFixed(2) + 'deg) rotateX(' + ((.5 - py) * 6).toFixed(2) + 'deg)';
-    });
-  });
-  hero.addEventListener('pointerleave', () => { if (demo) demo.style.transform = ''; });
 })();
