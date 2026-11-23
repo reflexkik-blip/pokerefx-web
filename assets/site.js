@@ -22,7 +22,7 @@
     const tools = ['simulador', 'entrenar', 'tablas', 'calculadoras', 'replayer', 'laboratorio', 'herramientas'].includes(active);
     const h = document.createElement('header'); h.className = 'fp-top';
     h.innerHTML = '<div class="fp-wrap fp-bar"><a class="skip-link" href="#fp-main">Ir al contenido</a>' +
-      '<a class="fp-logo" href="' + R + 'index.html"><img src="' + R + 'assets/icon.svg" alt="" width="24" height="24">PokerEFX</a>' +
+      '<a class="fp-logo" href="' + R + 'index.html"><img src="/assets/icon.svg" alt="" width="24" height="24">PokerEFX</a>' +
       '<nav class="fp-links" id="nav" aria-label="Principal">' +
       '<div class="fp-item"><a class="fp-link" href="' + R + 'simulador/"' + cur('simulador') + '>Simulador</a></div>' +
       '<div class="fp-item"><a class="fp-link" href="' + R + 'tablas/"' + cur('tablas') + '>Tablas</a></div>' +
@@ -34,7 +34,7 @@
       '</div></div></div>' +
       '<div class="fp-item"><a class="fp-link" href="' + R + 'aprende/"' + cur('aprende') + '>Aprende</a></div>' +
       '<div class="fp-item fp-sheet-only"><a class="fp-link" href="' + R + 'cuenta/">Mi cuenta</a></div></nav>' +
-      '<div class="fp-actions"><a class="fp-link" href="' + R + 'cuenta/"' + cur('cuenta') + '>Mi cuenta</a><a class="btn btn--primary fp-cta" href="' + R + 'simulador/">Empezar a entrenar' + ARROW + '</a></div>' +
+      '<div class="fp-actions">' + '<a class="fp-link fp-lang" href="' + ((document.documentElement.lang === 'en') ? location.pathname.replace(/^\/en(\/|$)/, '/') : '/en' + location.pathname) + '" hreflang="' + ((document.documentElement.lang === 'en') ? 'es' : 'en') + '" lang="' + ((document.documentElement.lang === 'en') ? 'es' : 'en') + '" aria-label="' + ((document.documentElement.lang === 'en') ? 'Ver en español' : 'Read in English') + '">' + ((document.documentElement.lang === 'en') ? 'ES' : 'EN') + '</a>' + '<a class="fp-link" href="' + R + 'cuenta/"' + cur('cuenta') + '>Mi cuenta</a><a class="btn btn--primary fp-cta" href="' + R + 'simulador/">Empezar a entrenar' + ARROW + '</a></div>' +
       '<button class="fp-toggle navbtn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menú"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>';
     document.body.prepend(h);
     const main = document.querySelector('main') || document.querySelector('.wrap'); if (main && !main.id) main.id = 'fp-main';
@@ -45,7 +45,7 @@
     const f = document.createElement('footer'); f.className = 'fp-foot';
     f.innerHTML = '<div class="fp-wrap">' +
       (active === 'simulador' ? '' : '<div class="fp-close"><div><h2>Entrena antes de tu próximo torneo</h2><p>Diez minutos de simulador antes de jugar. Gratis y sin registro.</p></div><a class="btn btn--primary fp-cta fp-cta--wide" href="' + R + 'simulador/">Empezar a entrenar' + ARROW + '</a></div>') +
-      '<div class="fp-fgrid"><div class="fp-fbrand"><a class="fp-logo" href="' + R + 'index.html"><img src="' + R + 'assets/icon.svg" alt="" width="24" height="24">PokerEFX</a>' +
+      '<div class="fp-fgrid"><div class="fp-fbrand"><a class="fp-logo" href="' + R + 'index.html"><img src="/assets/icon.svg" alt="" width="24" height="24">PokerEFX</a>' +
       '<p class="fp-lede">Herramientas gratis para estudiar póker de torneos con un solver. Solo para mayores de 18 años; aquí no se juega dinero (<a href="https://www.jugarbien.es" rel="noopener">jugarbien.es</a>).</p></div>' +
       col('Practicar', [['simulador/', 'Simulador'], ['entrenar/', 'Entrenar rangos'], ['tablas/', 'Tablas preflop']]) +
       col('Analizar', [['calculadoras/', 'Calculadoras'], ['replayer/', 'Replayer'], ['laboratorio/', 'Laboratorio']]) +
@@ -95,4 +95,54 @@
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { io.unobserve(e.target); count(e.target); } }), { threshold: .6 });
     els.forEach(e => io.observe(e));
   });
+})();
+/* English edition: translate the text the tools create in the browser, with the same rules the build uses */
+(function () {
+  'use strict';
+  if (document.documentElement.lang !== 'en') return;
+  let R = null;
+  const NUM = s => s.replace(/(?<=\d)\.(?=\d{3}(?!\d))/g, '⁣').replace(/(?<=\d),(?=\d)/g, '.').replace(/⁣/g, ',').replace(/(?<=\d) %/g, '%');
+  // the page is already English when it loads: only text that still reads as Spanish is touched
+  const ES = /[áéíóúñ¿¡]|\b(de|la|el|los|las|que|con|para|por|una|del|tus|tu|manos|mano|ciegas|cuando|más|según|pierdes|juegas|rival|rivales|tabla|tablas|aquí|sin|está|son|es|y|o|subir|sube|pagar|paga|apuesta|bote|mesa|jugada|correcto|error|imprecisión|foldear|foldea|resubir|cargando|repaso|repasos|nuevo|nueva|hoy|días|cada|todo|todas|todos|ver|elige|mejor|pierde|gana|ganas|cubren|cubres|burbuja)\b/i;
+  const ESNUM = /\d,\d+ ?(%|bb|ciegas)/;
+  function tr(seg) {
+    if (!seg) return seg;
+    if (Object.prototype.hasOwnProperty.call(R.exact, seg)) return R.exact[seg];
+    if (!/[A-Za-zÁÉÍÓÚáéíóúñÑ¿¡]/.test(seg)) return ESNUM.test(seg) ? NUM(seg) : seg;
+    for (const [rx, rep] of R.tpl) { const m = seg.match(rx); if (m && m[0] === seg) return NUM(phr(seg.replace(rx, rep))); }
+    if (ES.test(seg) || ESNUM.test(seg)) return NUM(phr(seg));
+    return seg;
+  }
+  function phr(s) { for (const [rx, rep] of R.phr) s = s.replace(rx, rep); return s; }
+  const done = new WeakMap();
+  function text(n) {
+    const v = n.nodeValue; if (!v || !v.trim() || done.get(n) === v) return;
+    const lead = v.match(/^\s*/)[0], trail = v.match(/\s*$/)[0], core = v.trim().replace(/\s+/g, ' ');
+    const out = (lead + tr(core) + trail).replace(/(\d)[\s\u00a0\u202f]%/g, '$1%'); done.set(n, out); if (out !== v) n.nodeValue = out;
+  }
+  const ATTRS = ['placeholder', 'title', 'aria-label'];
+  const doneA = new WeakMap();
+  function el(e) {
+    if (!e.getAttribute) return;
+    const seen = doneA.get(e) || {};
+    for (const a of ATTRS) {
+      const v = e.getAttribute(a); if (!v || seen[a] === v || !/[a-záéíóúñ]{3}/i.test(v)) continue;
+      const t = tr(v.trim().replace(/\s+/g, ' ')); seen[a] = t; if (t !== v) e.setAttribute(a, t);
+    }
+    doneA.set(e, seen);
+  }
+  function walk(root) {
+    if (root.nodeType === 3) { if (!skip(root.parentNode)) text(root); return; }
+    if (root.nodeType !== 1 || skip(root)) return;
+    el(root);
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+    let n; while ((n = w.nextNode())) { if (n.nodeType === 1) { if (skip(n)) continue; el(n); } else if (!skip(n.parentNode)) text(n); }
+  }
+  function skip(e) { return !e || (e.closest && e.closest('script,style,textarea,code,pre.hh,[data-no-tr]')); }
+  fetch('/assets/i18n-en.json').then(r => r.json()).then(d => {
+    R = { exact: d.exact, tpl: d.tpl.map(([p, r]) => [new RegExp(p), r]), phr: d.phr.map(([p, r]) => [new RegExp(p, 'g'), r]) };
+    walk(document.body);
+    new MutationObserver(ms => { for (const m of ms) { if (m.type === 'characterData') text(m.target); else m.addedNodes.forEach(walk); if (m.type === 'attributes') el(m.target); } })
+      .observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+  }).catch(() => {});
 })();

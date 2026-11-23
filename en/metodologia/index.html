@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;self&#x27;; script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://cdn.jsdelivr.net https://gc.zgo.at https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.google.com https://*.gstatic.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://fonts.googleapis.com; font-src &#x27;self&#x27; https://fonts.gstatic.com; img-src &#x27;self&#x27; data: https:; connect-src &#x27;self&#x27; https://pokerefx.goatcounter.com https://*.supabase.co wss://*.supabase.co https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; frame-src https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; worker-src &#x27;self&#x27; blob:; object-src &#x27;none&#x27;; base-uri &#x27;self&#x27;; form-action &#x27;self&#x27;"><meta name="referrer" content="strict-origin-when-cross-origin"><script data-goatcounter="https://pokerefx.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<title>How we calculate and verify the poker charts | PokerEFX</title>
+<meta name="description" content="Model, solver and verification of PokerEFX&#x27;s preflop charts: comparison with published Nash push/fold charts and a consistency audit of 375 ranges.">
+<link rel="canonical" href="https://pokerefx.com/en/metodologia/">
+<script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+
+<meta property="og:title" content="How we calculate and verify the poker charts | PokerEFX"><meta property="og:description" content="Model, solver and verification of PokerEFX&#x27;s preflop charts: comparison with published Nash push/fold charts and a consistency audit of 375 ranges."><meta property="og:type" content="website"><meta property="og:url" content="https://pokerefx.com/en/metodologia/"><meta property="og:image" content="https://pokerefx.com/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="PokerEFX"><meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#17584c">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/assets/icon-180.png"><link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/assets/fonts/host-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+
+
+<link rel="alternate" hreflang="es" href="https://pokerefx.com/metodologia/"><link rel="alternate" hreflang="en" href="https://pokerefx.com/en/metodologia/"><link rel="alternate" hreflang="x-default" href="https://pokerefx.com/metodologia/"></head>
+<body>
+<main>
+<section><div class="wrap prose"><div class="eyebrow">Transparencia</div><h1>How we calculate the charts and how we verify them</h1>
+<p>A chart is only useful if you can trust it. Here we explain which model we use, what assumptions lie behind it and how we check that the numbers match independent sources.</p>
+<h2>The model</h2>
+<ul><li><b>Formato:</b> 6-max tournament, 1 bb ante paid by the big blind (big blind ante), equal stacks.</li>
+<li><b>Equity:</b> exact enumeration of the 1,326 combinations of every hand against every hand, with card removal.</li>
+<li><b>Solver:</b> counterfactual regret minimisation (CFR) over the full preflop tree: open, limp, 3-bet, 4-bet, all-in, squeeze and limped pots. Strategies are solved until no hand can gain more than a few hundredths of a big blind by changing action.</li>
+<li><b>Postflop:</b> the value of reaching the flop is estimated with an equity-realisation model calibrated with 14,000+ real tournament hands. It is the model's main approximation: in spots with a lot of postflop play (deep stacks) the ranges are good starting points, not exact truths.</li>
+<li><b>ICM and PKO:</b> the bubble, ITM, final table and PKO formats use the Malmuth-Harville model or the bounty value over the same tree.</li></ul>
+<h2>Verification 1: heads-up push/fold against a published Nash chart</h2>
+<p>With the same equity engine we solve small blind vs big blind push/fold without an ante and compare it with the Nash chart published by <a href="https://www.pokerstrategy.com/strategy/sit-and-go/1779/" rel="noopener">PokerStrategy</a>:</p>
+<div class="tw"><table class="t"><tr><th>Stack</th><th>SB push (nuestro)</th><th>SB push (publicado)</th><th>BB call (nuestro)</th><th>BB call (publicado)</th></tr><tr><td>5 bb</td><td>71.5%</td><td>74.1%</td><td>62.0%</td><td>68.6%</td></tr><tr><td>8 bb</td><td>61.9%</td><td>62.6%</td><td>45.0%</td><td>48.4%</td></tr><tr><td>10 bb</td><td>58.3%</td><td>56.6%</td><td>37.4%</td><td>38.5%</td></tr><tr><td>12 bb</td><td>53.4%</td><td>51.4%</td><td>33.0%</td><td>33.0%</td></tr><tr><td>15 bb</td><td>45.7%</td><td>45.7%</td><td>28.6%</td><td>28.4%</td></tr><tr><td>20 bb</td><td>40.3%</td><td>40.9%</td><td>21.7%</td><td>21.7%</td></tr></table></div>
+<p>From 8 to 20 big blinds the differences are 0 to 2 points, which is how much different calculators vary from each other (the published chart rounds ranges to steps of hands). At 5 big blinds the difference is a little larger: there almost any hand is a push and small differences in how marginal hands are ordered move the percentage.</p>
+<h2>Verification 2: internal consistency</h2>
+<p>We automatically check the 375 open and all-in-calling charts for “holes”: a hand that is played while a strictly better one of the same shape is folded. Only 3 cases appear, and all three are A5o being played before A6o, a known equilibrium pattern (the 5 makes a straight with A-2-3-4 and blocks the opponent's hands).</p>
+<h2>Verification 3: SB raise size</h2>
+<p>We compared five strategies for the small blind (limp + a raise of 2.5, 3 or 3.5 bb, and raising without limping). The size barely changes the EV and limping adds between 0.05 and 0.11 bb per hand from 14 big blinds up: <a href="../aprende/ciega-pequena-limp-o-subir.html">see the numbers</a>.</p>
+<h2>Limits</h2>
+<p>No model is perfect. If you see a chart that doesn't add up, write to us: we review it and, if needed, recompute it. We keep extending the tree (more raise sizes, responses to the squeeze, cold 4-bets) and recomputing with more iterations.</p>
+</div></section>
+</main>
+<script src="/assets/site.js" data-root="../"></script>
+<script>FP.chrome('tablas');</script>
+
+</body>
+</html>

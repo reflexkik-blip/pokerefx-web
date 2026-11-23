@@ -58,7 +58,7 @@
     box.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => render(+b.dataset.a)));
     const nx = $('dnext'); if (nx) nx.addEventListener('click', deal);
   }
-  fetch('data/demo.json').then(r => r.json()).then(d => { D = d; deal(); }).catch(() => { box.innerHTML = '<p class="small2">No se pudo cargar la demo. <a href="simulador/">Abre el simulador</a>.</p>'; });
+  fetch('/data/demo.json').then(r => r.json()).then(d => { D = d; deal(); }).catch(() => { box.innerHTML = '<p class="small2">No se pudo cargar la demo. <a href="simulador/">Abre el simulador</a>.</p>'; });
 })();
 /* Daily challenge: the same 10 hands for everyone each day (seeded by date), score, streak and a shareable result. */
 (function () {
@@ -102,7 +102,7 @@
       i++; setTimeout(show, ok ? 1000 : 2200);
     }));
   }
-  fetch('data/demo.json').then(r => r.json()).then(D => {
+  fetch('/data/demo.json').then(r => r.json()).then(D => {
     const done = get('fp.daily', null); if (done && done.key === key) { res = done.res; finish(); return; }
     for (let n = 0; n < 10; n++) {
       const sp = D[Math.floor(rnd() * D.length)]; let k, t = 0;

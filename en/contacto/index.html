@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;self&#x27;; script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://cdn.jsdelivr.net https://gc.zgo.at https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.google.com https://*.gstatic.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://fonts.googleapis.com; font-src &#x27;self&#x27; https://fonts.gstatic.com; img-src &#x27;self&#x27; data: https:; connect-src &#x27;self&#x27; https://pokerefx.goatcounter.com https://*.supabase.co wss://*.supabase.co https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; frame-src https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; worker-src &#x27;self&#x27; blob:; object-src &#x27;none&#x27;; base-uri &#x27;self&#x27;; form-action &#x27;self&#x27;"><meta name="referrer" content="strict-origin-when-cross-origin"><script data-goatcounter="https://pokerefx.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<title>Contacto | PokerEFX</title>
+<meta name="description" content="Write to PokerEFX: ideas, bugs or a range chart that doesn&#x27;t add up.">
+<link rel="canonical" href="https://pokerefx.com/en/contacto/">
+<script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+
+<meta property="og:title" content="Contacto | PokerEFX"><meta property="og:description" content="Write to PokerEFX: ideas, bugs or a range chart that doesn&#x27;t add up."><meta property="og:type" content="website"><meta property="og:url" content="https://pokerefx.com/en/contacto/"><meta property="og:image" content="https://pokerefx.com/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="PokerEFX"><meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#17584c">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/assets/icon-180.png"><link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/assets/fonts/host-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+
+
+<link rel="alternate" hreflang="es" href="https://pokerefx.com/contacto/"><link rel="alternate" hreflang="en" href="https://pokerefx.com/en/contacto/"><link rel="alternate" hreflang="x-default" href="https://pokerefx.com/contacto/"></head>
+<body>
+<main>
+<section><div class="wrap" style="max-width:760px">
+<h1>Contact</h1>
+<p>An idea, a bug or a chart that doesn't add up? Write to us and we will reply within a few days.</p>
+<form id="contact" class="box" novalidate style="display:grid;gap:14px;margin-top:20px">
+<p hidden><label>No rellenar <input name="web"></label></p>
+<label class="f">Nombre<input type="text" name="nombre" required maxlength="80" autocomplete="name"></label>
+<label class="f">Email<input type="email" name="email" required maxlength="120" autocomplete="email"></label>
+<label class="f">Asunto<select name="asunto"><option>Pregunta</option><option>Bug on the site</option><option>A range doesn't add up</option><option>Sugerencia</option><option>Collaboration</option></select></label>
+<label class="f">Mensaje<textarea name="mensaje" rows="6" required maxlength="3000" style="font:inherit;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--card);color:var(--ink)"></textarea></label>
+<div class="row"><button class="btn pri" type="submit">Enviar mensaje</button><span class="small" id="contact-msg" role="status"></span></div>
+</form></div></section>
+<script>document.getElementById('contact').addEventListener('submit',function(e){e.preventDefault();const f=e.target,m=document.getElementById('contact-msg'),d=new FormData(f);if(d.get('web'))return;if(!f.reportValidity())return;m.textContent='Enviando…';
+fetch('https://mbbjgprfkmmysjhpyjas.supabase.co/rest/v1/contact',{method:'POST',headers:{'apikey':'sb_publishable_WybvVuZs_IGCGV1IzgX6uQ_hbfUSTXa','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({nombre:d.get('nombre'),email:d.get('email'),asunto:d.get('asunto'),mensaje:d.get('mensaje')})})
+.then(r=>{if(!r.ok)throw 0;f.reset();m.textContent='Message sent. We\'ll reply within a few days.';}).catch(()=>{m.textContent='It couldn\'t be sent. Your text is still there: try again in a while.';});});</script>
+</main>
+<script src="/assets/site.js" data-root="../"></script>
+<script>FP.chrome('');</script>
+
+</body>
+</html>

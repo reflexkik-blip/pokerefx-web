@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en" data-type="software" data-radius="soft" data-buttons="arrow" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;self&#x27;; script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://cdn.jsdelivr.net https://gc.zgo.at https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.google.com https://*.gstatic.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://fonts.googleapis.com; font-src &#x27;self&#x27; https://fonts.gstatic.com; img-src &#x27;self&#x27; data: https:; connect-src &#x27;self&#x27; https://pokerefx.goatcounter.com https://*.supabase.co wss://*.supabase.co https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; frame-src https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; worker-src &#x27;self&#x27; blob:; object-src &#x27;none&#x27;; base-uri &#x27;self&#x27;; form-action &#x27;self&#x27;"><meta name="referrer" content="strict-origin-when-cross-origin"><script data-goatcounter="https://pokerefx.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script><meta name="referrer" content="strict-origin-when-cross-origin">
+<title>PokerEFX: study poker for free with GTO ranges and a simulator</title>
+<meta name="description" content="Study poker for free: a range trainer, 1,000+ GTO preflop charts, a simulator that corrects every decision, a hand replayer and calculators.">
+<meta name="google-site-verification" content="6n5uc1S0AmFdtetoz-giflUgl79UyptjAyrwNz95n-Q" />
+<meta name="google-site-verification" content="5W_RwbCmxaD-LMvImB1p8zZ8K6WRviRe2nwSk6HKOSE" />
+<script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+<link rel="canonical" href="https://pokerefx.com/en/">
+<meta property="og:title" content="PokerEFX — free GTO tournament trainer">
+<meta property="og:description" content="A simulator that corrects every decision with a GTO solver, tournament preflop charts and calculators. Free.">
+<meta property="og:type" content="website"><meta property="og:url" content="https://pokerefx.com/en/"><meta property="og:image" content="https://pokerefx.com/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="PokerEFX"><meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0f0f0f">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/assets/icon-180.png"><link rel="manifest" href="/manifest.webmanifest">
+
+
+
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "PokerEFX", "applicationCategory": "GameApplication", "operatingSystem": "Web", "inLanguage": "en", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "Poker tournament trainer with a GTO solver, preflop charts and calculators."}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What does PokerEFX include?", "acceptedAnswer": {"@type": "Answer", "text": "GTO tournament preflop charts in eleven formats (ChipEV, PKO, bubble, ITM, ICM and final table), 1,000+ range pages by situation, a simulator that corrects every preflop and postflop decision with the EV in big blinds, a spaced-repetition range trainer, equity, ICM, pot odds and variance calculators, a Winamax and PokerStars hand replayer, and a lab with statistics on how real opponents play. All free and with no sign-up."}}, {"@type": "Question", "name": "Is PokerEFX free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The simulator, the charts, the 1,000+ ranges, the trainer, the replayer and the calculators are free. There are optional ad-free plans."}}, {"@type": "Question", "name": "Can I use it without signing up?", "acceptedAnswer": {"@type": "Answer", "text": "Yes: everything works without an account and your progress is saved in your browser. If you sign in with Google, it syncs across your devices."}}, {"@type": "Question", "name": "Where do the ranges come from?", "acceptedAnswer": {"@type": "Answer", "text": "From our own GTO solver for 6-max tournaments (CFR over the full preflop tree), checked against published Nash charts. We explain it in “How we calculate”."}}, {"@type": "Question", "name": "Does it cover ICM, the bubble and PKO?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The interactive charts have eleven formats: ChipEV, PKO covering and covered, bubble, ITM, mid ICM and final table."}}, {"@type": "Question", "name": "Does it work on mobile?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, the whole site is built for phones and you can add it to your home screen like an app."}}, {"@type": "Question", "name": "Is real money played here?", "acceptedAnswer": {"@type": "Answer", "text": "No. PokerEFX is a training tool: there are no bets or deposits. Content for adults (18+)."}}, {"@type": "Question", "name": "Can I import my hands?", "acceptedAnswer": {"@type": "Answer", "text": "Yes: the replayer reads Winamax and PokerStars hand histories, and everything is processed in your browser."}}, {"@type": "Question", "name": "Can I train my own ranges?", "acceptedAnswer": {"@type": "Answer", "text": "Yes: in “Range trainer” you can paint or paste your own ranges and memorise them with spaced repetition."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://pokerefx.com/#org", "name": "PokerEFX", "url": "https://pokerefx.com/en/", "logo": "https://pokerefx.com/assets/icon-512.png", "description": "Free tools to study tournament poker with a GTO solver.", "sameAs": ["https://www.instagram.com/pokerefx/", "https://www.youtube.com/@pokerefx", "https://x.com/pokerefx"]}, {"@type": "WebSite", "@id": "https://pokerefx.com/#web", "name": "PokerEFX", "url": "https://pokerefx.com/en/", "inLanguage": "en", "publisher": {"@id": "https://pokerefx.com/#org"}}]}</script>
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<link rel="preload" href="/assets/fonts/host-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Host Grotesk"; font-style: normal; font-display: swap; font-weight: 300 800; src: url("/assets/fonts/host-grotesk-latin-wght-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-display: swap; font-weight: 100 800; src: url("/assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); }
+</style>
+<link rel="stylesheet" href="/assets/kit/system.css">
+<link rel="stylesheet" href="/assets/kit/ui/cards.css">
+<link rel="stylesheet" href="/assets/kit/motion/motion.css">
+<link rel="stylesheet" href="/assets/kit/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="/assets/kit/layout/layout.css">
+<link rel="stylesheet" href="/assets/kit/icons/icon.css">
+<style>
+:root {
+  --p-bg: #0f0f0f; --p-surface: #1a1a1a; --p-ink: #ffffff; --p-muted: #8f8f8f;
+  --p-accent: #dafa9c; --p-accent-ink: #0f0f0f; --p-action: #dafa9c; --p-action-ink: #0f0f0f;
+  --p-inv-bg: #ffffff; --p-inv-surface: #ececec; --p-inv-ink: #0f0f0f; --p-inv-muted: #5f5f5f;
+  --p-inv-accent: #0f0f0f; --p-inv-accent-ink: #ffffff; --p-inv-action: #0f0f0f; --p-inv-action-ink: #ffffff;
+  --font-display: "Host Grotesk", system-ui, sans-serif;
+  --font-text: "Host Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 500;
+  --display-tracking: -0.035em;
+  --display-tracking-xl: -0.04em;
+}
+</style>
+<link rel="stylesheet" href="/assets/kit/ui/base.css">
+<script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+<script src="/assets/kit/backgrounds/backgrounds.js"></script>
+<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+<link rel="modulepreload" href="/assets/kit/moments/moments.js">
+<link rel="modulepreload" href="/assets/kit/moments/lib.js">
+<link rel="modulepreload" href="/assets/kit/moments/iris-opens/moment.js">
+<link rel="modulepreload" href="/assets/kit/moments/word-highlight/moment.js">
+<style>
+  /* the solver's action colours: data, not decoration (fold, raise, call, limp, all-in) */
+  :root { --k-F: #34383a; --k-R: #c8432c; --k-C: #287f4f; --k-L: #d9a93a; --k-A: #c23a70; }
+  .ground-inverse { --k-F: #d9dcde; }
+  .ground-inverse .link { color: var(--ink); }
+  /* playing cards inside the windows */
+  .pc { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 52px; height: 72px; border-radius: 8px; background: #fff; color: #111; font: 600 24px/1 var(--font-display); box-shadow: 0 1px 0 rgba(0,0,0,.4); }
+  .pc small { font-size: 18px; } .pc.h { color: #c8302a; } .pc.d { color: #1f62c9; } .pc.c { color: #1d7a3e; }
+  /* app window shell (one drawn window, the kit's tokens) */
+  .win { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--p-surface); overflow: hidden; display: flex; flex-direction: column; }
+  .win__bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; font: 500 13px/1 var(--font-mono); color: var(--muted); }
+  .win__bar i { width: 10px; height: 10px; border-radius: 50%; background: #3a3a3a; }
+  .win__bar span { margin-left: 8px; }
+  /* hero: the live hand the solver grades */
+  .hero__media.win { padding: 0; }
+  #demo { padding: 24px; display: grid; gap: 16px; align-content: start; flex: 1; }
+  .dh { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .chip2 { font: 500 13px/1 var(--font-mono); color: var(--accent); }
+  .small2 { font-size: 14px; color: var(--muted); margin: 0; }
+  #demo .dt { font-size: var(--t-card); margin: 0; font-weight: 500; }
+  .dc { display: flex; gap: 8px; }
+  .acts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .act { min-height: 44px; padding: 0 16px; border-radius: var(--r-sm); border: 1px solid var(--line-strong, #3a3a3a); background: #222; color: var(--p-ink); font: 500 15px/1 var(--font-text); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background-color .15s, transform .12s; }
+  .act::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  .act:hover { background: #2c2c2c; } .act:active { transform: scale(.97); }
+  .tbl { position: relative; height: 440px; margin: 8px 0 4px; }
+  .felt { position: absolute; inset: 34px 70px; border-radius: 999px; background: radial-gradient(ellipse at 50% 40%, #1f4a3d, #12261f 75%); border: 6px solid #2a2a2a; display: grid; place-items: center; }
+  .felt .dc { gap: 6px; }
+  .btnd { position: absolute; width: 22px; height: 22px; border-radius: 50%; background: #f2f2f2; color: #111; font: 600 11px/22px var(--font-text); text-align: center; }
+  .seat { position: absolute; display: grid; gap: 2px; justify-items: center; min-width: 56px; font-size: 12px; transform: translate(-50%, -50%); }
+  .seat b { font: 500 12px/1 var(--font-mono); } .seat em { font-style: normal; color: #c4c4c4; font-size: 12px; }
+  .seat.me b { color: var(--accent); } .seat.me em { color: var(--accent); }
+  .seat.on em { color: #ff9b85; } .seat.out b { color: var(--muted); }
+  .d0 { left: 58%; bottom: 6%; } .d1 { left: 10%; bottom: 22%; } .d2 { left: 10%; top: 22%; } .d3 { left: 58%; top: 6%; } .d4 { right: 10%; top: 22%; } .d5 { right: 10%; bottom: 22%; }
+  .s0 { left: 50%; top: 90%; } .s1 { left: 11%; top: 72%; } .s2 { left: 11%; top: 24%; } .s3 { left: 50%; top: 8%; } .s4 { left: 89%; top: 24%; } .s5 { left: 89%; top: 72%; }
+  @media (max-width: 639px) { .tbl { height: 200px; } .felt { inset: 26px 44px; } .felt .pc { width: 38px; height: 54px; font-size: 18px; } .seat { min-width: 44px; } .dh, #demo .small2 { display: none; } .tbl { height: 170px; } #demo { padding: 16px; gap: 10px; } }
+  .dv { font-size: 15px; line-height: 1.5; }
+  .dv b { color: var(--accent); font-weight: 500; }
+  .dv.ko b { color: #ff8a7a; }
+  .dg { display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; max-width: 300px; }
+  .dg i { aspect-ratio: 1; border-radius: 2px; }
+  /* app-frame: the spots list beside the open chart */
+  .app { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); margin-top: var(--s-7); border: 1px solid var(--line); border-radius: var(--r-lg); background: transparent; overflow: hidden; }
+  .app__bar { grid-column: 1 / -1; }
+  .app__list { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; }
+  .app__list ul { list-style: none; margin: 0; padding: 8px; display: grid; gap: 2px; }
+  .app__list li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: var(--r-sm); font-size: 15px; }
+  .app__list li span:last-child { font: 400 13px/1.6 var(--font-mono); color: var(--muted); }
+  .app__list li[aria-current] { background: #262626; }
+  .app__list li[aria-current] span:last-child { color: var(--accent); }
+  .app__open { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 24px; padding: 24px; min-width: 0; }
+  .rg { display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; align-self: start; }
+  .rg i { font: 500 10px/1 var(--font-mono); font-style: normal; color: rgba(255,255,255,.92); aspect-ratio: 1.25; display: grid; place-items: center; border-radius: 3px; overflow: hidden; }
+  .rg i.k-F { background: var(--k-F); color: #8f8f8f; } .rg i.k-R { background: var(--k-R); } .rg i.k-A { background: var(--k-A); } .rg i.k-C { background: var(--k-C); } .rg i.k-L { background: var(--k-L); }
+  .app__side { display: grid; gap: 16px; align-content: start; font-size: 15px; }
+  .app__side .dt { font-size: var(--t-card); margin: 0; font-weight: 500; }
+  .bar { display: grid; gap: 6px; }
+  .bar > div { display: flex; justify-content: space-between; }
+  .bar s { display: block; height: 6px; border-radius: 3px; background: #2b2b2b; text-decoration: none; position: relative; overflow: hidden; }
+  .bar s::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w); background: var(--c); border-radius: 3px; }
+  .key { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); margin-right: 6px; vertical-align: -1px; }
+  /* tool tiles: small live pieces of each tool */
+  #herramientas .panel { --p-h: 200px; background: var(--p-surface); border: 1px solid var(--line); display: grid; place-items: center; padding: 24px; }
+  .flash { width: min(100%, 460px); display: grid; grid-template-columns: 150px 1fr; gap: 24px; align-items: center; }
+  .flash__side { display: grid; gap: 16px; } .flash__q { display: grid !important; gap: 6px; }
+  .flash .flash__btns { grid-template-columns: repeat(2, 1fr); }
+  #herramientas .panel { overflow: hidden; height: var(--p-h); }
+  .flash__q { display: flex; justify-content: space-between; font: 500 13px/1 var(--font-mono); color: var(--muted); }
+  .flash .dg { max-width: none; }
+  .flash__btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .flash__btns span { text-align: center; padding: 8px 0; border: 1px solid var(--line); border-radius: var(--r-sm); font-size: 13px; }
+  .flash__btns span:last-child { border-color: var(--accent); color: var(--accent); }
+  .eq { width: min(100%, 460px); display: grid; gap: 14px; }
+  .eq__row { display: grid; grid-template-columns: 110px 1fr 56px; gap: 12px; align-items: center; font-size: 15px; }
+  .eq__row s { height: 10px; border-radius: 5px; background: #2b2b2b; position: relative; overflow: hidden; text-decoration: none; }
+  .eq__row s::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w); background: var(--c); }
+  .eq__row b { font: 500 15px/1 var(--font-mono); text-align: right; }
+  .hh { width: min(100%, 460px); font: 400 13px/1.9 var(--font-mono); color: var(--muted); }
+  .hh b { color: var(--p-ink); font-weight: 500; } .hh .lo { color: #ff8a7a; } .hh .ok { color: var(--accent); }
+  .lab { width: min(100%, 460px); display: grid; gap: 12px; }
+  .lab__row { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 14px; }
+  .lab__row s { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: #2b2b2b; position: relative; overflow: hidden; text-decoration: none; }
+  .lab__row s::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w); background: var(--accent); }
+  .lab__row b { font: 500 14px/1.4 var(--font-mono); }
+  /* popular charts on the inverse band */
+  .rcs .rc { gap: var(--s-3); transition: transform .3s var(--m-ease, ease), border-color .3s; }
+  .rcs .rc:hover { transform: translateY(-2px); } .rcs .rc:hover .mg { opacity: .88; }
+  .mg { display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; aspect-ratio: 1; }
+  .mg i { border-radius: 2px; }
+  .rcs h3 { margin: 0; font-size: var(--t-card); }
+  /* daily challenge window */
+  #daily { padding: 24px; display: grid; gap: 14px; align-content: start; min-height: 540px; }
+  #daily .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  #daily .tag { font: 500 13px/1 var(--font-mono); color: var(--accent); }
+  #daily h3 { margin: 0; font-size: var(--t-card); }
+  #daily .small { font-size: 14px; color: var(--muted); margin: 0; }
+  /* consent: the one legal notice (AdSense), small, at the foot */
+  .nav__actions .btn { --btn-h: 44px; min-height: 44px; }
+  .consent { position: static; margin: 0 0 32px; color: var(--p-ink); padding: 0; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 14px; }
+  .footer__legal > span { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .consent p { margin: 0; flex: 1 1 100%; }
+  .consent { display: grid !important; justify-items: start; } .consent a { color: var(--accent); }
+  .consent .btn { --btn-h: 44px; }
+  @media (min-width: 640px) { #preguntas .faq-wrap { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; align-items: start; } .faq-main { grid-column: 1 / span 6; } .faq-side { grid-column: 7 / span 6; } }
+  .faq-q { font: 500 var(--t-lead)/1.4 var(--font-text); margin: 0; }
+  .nash__body { padding: 24px; display: grid; gap: 12px; }
+  .nash__n { font: 500 var(--t-stat)/1 var(--font-display); margin: 0; letter-spacing: -.02em; }
+  .nash__bars { display: grid; gap: 6px; } .nash__bars s { height: 10px; border-radius: 5px; background: #2b2b2b; position: relative; overflow: hidden; text-decoration: none; }
+  .nash__bars s::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w); background: var(--accent); } .nash__bars s:nth-child(2)::after { background: #8f8f8f; } .nash__bars s:nth-child(3)::after { background: #ff8a7a; }
+  @media (max-width: 1279px) { #herramientas .panel { --p-h: 200px; } .tbl { height: 300px; } }
+  @media (max-width: 1279px) { .footer__legal > span { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 24px; flex: 1; } .footer__legal { display: block; } .app { grid-template-columns: 1fr; } .app__list { display: none; } .hero .btn-row .btn--secondary { padding-left: 0; } }
+  @media (max-width: 1023px) { .eq, .lab, .hh { width: 100%; } }
+  @media (max-width: 639px) { footer.closing { --hm: 2; } }
+  @media (min-width: 640px) and (max-width: 1023px) { #herramientas .panel { --p-h: 240px; } #herramientas .card { grid-column: 1 / -1 !important; } .footer__lede, .closing__cta .section-head p { display: none; } .closing__links .grid > .footer__col { grid-column: span 3; } #rangos .fill { margin-top: var(--s-4) !important; } #rangos .grid h2 { margin-bottom: 0; } }
+  @media (min-width: 1024px) and (max-width: 1279px) { #herramientas .panel { --p-h: 150px; } #herramientas .card > p { display: none; } }
+  @media (max-width: 1023px) { #rangos .fill { margin-top: var(--s-5) !important; } }
+  @media (min-width: 640px) and (max-width: 1023px) { .rcs .rc { grid-column: span 6 !important; } .rcs .mg { width: min(100%, 250px); } .rcs p { display: none; } #rangos .span-6.start-7 > p:not(:has(a)) { display: none; } }
+  @media (max-width: 639px) { .footer__legal > span { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; } .footer__legal > span br { display: none; } #rangos .span-6.start-7 > p.muted { display: none; } .rcs p { display: none; } .rcs .rc { grid-column: span 6; } .flash { grid-template-columns: 110px 1fr; gap: 16px; } .app__side { display: none; } #daily { min-height: 460px; } #reto .stack-4 > p:not(:has(a)) { display: none; } #herramientas .card > p { display: none; } }
+  @media (max-width: 1023px) { .app { grid-template-columns: 1fr; } .app__list { display: none; } }
+  @media (max-width: 639px) { .app__open { grid-template-columns: 1fr; padding: 16px; } .rg i { font-size: 7px; } #herramientas .panel { --p-h: 200px; } .app__side .bar:nth-of-type(n+3) { display: none; } }
+</style>
+<link rel="alternate" hreflang="es" href="https://pokerefx.com/"><link rel="alternate" hreflang="en" href="https://pokerefx.com/en/"><link rel="alternate" hreflang="x-default" href="https://pokerefx.com/"></head>
+<body>
+<!-- type: software
+     deal: hero split, nav nav-centre, close close-type, footer footer-columns, rhythm dark-band, buttons arrow, mark arc (own logo used), grounds paper/topglow (none used), palette soot-pale-lime (a card room at night: near-black felt-free ground, the lime of a lit chip; the colour stays in the solver's own charts), type host
+     moments: iris-opens on #reto (the daily table opens), word-highlight on #solver (the statement) -->
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Skip to content</a>
+    <a class="nav__logo" href="#top"><img src="/assets/icon.svg" alt="" width="28" height="28">PokerEFX</a>
+    <nav class="nav__links" aria-label="Main">
+      <div class="nav__item"><a class="nav__link" href="simulador/">Simulator</a></div>
+      <div class="nav__item"><a class="nav__link" href="#tablas">Charts</a></div>
+      <div class="nav__item">
+        <a class="nav__link" href="#herramientas">Tools <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="nav__menu">
+          <div class="wrap grid">
+            <div class="menu-col span-3">
+              <p class="t-label">Practise</p>
+              <a href="simulador/">Simulator<span>Play and the solver corrects you</span></a>
+              <a href="entrenar/">Range trainer<span>Memorise with spaced repetition</span></a>
+              <a href="tablas/">Preflop charts<span>11 formats, 5 to 100 big blinds</span></a>
+            </div>
+            <div class="menu-col span-3">
+              <p class="t-label">Analyse</p>
+              <a href="calculadoras/">Calculators<span>Equity, ICM, pot odds and variance</span></a>
+              <a href="replayer/">Replayer<span>Replay your Winamax hands</span></a>
+              <a href="laboratorio/">Lab<span>How real opponents play</span></a>
+            </div>
+            <div class="menu-col span-3">
+              <p class="t-label">Learn</p>
+              <a href="aprende/">Guides<span>19 guides with solver numbers</span></a>
+              <a href="rangos/">All ranges<span>1,061 charts by stack</span></a>
+              <a href="aprende/glosario-poker.html">Glossary<span>70+ terms explained</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav__item"><a class="nav__link" href="aprende/">Learn</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="nav__link" data-lang-switch href="/" hreflang="es" lang="es" aria-label="Ver en español">ES</a>
+      <a class="nav__link" href="cuenta/">My account</a>
+      <a class="btn btn--primary" href="simulador/">Start training</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero hero--split" data-enter aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text grid hero__grid">
+      <div class="hero__text span-5">
+        <p class="hero__kicker"><span class="dot" aria-hidden="true"></span>Free, no sign-up, in English and Spanish</p>
+        <h1 id="hero-h">Poker simulator for tournaments</h1>
+        <p class="hero__lead">You play the hand and the solver tells you how many big blinds your play loses against the best one. 1,061 charts from 5 to 100 big blinds.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="simulador/">Start training<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="#tablas">See preflop charts</a></div>
+      </div>
+      <div class="hero__media win ui ui-live span-6 start-7">
+        <div class="win__bar" aria-hidden="true"><i></i><i></i><i></i><span>pokerefx · quick test</span></div>
+        <div id="demo" aria-live="polite"><p class="small2">Dealing a hand…</p></div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="section" id="tablas" aria-labelledby="tablas-h">
+    <div class="wrap">
+      <div class="grid">
+        <h2 class="span-5" id="tablas-h">Preflop charts by position and stack</h2>
+        <div class="span-6 start-7 stack-4">
+          <p>Each cell is a hand and its colour shows what the solver does: raise, call, go all-in or fold. ChipEV, PKO, bubble and final table.</p>
+          <p><a class="link" href="tablas/">Open the interactive chart</a></p>
+        </div>
+      </div>
+      <div class="ui app fill" role="img" aria-label="Open chart from the button with 20 big blinds: you play 38.7% of hands">
+        <div class="win__bar app__bar"><i></i><i></i><i></i><span>pokerefx · preflop charts · open · 20 bb</span></div>
+        <div class="app__pane app__pane--list app__list">
+          <ul>
+            <li><span>Open UTG</span><span>21.7%</span></li>
+            <li><span>Open HJ</span><span>25.5%</span></li>
+            <li><span>Open CO</span><span>30.1%</span></li>
+            <li aria-current="true"><span>Open BTN</span><span>38.7%</span></li>
+            <li><span>Open SB</span><span>89.1%</span></li>
+            <li><span>BB contra BTN</span><span>81.9%</span></li>
+            <li><span>BTN contra CO</span><span>23.0%</span></li>
+            <li><span>BB contra push · 10 bb</span><span>52.9%</span></li>
+            <li><span>UTG · 40 bb</span><span>23.0%</span></li>
+          </ul>
+        </div>
+        <div class="app__pane app__pane--open app__open">
+          <!--APP--><div class="rg" aria-hidden="true"><i class="k-R">AA</i><i class="k-R">AKs</i><i class="k-R">AQs</i><i class="k-R">AJs</i><i class="k-R">ATs</i><i class="k-R">A9s</i><i class="k-R">A8s</i><i class="k-R">A7s</i><i class="k-R">A6s</i><i class="k-R">A5s</i><i class="k-R">A4s</i><i class="k-A">A3s</i><i class="k-R">A2s</i><i class="k-R">AKo</i><i class="k-R">KK</i><i class="k-R">KQs</i><i class="k-R">KJs</i><i class="k-R">KTs</i><i class="k-R">K9s</i><i class="k-R">K8s</i><i class="k-R">K7s</i><i class="k-R">K6s</i><i class="k-R">K5s</i><i class="k-R">K4s</i><i class="k-R">K3s</i><i class="k-R">K2s</i><i class="k-R">AQo</i><i class="k-A">KQo</i><i class="k-R">QQ</i><i class="k-R">QJs</i><i class="k-R">QTs</i><i class="k-R">Q9s</i><i class="k-R">Q8s</i><i class="k-R">Q7s</i><i class="k-R">Q6s</i><i class="k-R">Q5s</i><i class="k-F">Q4s</i><i class="k-F">Q3s</i><i class="k-F">Q2s</i><i class="k-R">AJo</i><i class="k-R">KJo</i><i class="k-A">QJo</i><i class="k-R">JJ</i><i class="k-A">JTs</i><i class="k-A">J9s</i><i class="k-R">J8s</i><i class="k-R">J7s</i><i class="k-F">J6s</i><i class="k-F">J5s</i><i class="k-F">J4s</i><i class="k-F">J3s</i><i class="k-F">J2s</i><i class="k-R">ATo</i><i class="k-R">KTo</i><i class="k-R">QTo</i><i class="k-R">JTo</i><i class="k-R">TT</i><i class="k-A">T9s</i><i class="k-R">T8s</i><i class="k-R">T7s</i><i class="k-F">T6s</i><i class="k-F">T5s</i><i class="k-F">T4s</i><i class="k-F">T3s</i><i class="k-F">T2s</i><i class="k-A">A9o</i><i class="k-R">K9o</i><i class="k-R">Q9o</i><i class="k-R">J9o</i><i class="k-F">T9o</i><i class="k-R">99</i><i class="k-A">98s</i><i class="k-R">97s</i><i class="k-F">96s</i><i class="k-F">95s</i><i class="k-F">94s</i><i class="k-F">93s</i><i class="k-F">92s</i><i class="k-A">A8o</i><i class="k-R">K8o</i><i class="k-F">Q8o</i><i class="k-F">J8o</i><i class="k-F">T8o</i><i class="k-F">98o</i><i class="k-R">88</i><i class="k-A">87s</i><i class="k-F">86s</i><i class="k-F">85s</i><i class="k-F">84s</i><i class="k-F">83s</i><i class="k-F">82s</i><i class="k-A">A7o</i><i class="k-R">K7o</i><i class="k-F">Q7o</i><i class="k-F">J7o</i><i class="k-F">T7o</i><i class="k-F">97o</i><i class="k-F">87o</i><i class="k-R">77</i><i class="k-F">76s</i><i class="k-F">75s</i><i class="k-F">74s</i><i class="k-F">73s</i><i class="k-F">72s</i><i class="k-A">A6o</i><i class="k-F">K6o</i><i class="k-F">Q6o</i><i class="k-F">J6o</i><i class="k-F">T6o</i><i class="k-F">96o</i><i class="k-F">86o</i><i class="k-F">76o</i><i class="k-R">66</i><i class="k-F">65s</i><i class="k-F">64s</i><i class="k-F">63s</i><i class="k-F">62s</i><i class="k-A">A5o</i><i class="k-F">K5o</i><i class="k-F">Q5o</i><i class="k-F">J5o</i><i class="k-F">T5o</i><i class="k-F">95o</i><i class="k-F">85o</i><i class="k-F">75o</i><i class="k-F">65o</i><i class="k-A">55</i><i class="k-F">54s</i><i class="k-F">53s</i><i class="k-F">52s</i><i class="k-R">A4o</i><i class="k-F">K4o</i><i class="k-F">Q4o</i><i class="k-F">J4o</i><i class="k-F">T4o</i><i class="k-F">94o</i><i class="k-F">84o</i><i class="k-F">74o</i><i class="k-F">64o</i><i class="k-F">54o</i><i class="k-A">44</i><i class="k-F">43s</i><i class="k-F">42s</i><i class="k-R">A3o</i><i class="k-F">K3o</i><i class="k-F">Q3o</i><i class="k-F">J3o</i><i class="k-F">T3o</i><i class="k-F">93o</i><i class="k-F">83o</i><i class="k-F">73o</i><i class="k-F">63o</i><i class="k-F">53o</i><i class="k-F">43o</i><i class="k-A">33</i><i class="k-F">32s</i><i class="k-R">A2o</i><i class="k-F">K2o</i><i class="k-F">Q2o</i><i class="k-F">J2o</i><i class="k-F">T2o</i><i class="k-F">92o</i><i class="k-F">82o</i><i class="k-F">72o</i><i class="k-F">62o</i><i class="k-F">52o</i><i class="k-F">42o</i><i class="k-F">32o</i><i class="k-A">22</i></div><!--/APP-->
+          <div class="app__side">
+            <p class="dt">Abrir desde BTN</p>
+            <p class="t-small muted">20 big blinds · ante 1 bb · ChipEV</p>
+            <div class="bar"><div><span>Raise to 2 bb</span><span>28.2%</span></div><s style="--w:28.2%;--c:var(--k-R)"></s></div>
+            <div class="bar"><div><span>All-in</span><span>10.5%</span></div><s style="--w:10.5%;--c:var(--k-A)"></s></div>
+            <div class="bar"><div><span>Fold</span><span>61.3%</span></div><s style="--w:61.3%;--c:#5a5f62"></s></div>
+            <div class="key"><span style="--c:var(--k-R)">Raise</span><span style="--c:var(--k-A)">All-in</span><span style="--c:var(--k-F)">Fold</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section g2" id="herramientas" aria-labelledby="herr-h">
+    <div class="wrap">
+      <div class="group">
+        <div class="section-head">
+          <h2 id="herr-h">Four tools to study poker. <span class="muted">All of them work on your phone.</span></h2>
+        </div>
+        <div class="grid">
+          <a class="card card--row card--open card--link span-6" href="entrenar/">
+            <h3>Memorise poker charts</h3>
+            <p>It asks you for each chart just before you forget it.</p>
+            <div class="panel" role="img" aria-label="Review card: the CO open chart with 25 big blinds and the Again, Hard, Good and Easy buttons"><div class="flash">
+              <div class="dg"><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i></div>
+              <div class="flash__side"><div class="flash__q"><span>Open CO · 25 bb</span><span>Review 12 of 20</span></div><div class="flash__btns"><span>Otra vez</span><span>Hard</span><span>Bien</span><span>Easy</span></div></div>
+            </div></div>
+          </a>
+          <a class="card card--row card--open card--link span-6" href="calculadoras/">
+            <h3>Calculate tournament equity and ICM</h3>
+            <p>Your hand against a range, pot odds, MDF and variance.</p>
+            <div class="panel" role="img" aria-label="A-K against a pair of twos: 47 vs 53% equity; pot odds of 33%"><div class="eq">
+              <div class="eq__row"><span>A♠ K♦</span><s style="--w:47%;--c:var(--accent)"></s><b>47.0</b></div>
+              <div class="eq__row"><span>2♣ 2♥</span><s style="--w:53%;--c:#8f8f8f"></s><b>53.0</b></div>
+              <div class="eq__row"><span>Pot odds</span><s style="--w:33%;--c:var(--k-C)"></s><b>33.3</b></div>
+            </div></div>
+          </a>
+        </div>
+      </div>
+      <div class="grid">
+        <a class="card card--row card--open card--link span-6" href="replayer/">
+          <h3>Replay your poker hands</h3>
+          <p>Paste your Winamax or PokerStars history.</p>
+          <div class="panel" role="img" aria-label="A hand in the replayer: A-J calls an all-in with 54% equity and loses on the river"><div class="hh">
+            <div><b>Hand 4 of 112</b> · nivel 9 · 300/600</div>
+            <div>You (BTN) A♥ J♣ · raises to 1,200</div>
+            <div>BB va all-in 14,800</div>
+            <div>You call · <span class="ok">equity 54%</span></div>
+            <div>River 7♦ · <span class="lo">you lose 15,400</span></div>
+          </div></div>
+        </a>
+        <a class="card card--row card--open card--link span-6" href="laboratorio/">
+          <h3>See how tournaments are really played</h3>
+          <p>14,000+ real hands: who bluffs and when they call.</p>
+          <div class="panel" role="img" aria-label="Real opponent data: 41% fold to a c-bet, 18% call an all-in on the bubble, 27% bluff the river"><div class="lab">
+            <div class="lab__row"><span>Fold to a flop c-bet</span><b>41%</b><s style="--w:41%"></s></div>
+            <div class="lab__row"><span>Call an all-in on the bubble</span><b>18%</b><s style="--w:18%"></s></div>
+            <div class="lab__row"><span>Bluff the river</span><b>27%</b><s style="--w:27%"></s></div>
+          </div></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section statement" id="solver" data-moment="word-highlight" aria-label="How it corrects">
+    <div class="wrap">
+      <p class="t-label">How it corrects you</p>
+      <p class="mo-wh__text">Every decision you make is compared with our tournament solver and with how opponents play in 14,000+ real hands: you see <strong>how many big blinds</strong> your play costs and why.</p>
+    </div>
+  </section>
+
+  <section class="section ground-inverse" id="rangos" aria-labelledby="rangos-h">
+    <div class="wrap">
+      <div class="grid">
+        <h2 class="span-5" id="rangos-h">The most viewed poker charts</h2>
+        <div class="span-6 start-7 stack-4">
+          <p>One page per position, stack and situation, each with its own analysis and borderline hands.</p>
+          <p><a class="link" href="rangos/">See all 1,061 charts</a></p>
+        </div>
+      </div>
+      <div class="fill" style="margin-top:var(--s-7)"><!--POP--><div class="grid rcs"><a class="card card--link rc span-3" href="rangos/open-btn-20bb/"><div class="mg" role="img" aria-label="Open BTN chart with 20 big blinds"><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i></div><h3>Open BTN</h3><p class="t-small muted">20 bb · juega 39%</p></a><a class="card card--link rc span-3" href="rangos/open-co-25bb/"><div class="mg" role="img" aria-label="Open CO chart with 25 big blinds"><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-R)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i></div><h3>Open CO</h3><p class="t-small muted">25 bb · juega 32%</p></a><a class="card card--link rc span-3" href="rangos/bb-vs-open-btn-20bb/"><div class="mg" role="img" aria-label="BB vs BTN chart with 20 big blinds"><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-A)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-A)"></i></div><h3>BB contra BTN</h3><p class="t-small muted">20 bb · juega 82%</p></a><a class="card card--link rc span-3" href="rangos/bb-vs-all-in-sb-10bb/"><div class="mg" role="img" aria-label="BB vs SB push chart with 10 big blinds"><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-C)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-F)"></i><i style="background:var(--k-C)"></i></div><h3>BB vs SB push</h3><p class="t-small muted">10 bb · juega 53%</p></a></div><!--/POP--></div>
+    </div>
+  </section>
+
+  <section class="section" id="reto" data-moment="iris-opens" data-moment-opts='{"from": "base"}' aria-labelledby="reto-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-5 stack-4">
+          <h2 id="reto-h">Daily challenge: 10 hands for everyone</h2>
+          <p>The same ten hands for every player, new each day. Compare your result with your group and keep your streak.</p>
+          <p><a class="link" href="simulador/">Practise without limits in the simulator</a></p>
+        </div>
+        <div class="win ui ui-live span-6 start-7"><div class="win__bar" aria-hidden="true"><i></i><i></i><i></i><span>daily challenge</span></div><div id="daily" aria-live="polite"><p class="small">Loading the challenge…</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section g2m" id="preguntas" aria-labelledby="faq-h">
+    <div class="wrap faq-wrap">
+      <div class="faq-main">
+        <div class="section-head"><h2 id="faq-h">Preguntas sobre PokerEFX</h2></div>
+        <div class="faq">
+            <div class="faq__item"><h3>Is it free?</h3><p>Yes. The simulator, the charts, the trainer, the replayer and the calculators are free and work without an account.</p></div>
+            <div class="faq__item"><h3>Does it work for tournaments with ICM, the bubble and PKO?</h3><p>Yes: the charts have 11 formats, from ChipEV to final table, covering and covered.</p></div>
+            <div class="faq__item"><h3>Is money played here?</h3><p>No. It is a study tool with no bets or deposits, for adults (18+).</p></div>
+            <div class="faq__item"><h3>Can I import my poker hands?</h3><p>Yes: the replayer reads Winamax and PokerStars histories and everything is processed in your browser.</p></div>
+          </div>
+      </div>
+      <div class="faq-side stack-4">
+            <h3 class="faq-q">Where do the charts come from?</h3>
+            <p>From our solver for 6-max tournaments, computed over the full preflop tree and checked against Nash push/fold charts. <a class="link" href="metodologia/">Read how we calculate</a></p>
+            <div class="win ui ui-nash nash" role="img" aria-label="Library check: 98.2% of 18,822 charts lose 0.05 big blinds or less against the equilibrium">
+              <div class="win__bar"><i></i><i></i><i></i><span>check · 18,822 charts</span></div>
+              <div class="nash__body"><p class="nash__n">98.2%</p><p class="t-small muted">of charts lose 0.05 big blinds or less against the equilibrium</p>
+              <div class="nash__bars"><s style="--w:98.2%"></s><s style="--w:1.6%"></s><s style="--w:.2%"></s></div>
+              <div class="key"><span style="--c:var(--accent)">≤ 0.05 bb</span><span style="--c:#8f8f8f">0.05 a 0.2</span><span style="--c:#ff8a7a">&gt; 0.2</span></div></div>
+            </div>
+            <div class="faq"><div class="faq__item"><h3>Does it work on mobile?</h3><p>Yes, and you can add PokerEFX to your home screen like an app.</p></div></div>
+          </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer closing" id="contact-footer" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">Train before your next tournament</h2>
+        <p>Ten minutes on the simulator before you play. Free, no sign-up.</p>
+      </div>
+      <a class="btn btn--primary btn--wide" href="simulador/">Start training<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="#top"><img src="/assets/icon.svg" alt="" width="28" height="28">PokerEFX</a>
+          <p class="footer__lede">Free tools to study tournament poker with a solver. Adults (18+) only; no real-money play here (<a href="https://www.jugarbien.es" rel="noopener">jugarbien.es</a>).</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Practise</h3><ul><li><a href="simulador/">Simulator</a></li><li><a href="entrenar/">Range trainer</a></li><li><a href="tablas/">Preflop charts</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Analyse</h3><ul><li><a href="calculadoras/">Calculators</a></li><li><a href="replayer/">Replayer</a></li><li><a href="laboratorio/">Lab</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Learn</h3><ul><li><a href="aprende/">Guides</a></li><li><a href="rangos/">All ranges</a></li><li><a href="metodologia/">How we calculate</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>PokerEFX</h3><ul><li><a href="cuenta/">My account</a></li><li><a href="contacto/">Contact</a></li><li><a href="https://www.instagram.com/pokerefx/" rel="noopener">Instagram</a></li><li><a href="https://www.youtube.com/@pokerefx" rel="noopener">YouTube</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span><span>© 2026 PokerEFX</span> <a href="legal/privacidad.html">Privacy</a> <a href="legal/cookies.html">Cookies</a> <a href="legal/aviso-legal.html">Legal notice</a> <a href="legal/cookies.html" id="fp-cookies">Cookie preferences</a></span>
+        
+      </div>
+    </div>
+  </div>
+</footer>
+<nav class="actionbar" aria-label="Quick action">
+  <a class="btn btn--primary" href="simulador/">Start training</a>
+</nav>
+<script src="/assets/site.js" data-root=""></script>
+<script>FP.consentOnly();</script>
+<script src="/assets/en/home.js"></script>
+<script type="module" src="/assets/kit/system.js"></script>
+<script type="module" src="/assets/kit/motion/motion.js"></script>
+<script type="module" src="/assets/kit/layout/layout.js"></script>
+</body>
+</html>

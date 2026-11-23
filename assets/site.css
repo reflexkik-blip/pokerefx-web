@@ -435,3 +435,4 @@ table.t th { letter-spacing: 0 !important; font-weight: 500 !important; font-siz
 body:has(header.top) .card:not(.back) { background: #ffffff !important; border-color: #d4d4d4 !important }
 body:has(header.top) { --s-s: #e8e8e8; --s-c: #4cc17a; --s-h: #ff6b5c; --s-d: #6aa0ff }
 body:has(header.top) .card:not(.back) { --s-s: #141414; --s-c: #1f7a43; --s-h: #cf3626; --s-d: #2463c9 }
+.fp-lang { font-weight: 600 !important; letter-spacing: .02em }

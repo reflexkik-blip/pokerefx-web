@@ -43,7 +43,7 @@
 
   function lib() { return LIB[S.ctx]; }
   function stacks() { return Object.keys(lib()).map(Number).sort((a, b) => a - b); }
-  let UNR = {}; fetch('../data/unreached.json').then(r => r.json()).then(u => { UNR = u; try { draw(); } catch (e) { /* not ready */ } }).catch(() => {});
+  let UNR = {}; fetch('/data/unreached.json').then(r => r.json()).then(u => { UNR = u; try { draw(); } catch (e) { /* not ready */ } }).catch(() => {});
   function keysAt(s) { const bad = new Set(((UNR[S.ctx] || {})[s]) || []); return Object.keys(lib()[s] || {}).filter(k => !bad.has(k)); }
   function parts(k) { const [h, p, v] = k.split('|'); return [h, +p, (v || '').split(',').filter(x => x !== '').map(Number)]; }
   function famKeys(s) { const f = FAM.find(x => x[0] === S.fam); return keysAt(s).filter(k => f[2](parts(k))); }
@@ -68,7 +68,7 @@
     [...$('t-ctx').children].forEach(b => b.classList.toggle('on', b.dataset.v === S.ctx));
     if (LIB[S.ctx]) return fill();
     $('t-grid').innerHTML = '<p class="small">Cargando la librería…</p>';
-    fetch('../data/lib-' + S.ctx + '.json').then(r => r.json()).then(d => { LIB[S.ctx] = d; fill(); }).catch(() => { $('t-grid').innerHTML = '<p>No se ha podido cargar la librería.</p>'; });
+    fetch('/data/lib-' + S.ctx + '.json').then(r => r.json()).then(d => { LIB[S.ctx] = d; fill(); }).catch(() => { $('t-grid').innerHTML = '<p>No se ha podido cargar la librería.</p>'; });
   }
   function fill() {
     const ss = stacks(); if (!ss.includes(+S.stack)) S.stack = ss.reduce((a, b) => Math.abs(b - S.stack) < Math.abs(a - S.stack) ? b : a);

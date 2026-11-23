@@ -12,7 +12,7 @@
       '<div class="gv"><b style="color:' + (good ? 'var(--good)' : 'var(--bad)') + '">' + pc(fold) + '</b> ' + label + '</div>' +
       '<p class="verd ' + (good ? 'ok' : 'no') + '">' + (good ? (margin > 0.1 ? 'El farol gana claramente: apuesta con todo tu aire.' : 'El farol gana poco: farolea con las manos con algo de equity (proyectos).') : (margin > -0.08 ? 'Al límite: el farol puro pierde algo; apuesta solo con proyectos y valor.' : 'El farol pierde dinero: aquí apuesta solo por valor.')) + '</p></div>';
   }
-  fetch('../data/lab.json').then(r => r.json()).then(D => {
+  fetch('/data/lab.json').then(r => r.json()).then(D => {
     // ---------------------------------------------------------------- 1. rival map
     const P = D.players.filter(p => p.vpip != null && p.pfr != null && TY[p.k]); let only = null;
     const W = 560, H = 360, X = v => 40 + (W - 60) * Math.min(v, 70) / 70, Y = v => H - 30 - (H - 50) * Math.min(v, 50) / 50;

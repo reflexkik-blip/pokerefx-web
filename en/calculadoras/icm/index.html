@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;self&#x27;; script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://cdn.jsdelivr.net https://gc.zgo.at https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.google.com https://*.gstatic.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://fonts.googleapis.com; font-src &#x27;self&#x27; https://fonts.gstatic.com; img-src &#x27;self&#x27; data: https:; connect-src &#x27;self&#x27; https://pokerefx.goatcounter.com https://*.supabase.co wss://*.supabase.co https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; frame-src https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.googleadservices.com; worker-src &#x27;self&#x27; blob:; object-src &#x27;none&#x27;; base-uri &#x27;self&#x27;; form-action &#x27;self&#x27;"><meta name="referrer" content="strict-origin-when-cross-origin"><script data-goatcounter="https://pokerefx.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<title>Free poker ICM calculator | PokerEFX</title>
+<meta name="description" content="Calculate what your chips are worth in money in a tournament with the Malmuth-Harville ICM model: stacks, payouts and the difference from ChipEV.">
+<link rel="canonical" href="https://pokerefx.com/en/calculadoras/icm/">
+<script>(function(){var c;try{c=JSON.parse(localStorage.getItem("fp.consent"))}catch(e){}window.adsbygoogle=window.adsbygoogle||[];if(c!=="all")window.adsbygoogle.requestNonPersonalizedAds=1;})();</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8353031616797469" crossorigin="anonymous"></script>
+
+<meta property="og:title" content="Poker calculators: equity, ICM and pot odds — PokerEFX"><meta property="og:description" content="Poker equity calculator (hand or range against ranges), ICM calculator, pot odds with MDF and a tournament variance and bankroll simulator. Free and…"><meta property="og:type" content="website"><meta property="og:url" content="https://pokerefx.com/en/calculadoras/icm/"><meta property="og:image" content="https://pokerefx.com/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="PokerEFX"><meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#17584c">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/assets/icon-180.png"><link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/assets/fonts/host-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Poker calculators", "url": "https://pokerefx.com/en/calculadoras/", "applicationCategory": "GameApplication", "operatingSystem": "Web", "inLanguage": "en", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@type": "Organization", "name": "PokerEFX", "url": "https://pokerefx.com/en/"}}</script>
+
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How are pot odds calculated?", "acceptedAnswer": {"@type": "Answer", "text": "Divide what you have to call by the final pot after your call. If you call 10 into a pot that will be 40, you need to win 25% of the time."}}, {"@type": "Question", "name": "What is ICM?", "acceptedAnswer": {"@type": "Answer", "text": "A model that converts chips into money according to the payouts: on the bubble or at the final table, losing chips costs more than winning them is worth."}}, {"@type": "Question", "name": "Are the calculators free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, they all run in your browser, with no sign-up."}}]}</script><link rel="alternate" hreflang="es" href="https://pokerefx.com/calculadoras/icm/"><link rel="alternate" hreflang="en" href="https://pokerefx.com/en/calculadoras/icm/"><link rel="alternate" hreflang="x-default" href="https://pokerefx.com/calculadoras/icm/"></head>
+<body>
+<main>
+<section><div class="wrap">
+<div class="eyebrow">Calculators</div><h1>ICM calculator</h1>
+<p>Exact equity when it can be enumerated, Monte Carlo with tens of thousands of samples when there are ranges. Everything runs in your browser. Want to replay your hands? Try the <a href="../../replayer/">Winamax and PokerStars hand replayer</a>.</p>
+<div class="row" style="margin:18px 0 6px" id="tabs">
+<button class="btn felt" data-tab="eq" type="button">Equity</button><button class="btn" data-tab="icm" type="button">ICM</button><button class="btn" data-tab="odds" type="button">Pot odds and MDF</button><button class="btn" data-tab="var" type="button">Varianza and bankroll</button></div>
+
+<div class="box" id="tab-eq" style="margin-top:12px">
+<h2>Equity: hands and ranges</h2>
+<p class="small">Each player can be a hand (<code>AhKd</code>) or a range (<code>QQ+, AKs, AQo, 77-99, A5s-A2s</code>, or a percentage such as <code>12%</code>). Optional board (<code>Ah7d2c</code>).</p>
+<div id="eq-players" style="display:flex;flex-direction:column;gap:10px"></div>
+<div class="row" style="margin-top:12px"><label class="f" style="flex:1 1 220px">Table<input type="text" id="eq-board" placeholder="empty = preflop" autocomplete="off"></label>
+<button class="btn" type="button" id="eq-add">+ Jugador</button><button class="btn pri" type="button" id="eq-go">Calcular</button></div>
+<div id="eq-out" style="margin-top:16px"></div>
+</div>
+
+<div class="box" id="tab-icm" style="margin-top:12px" hidden>
+<h2>ICM: what your chips are worth in money</h2>
+<p class="small">Malmuth-Harville model: the probability of finishing in each place is proportional to chips. Exact up to 11 players.</p>
+<div class="row"><label class="f" style="flex:1 1 280px">Stacks (comma-separated)<input type="text" id="icm-stacks" value="5000, 3000, 2000, 1500"></label>
+<label class="f" style="flex:1 1 280px">Premios (1.º, 2.º…)<input type="text" id="icm-prizes" value="50, 30, 20"></label>
+<button class="btn pri" type="button" id="icm-go">Calcular</button></div>
+<div id="icm-out" class="tw" style="margin-top:16px"></div>
+</div>
+
+<div class="box" id="tab-odds" style="margin-top:12px" hidden>
+<h2>Pot odds, MDF and faroles</h2>
+<div class="row"><label class="f">Pot before the bet (bb)<input type="number" id="o-pot" value="10" min="0" step="0.5"></label>
+<label class="f">Opponent's bet (bb)<input type="number" id="o-bet" value="7.5" min="0" step="0.5"></label></div>
+<div id="odds-out" style="margin-top:16px"></div>
+</div>
+
+<div class="box" id="tab-var" style="margin-top:12px" hidden>
+<h2>Tournament variance and bankroll</h2>
+<p class="small">Simulate thousands of tournament careers with your ROI and see what can happen: the normal range of results, the worst downswings and how much bankroll you need not to go broke. Typical MTT payout structure (~15% of the field cashes).</p>
+<div class="row"><label class="f">Players per tournament<input type="number" id="v-n" value="500" min="10" max="20000" step="10"></label>
+<label class="f">Buy-in (€)<input type="number" id="v-bi" value="10" min="0.1" step="0.5"></label>
+<label class="f">Rake (%)<input type="number" id="v-rake" value="10" min="0" max="30" step="1"></label>
+<label class="f">Your ROI (%)<input type="number" id="v-roi" value="15" min="-50" max="200" step="1"></label>
+<label class="f">Torneos<input type="number" id="v-t" value="1000" min="10" max="10000" step="50"></label>
+<button class="btn pri" type="button" id="v-go">Simular</button></div>
+<div id="v-out" style="margin-top:16px"></div>
+</div>
+</div></section>
+<div class="wrap"><div class="ad" data-slot="calc-1">Advertising</div></div>
+<section style="padding-top:0"><div class="wrap prose">
+<h2>How to read the results</h2>
+<p><b>Equity</b> is the share of the pot you take on average if nobody bets again: wins plus half the ties. Against a range, the result weights each combination (combos blocked by your cards or the board don't count).</p>
+<p><b>ICM</b> converts chips into money. On the bubble and at the final table, losing chips costs more than winning them is worth: that is why ICM charts fold hands that would go all-in in ChipEV.</p>
+<p><b>Pot odds</b> is the minimum equity to call without losing money. <b>MDF</b> (minimum defence frequency) is how much of your range you must continue with so an opponent's bluff doesn't win automatically.</p>
+</div></section>
+<section id="seo-faq" style="padding-top:8px"><div class="wrap prose"><h2>What each tool calculates</h2><p><b>Equity</b>: the probability of winning for a hand or range against one or more ranges, preflop or with cards on the board. It tells you whether an all-in call is worth it or how much your draw is worth.</p><p><b>Pot odds and MDF</b>: how much equity you need to call a bet (bet / final pot) and how often you must defend so an opponent's bluff doesn't make money automatically. <b>ICM</b>: what your chips are worth in money given the payouts left, with the Malmuth-Harville model. <b>Varianza</b>: simulates thousands of tournaments with your ROI to show normal downswings and the bankroll you need.</p><h2>Frequently asked questions</h2><details class="box" style="margin-top:8px"><summary style="cursor:pointer;font-weight:600">How are pot odds calculated?</summary><p style="margin:8px 0 0">Divide what you have to call by the final pot after your call. If you call 10 into a pot that will be 40, you need to win 25% of the time.</p></details><details class="box" style="margin-top:8px"><summary style="cursor:pointer;font-weight:600">What is ICM?</summary><p style="margin:8px 0 0">A model that converts chips into money according to the payouts: on the bubble or at the final table, losing chips costs more than winning them is worth.</p></details><details class="box" style="margin-top:8px"><summary style="cursor:pointer;font-weight:600">Are the calculators free?</summary><p style="margin:8px 0 0">Yes, they all run in your browser, with no sign-up.</p></details></div></section></main>
+<script src="/assets/site.js" data-root="../../"></script>
+<script>FP.chrome('calculadoras');</script>
+<script src="/assets/en/engine.js"></script><script src="/assets/en/calc.js"></script>
+<script>(function(){var b=document.querySelector('#tabs [data-tab="icm"]');if(b)b.click();document.getElementById("tabs").hidden=true;})();</script></body>
+</html>

@@ -185,6 +185,6 @@
       setTimeout(nextHand, ok ? 900 : 2200);
     }));
   }
-  fetch('../data/srs.json').then(r => r.json()).then(d => { D = d.concat(mine()); renderDeck(); const first = due()[0]; renderWork(); if (first && innerWidth >= 900) open(first); })
+  fetch('/data/srs.json').then(r => r.json()).then(d => { D = d.concat(mine()); renderDeck(); const first = due()[0]; renderWork(); if (first && innerWidth >= 900) open(first); })
     .catch(() => { $('e-work').innerHTML = '<p>No se pudo cargar el entrenador. Recarga la página.</p>'; });
 })();

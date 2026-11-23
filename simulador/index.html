@@ -136,7 +136,7 @@ ul.why li::marker { color: var(--chip) }
 .loading { padding: 30px; text-align: center; color: var(--muted) }
 @media (prefers-reduced-motion: no-preference) { .bubble, .board .card { transition: opacity .2s } }
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿El simulador es gratis?", "acceptedAnswer": {"@type": "Answer", "text": "Sí, sin registro y sin dinero real: es una herramienta de formación."}}, {"@type": "Question", "name": "¿Corrige también el postflop?", "acceptedAnswer": {"@type": "Answer", "text": "Sí: flop, turn y river se resuelven con un solver en tu navegador para tu mano exacta."}}, {"@type": "Question", "name": "¿Cómo son los rivales?", "acceptedAnswer": {"@type": "Answer", "text": "Perfiles calibrados con miles de manos reales de torneos: cuánto abren, pagan, foldean y farolean."}}]}</script></head><body>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿El simulador es gratis?", "acceptedAnswer": {"@type": "Answer", "text": "Sí, sin registro y sin dinero real: es una herramienta de formación."}}, {"@type": "Question", "name": "¿Corrige también el postflop?", "acceptedAnswer": {"@type": "Answer", "text": "Sí: flop, turn y river se resuelven con un solver en tu navegador para tu mano exacta."}}, {"@type": "Question", "name": "¿Cómo son los rivales?", "acceptedAnswer": {"@type": "Answer", "text": "Perfiles calibrados con miles de manos reales de torneos: cuánto abren, pagan, foldean y farolean."}}]}</script><link rel="alternate" hreflang="es" href="https://pokerefx.com/simulador/"><link rel="alternate" hreflang="en" href="https://pokerefx.com/en/simulador/"><link rel="alternate" hreflang="x-default" href="https://pokerefx.com/simulador/"></head><body>
 
 
 <div class="wrap">
@@ -1089,7 +1089,7 @@ const who = s => s.hero ? 'Tú' : POS[s.pos] + ' (' + TNAME(s.type) + ')';
 function setActions(btns, prompt) {
   $('prompt').innerHTML = prompt || '';
   const A = $('actions'); A.innerHTML = '';
-  btns.forEach((b, i) => { const e = document.createElement('button'); e.type = 'button'; e.className = 'btn ' + (b.cls || ''); e.textContent = b.label; e.title = b.label === 'Siguiente mano' ? 'Tecla Enter' : 'Tecla ' + (i + 1); e.addEventListener('click', b.fn); A.appendChild(e); });
+  btns.forEach((b, i) => { const e = document.createElement('button'); e.type = 'button'; e.className = 'btn ' + (b.cls || ''); e.textContent = b.label; if (b.label === 'Siguiente mano') e.dataset.next = '1'; e.title = b.label === 'Siguiente mano' ? 'Tecla Enter' : 'Tecla ' + (i + 1); e.addEventListener('click', b.fn); A.appendChild(e); });
 }
 
 // ------------------------------------------------------------------ preflop flow
@@ -2245,14 +2245,14 @@ function replay(d) {
   REPLAY = d; const keep = Object.assign({}, SET); Object.assign(SET, { focus: '' }, d.cfg, { ctx: d.cfg.ctx });
   const go = () => { HANDS = parseHands(SET.hands).list; startHand(d.seed, !!d.sub); Object.assign(SET, keep); HANDS = parseHands(SET.hands).list; window.scrollTo({ top: 0, behavior: 'smooth' }); log('Repites una mano en la que fallaste: ' + d.choice + ' (' + { pre: 'preflop', flop: 'flop', turn: 'turn', river: 'river' }[d.street] + ').', 'st'); };
   LIBKEY = d.cfg.ctx;
-  if (LIB[LIBKEY]) go(); else fetch('../data/lib-' + LIBKEY + '.json').then(r => r.json()).then(x => { LIB[LIBKEY] = x; go(); });
+  if (LIB[LIBKEY]) go(); else fetch('/data/lib-' + LIBKEY + '.json').then(r => r.json()).then(x => { LIB[LIBKEY] = x; go(); });
 }
 function loadLib() {
   LIBKEY = SET.ctx;
   $('p-ctx').value = LIBKEY;
   if (LIB[LIBKEY]) { fillStacks(); pickBuild(true); startHand(); return; }
   setActions([], 'Cargando las tablas de ' + $('s-ctx').selectedOptions[0].textContent + '…');
-  fetch('../data/lib-' + LIBKEY + '.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => { LIB[LIBKEY] = d; fillStacks(); pickBuild(true); startHand(); })
+  fetch('/data/lib-' + LIBKEY + '.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => { LIB[LIBKEY] = d; fillStacks(); pickBuild(true); startHand(); })
     .catch(() => setActions([{ label: 'Reintentar', cls: 'pri', fn: loadLib }], 'No he podido cargar las tablas. Reintenta.'));
 }
 // ------------------------------------------------------------------ your real hands as exercises
@@ -2284,7 +2284,7 @@ function realNext() {
 function startReal() {
   if (!REAL) {
     setActions([], 'Cargando tus manos reales…');
-    fetch('../data/real_spots.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => { REAL = d.filter(s => s.acts && s.acts.length > 1); REAL.forEach(s => { s.fk = s.st + '|' + (s.acts.some(a => a[0] === 'fold') ? 'facing' : 'first'); }); startReal(); })
+    fetch('/data/real_spots.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => { REAL = d.filter(s => s.acts && s.acts.length > 1); REAL.forEach(s => { s.fk = s.st + '|' + (s.acts.some(a => a[0] === 'fold') ? 'facing' : 'first'); }); startReal(); })
       .catch(() => setActions([{ label: 'Reintentar', cls: 'pri', fn: startReal }], 'Todavía no he podido cargar tus manos reales revisadas.'));
     return;
   }
@@ -2346,11 +2346,11 @@ window.addEventListener('resize', () => { if (G) render(); });
 document.addEventListener('keydown', e => {
   if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
   const bs = [...document.querySelectorAll('#actions button')]; if (!bs.length) return;
-  if (/^[1-9]$/.test(e.key) && bs[+e.key - 1] && bs[0].textContent !== 'Siguiente mano') { e.preventDefault(); bs[+e.key - 1].click(); }
-  else if ((e.key === 'Enter' || e.key === ' ') && bs[0].textContent === 'Siguiente mano') { e.preventDefault(); bs[0].click(); }
+  if (/^[1-9]$/.test(e.key) && bs[+e.key - 1] && !bs[0].dataset.next) { e.preventDefault(); bs[+e.key - 1].click(); }
+  else if ((e.key === 'Enter' || e.key === ' ') && bs[0].dataset.next) { e.preventDefault(); bs[0].click(); }
 });
 bindSettings(); pickInit(); renderSess();
-fetch('../data/model.json').then(r => r.json()).then(d => { M = d; prepModel(); prepProfiles(); renderPrinciples(); renderSess(); setFocus(SET.focus); if (SET.table === 'fixed' && !TABLE) { TABLE = newTable(); saveTable(); } renderReads(); loadLib(); }).catch(() => { $('coach').innerHTML = '<p>No he podido cargar el modelo de rivales. Recarga la página.</p>'; });
+fetch('/data/model.json').then(r => r.json()).then(d => { M = d; prepModel(); prepProfiles(); renderPrinciples(); renderSess(); setFocus(SET.focus); if (SET.table === 'fixed' && !TABLE) { TABLE = newTable(); saveTable(); } renderReads(); loadLib(); }).catch(() => { $('coach').innerHTML = '<p>No he podido cargar el modelo de rivales. Recarga la página.</p>'; });
 window.SIM = { g: () => G, cal: () => CAL, model: () => M, genPlayer, prePolicy, CMB, solverCore, solverCall, COMBOS, NC, dbg: () => { const cls = new Float32Array(169); let tot = 0; for (let i = 0; i < NC; i++) { cls[COMBOS[i][2]] += G.vw[i]; tot += G.vw[i]; } const top = [...cls.keys()].filter(k => cls[k] > 0).sort((a, b) => cls[b] - cls[a]).slice(0, 25).map(k => N[k] + ':' + cls[k].toFixed(1)); return { key: G.sc.key, now: G.key, hero: G.seats[G.hp].cards.map(ctext).join(''), board: G.board.map(ctext).join(''), vill: POS[G.vill] + ' ' + G.seats[G.vill].type, tot: tot.toFixed(1), top, three: G.threeBetPot, iso: G.isoPot, limp: G.limpPot, aggr: G.aggr }; }, start: () => startHand(), get G() { return G; }, evalCards, ev2, heroOptions, act: i => { const b = $('actions').querySelectorAll('button'); if (b[i]) b[i].click(); } };
 })();
 </script>
