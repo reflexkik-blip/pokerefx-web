@@ -107,10 +107,15 @@
     $('r-info').textContent = h.title + (h.date ? ' · ' + h.date : '') + ' · ciegas ' + fmt(h.sb, h) + '/' + fmt(h.bb, h);
   }
   function go(s) { const h = H[hi]; step = Math.max(0, Math.min(h.acts.length, s)); draw(); }
+  // Moving past the end of a hand opens the next one; moving back from its start opens the previous one at its end.
+  function hand(i, s) { if (i < 0 || i >= H.length) return false; hi = i; $('r-list').value = String(i); go(s); return true; }
+  function fwd() { if (step < H[hi].acts.length) go(step + 1); else hand(hi + 1, 0); }
+  function back() { if (step > 0) go(step - 1); else hand(hi - 1, 1e9); }
   function play() {
     if (timer) { clearInterval(timer); timer = null; $('r-play').textContent = '▶ Reproducir'; return; }
     $('r-play').textContent = '⏸ Pausa';
-    timer = setInterval(() => { if (step >= H[hi].acts.length) { play(); return; } go(step + 1); }, 900);
+    let wait = 0;
+    timer = setInterval(() => { if (step < H[hi].acts.length) { go(step + 1); return; } if (hi >= H.length - 1) { play(); return; } if (++wait >= 2) { wait = 0; hand(hi + 1, 0); } }, 900);
   }
   function load(txt) {
     H = split(txt).map(parse).filter(Boolean);
@@ -123,12 +128,13 @@
   $('r-file').addEventListener('change', e => { const fs = [...e.target.files]; Promise.all(fs.map(f => f.text())).then(t => load(t.join('\n'))); });
   $('r-demo').addEventListener('click', () => { $('r-txt').value = DEMO; load(DEMO); });
   $('r-list').addEventListener('change', e => { hi = +e.target.value; if (timer) play(); go(0); });
-  $('r-first').addEventListener('click', () => go(0)); $('r-prev').addEventListener('click', () => go(step - 1));
-  $('r-next').addEventListener('click', () => go(step + 1)); $('r-last').addEventListener('click', () => go(1e9));
+  $('r-first').addEventListener('click', () => go(0)); $('r-prev').addEventListener('click', back);
+  $('r-next').addEventListener('click', fwd);
+  $('r-phand').addEventListener('click', () => hand(hi - 1, 0)); $('r-nhand').addEventListener('click', () => hand(hi + 1, 0)); $('r-last').addEventListener('click', () => go(1e9));
   $('r-play').addEventListener('click', play);
   $('r-prog').addEventListener('input', e => go(+e.target.value));
   $('r-unit').addEventListener('change', e => { inBB = e.target.value === 'bb'; draw(); });
-  document.addEventListener('keydown', e => { if ($('r-view').hidden || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return; if (e.key === 'ArrowRight') go(step + 1); if (e.key === 'ArrowLeft') go(step - 1); });
+  document.addEventListener('keydown', e => { if ($('r-view').hidden || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return; if (e.key === 'ArrowRight') fwd(); if (e.key === 'ArrowLeft') back(); if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); hand(hi + 1, 0); } if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); hand(hi - 1, 0); } });
 
   const DEMO = `Winamax Poker - Tournament "Demo MTT" buyIn: 9€ + 1€ level: 12 - HandId: #1-1-1 - Holdem no limit (250/500/60) - 2026/11/16 21:30:00 UTC
 Table: 'Demo MTT(1)#3' 6-max (real money) Seat #4 is the button
