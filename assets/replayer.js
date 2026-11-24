@@ -1,4 +1,4 @@
-/* PokerEFX — hand replayer. Parses Winamax and PokerStars hand histories in the browser (nothing is uploaded), then
+/* PokerEFX — hand replayer. Parses Winamax, PokerStars, GGPoker, 888poker, partypoker and ACR/WPN hand histories in the browser (nothing is uploaded), then
    replays each hand action by action with stacks, bets, pot, board and the equity of every known hand. */
 (function () {
   'use strict';
@@ -7,8 +7,50 @@
   let H = [], hi = 0, step = 0, timer = null, inBB = true;
 
   // ---------------------------------------------------------------- parsing
+  // Hand starts of every supported room: Winamax, PokerStars, GGPoker/Natural8 ("Poker Hand #"),
+  // ACR/WPN ("Game Hand #"), 888poker ("#Game No :") and partypoker ("***** Hand History for Game").
+  const START = /^(?:Winamax Poker - |PokerStars [^\n]*?#|Poker Hand #|Game Hand #|#Game No :|\*{5} (?:888poker )?Hand History for Game|PokerKing Hand #)/;
   function split(txt) {
-    return txt.replace(/\r/g, '').split(/\n(?=(?:Winamax Poker - |PokerStars (?:Hand|Home Game Hand|Zoom Hand) #))/).map(s => s.trim()).filter(s => /^(Winamax Poker|PokerStars)/.test(s));
+    const L = txt.replace(/\r/g, '').replace(/﻿/g, '').split('\n'), out = [];
+    let cur = null;
+    for (const l of L) {
+      const t = l.trim();
+      // 888 writes "#Game No : n" and then "***** 888poker Hand History…": both open the same hand
+      if (START.test(t) && !(cur && /^\*{5}/.test(t) && cur.length <= 2 && /^#Game No/.test(cur[0]))) { cur = [t]; out.push(cur); }
+      else if (cur) cur.push(t);
+    }
+    return out.map(c => normalize(c.join('\n'))).filter(Boolean);
+  }
+  // 888poker and partypoker use brackets for amounts and their own street markers: rewrite them into the
+  // PokerStars shape the parser reads. Everything else passes through.
+  function normalize(t) {
+    if (!/^(#Game No|\*{5}[^\n]*Hand History for Game)/.test(t)) return t;
+    const L = t.split('\n').map(x => x.trim()).filter(Boolean), out = [];
+    const id = (t.match(/Game (?:No : )?(\d+)/) || [])[1] || '0';
+    const bl = t.match(/([\d.,$€]+)\/([\d.,$€]+) (?:Blinds|-)?[^\n]*?(?:Hold'?em|Holdem)/i) || t.match(/Blinds?[^\d$€]*([\d.,$€]+)\/([\d.,$€]+)/i);
+    const tour = (t.match(/Tournament #(\d+)/) || t.match(/Trny:? ?(\d+)/) || [])[1];
+    const date = (t.match(/(\d{2}) (\d{2}) (\d{4}) (\d{2}:\d{2}:\d{2})/) || []);
+    const head = 'PokerStars Hand #' + id + ': ' + (tour ? 'Tournament #' + tour + ', ' : '') + "Hold'em No Limit (" + (bl ? bl[1] + '/' + bl[2] : '0/0') + ') - ' + (date.length ? date[3] + '/' + date[2] + '/' + date[1] + ' ' + date[4] : '');
+    out.push(head);
+    const amt = x => String(x).replace(/[\s$€]|USD|EUR/g, '');
+    let flop = [];
+    for (const l of L) {
+      let m;
+      if ((m = l.match(/^Seat (\d+) is the button/))) { out.push('Table: x Seat #' + m[1] + ' is the button'); continue; }
+      if ((m = l.match(/^Seat (\d+): (.+?) \(\s*([^)]+?)\s*\)/))) { out.push('Seat ' + m[1] + ': ' + m[2] + ' (' + amt(m[3]) + ' in chips)'); continue; }
+      if ((m = l.match(/^(.+?) posts (small blind|big blind|ante|the ante) \[([^\]]+)\]/))) { out.push(m[1] + ': posts ' + m[2].replace('the ', '') + ' ' + amt(m[3])); continue; }
+      if ((m = l.match(/^Dealt to (.+?) \[\s*(.+?)\s*\]/))) { out.push('Dealt to ' + m[1] + ' [' + m[2].replace(/,\s*/g, ' ') + ']'); continue; }
+      if ((m = l.match(/^\*\* Dealing flop \*\* \[\s*(.+?)\s*\]/i))) { flop = m[1].split(/,\s*/); out.push('*** FLOP *** [' + flop.join(' ') + ']'); continue; }
+      if ((m = l.match(/^\*\* Dealing turn \*\* \[\s*(.+?)\s*\]/i))) { out.push('*** TURN *** [' + flop.join(' ') + '] [' + m[1] + ']'); continue; }
+      if ((m = l.match(/^\*\* Dealing river \*\* \[\s*(.+?)\s*\]/i))) { out.push('*** RIVER *** [' + flop.join(' ') + '] [' + m[1] + ']'); continue; }
+      if (/^\*\* Summary \*\*/i.test(l)) { out.push('*** SHOW DOWN ***'); continue; }
+      if ((m = l.match(/^(.+?) (calls|bets) \[([^\]]+)\]/))) { out.push(m[1] + ': ' + m[2] + ' ' + amt(m[3])); continue; }
+      if ((m = l.match(/^(.+?) raises \[([^\]]+)\]/))) { out.push(m[1] + ': raises by ' + amt(m[2])); continue; }
+      if ((m = l.match(/^(.+?) (?:shows|mucks) \[\s*(.+?)\s*\]/))) { out.push(m[1] + ': shows [' + m[2].replace(/,\s*/g, ' ') + ']'); continue; }
+      if ((m = l.match(/^(.+?) collected \[\s*([^\]]+?)\s*\]/)) || (m = l.match(/^(.+?) wins ([\d.,$€]+)(?: chips| USD| EUR)?/))) { out.push(m[1] + ' collected ' + amt(m[2]) + ' from pot'); continue; }
+      if ((m = l.match(/^(.+?) (checks|folds)/))) { out.push(m[1] + ': ' + m[2]); continue; }
+    }
+    return out.join('\n');
   }
   const num = s => parseFloat(String(s).replace(/[€$,]/g, '')) || 0;
   function parse(raw) {
@@ -24,8 +66,8 @@
     let street = 'pre';
     for (const l0 of L.slice(1)) {
       const l = l0.replace(/^([^:]+): (?=(posts|raises|calls|bets|checks|folds|shows|mucks|collected|is all-in))/, '$1 ');   // PokerStars "name: action"
-      if ((m = l.match(/Seat #(\d+) is the button/))) { h.btn = +m[1]; continue; }
-      if (street === 'pre' && (m = l.match(/^Seat (\d+): (.+?) \(([\d.,€$]+)(?: in chips)?(?:,[^)]*)?\)/))) { h.seats.push({ seat: +m[1], name: m[2], stack: num(m[3]) }); continue; }
+      if ((m = l.match(/Seat #?(\d+) is the button/))) { h.btn = +m[1]; continue; }
+      if (street === 'pre' && (m = l.match(/^Seat (\d+): (.+?) \(\s*([\d.,€$]+)\s*(?: in chips)?(?:,[^)]*|\s[^)]*)?\)/))) { h.seats.push({ seat: +m[1], name: m[2], stack: num(m[3]) }); continue; }
       if ((m = l.match(/^Dealt to (.+?) \[(.+?)\]/))) { h.hero = m[1]; h.shown[m[1]] = m[2].split(' '); continue; }
       if ((m = l.match(/^\*\*\* FLOP \*\*\* \[(.+?)\]/))) { street = 'flop'; h.board.flop = m[1].split(' '); h.acts.push({ st: 'flop' }); continue; }
       if ((m = l.match(/^\*\*\* TURN \*\*\* \[.+?\] ?\[(.+?)\]/))) { street = 'turn'; h.board.turn = m[1].split(' '); h.acts.push({ st: 'turn' }); continue; }
@@ -36,8 +78,9 @@
       if ((m = l.match(/^(.+?) collected ([\d.,€$]+)/))) { h.won[m[1]] = (h.won[m[1]] || 0) + num(m[2]); h.acts.push({ p: m[1], a: 'wins', v: num(m[2]) }); continue; }
       if ((m = l.match(/^Uncalled bet \(([\d.,€$]+)\) returned to (.+)$/))) { h.acts.push({ p: m[2], a: 'return', v: num(m[1]) }); continue; }
       if ((m = l.match(/^(.+?) posts (?:the )?ante ([\d.,€$]+)/))) { h.acts.push({ p: m[1], a: 'ante', v: num(m[2]) }); continue; }
-      if ((m = l.match(/^(.+?) posts small blind ([\d.,€$]+)/))) { h.acts.push({ p: m[1], a: 'sb', v: num(m[2]) }); continue; }
-      if ((m = l.match(/^(.+?) posts big blind ([\d.,€$]+)/))) { h.acts.push({ p: m[1], a: 'bb', v: num(m[2]) }); continue; }
+      if ((m = l.match(/^(.+?) posts (?:the )?small blind ([\d.,€$]+)/))) { h.acts.push({ p: m[1], a: 'sb', v: num(m[2]) }); continue; }
+      if ((m = l.match(/^(.+?) posts (?:the )?big blind ([\d.,€$]+)/))) { h.acts.push({ p: m[1], a: 'bb', v: num(m[2]) }); continue; }
+      if ((m = l.match(/^(.+?) raises by ([\d.,€$]+)/))) { h.acts.push({ p: m[1], a: 'raiseby', v: num(m[2]) }); continue; }
       if ((m = l.match(/^(.+?) raises [\d.,€$]+ to ([\d.,€$]+)/))) { h.acts.push({ p: m[1], a: 'raise', to: num(m[2]), allin: /all-in/.test(l) }); continue; }
       if ((m = l.match(/^(.+?) bets ([\d.,€$]+)/))) { h.acts.push({ p: m[1], a: 'bet', v: num(m[2]), allin: /all-in/.test(l) }); continue; }
       if ((m = l.match(/^(.+?) calls ([\d.,€$]+)/))) { h.acts.push({ p: m[1], a: 'call', v: num(m[2]), allin: /all-in/.test(l) }); continue; }
@@ -56,10 +99,13 @@
   function state(h, n) {
     const S = {}; h.seats.forEach(s => { S[s.name] = { stack: s.stack, bet: 0, fold: false, allin: false, last: '' }; });
     let pot = 0, street = 'pre', board = [], showAll = false, line = 'Reparto';
+    // A bet nobody called goes back to whoever made it (rooms like 888 do not write the line).
+    const uncalled = () => { const v = Object.values(S).sort((x, y) => y.bet - x.bet); if (v.length > 1 && v[0].bet > v[1].bet) { const back = v[0].bet - v[1].bet; v[0].bet -= back; v[0].stack += back; } };
     const collect = () => { Object.values(S).forEach(p => { pot += p.bet; p.bet = 0; }); };
     for (let i = 0; i < n; i++) {
       const a = h.acts[i];
       if (a.st) {
+        if (a.st === 'show') uncalled();
         collect(); Object.values(S).forEach(p => { p.last = ''; });
         if (a.st === 'show') { showAll = true; line = 'Se muestran las cartas'; continue; }
         street = a.st; board = h.board.flop.concat(a.st !== 'flop' ? h.board.turn : [], a.st === 'river' ? h.board.river : []);
@@ -70,13 +116,14 @@
       if (a.a === 'ante') { const x = Math.min(a.v, p.stack); p.stack -= x; pot += x; p.last = 'ante'; }
       else if (a.a === 'sb' || a.a === 'bb') { put(a.v); p.last = a.a.toUpperCase(); }
       else if (a.a === 'raise') { put(a.to - p.bet); p.last = 'sube a ' + fmt(a.to, h); }
+      else if (a.a === 'raiseby') { put(a.v); p.last = 'sube a ' + fmt(p.bet, h); }
       else if (a.a === 'bet') { put(a.v); p.last = 'apuesta ' + fmt(a.v, h); }
       else if (a.a === 'call') { put(a.v); p.last = 'paga ' + fmt(a.v, h); }
       else if (a.a === 'check') p.last = 'pasa';
       else if (a.a === 'fold') { p.fold = true; p.last = 'fold'; }
       else if (a.a === 'return') { p.bet -= a.v; p.stack += a.v; }
       else if (a.a === 'shows') { showAll = true; }
-      else if (a.a === 'wins') { collect(); p.stack += a.v; pot = Math.max(0, pot - a.v); p.last = 'gana ' + fmt(a.v, h); }
+      else if (a.a === 'wins') { uncalled(); collect(); p.stack += a.v; pot = Math.max(0, pot - a.v); p.last = 'gana ' + fmt(a.v, h); }
       if (p.allin && ['raise', 'bet', 'call'].includes(a.a)) p.last += ' (all-in)';
       line = a.p + ': ' + (p.last || a.a);
     }
@@ -125,7 +172,7 @@
   }
   function load(txt) {
     H = split(txt).map(parse).filter(Boolean);
-    if (!H.length) { $('r-msg').textContent = 'No he reconocido ninguna mano. Pega el historial tal cual lo guarda Winamax o PokerStars.'; return; }
+    if (!H.length) { $('r-msg').textContent = 'No he reconocido ninguna mano. Pega el historial tal cual lo guarda tu sala (Winamax, PokerStars, GGPoker, 888poker, partypoker, ACR…).'; return; }
     $('r-msg').textContent = H.length + ' mano' + (H.length > 1 ? 's' : '') + ' cargada' + (H.length > 1 ? 's' : '') + '. Todo se procesa en tu navegador: nada sale de tu dispositivo.';
     $('r-list').innerHTML = H.map((h, i) => { const c = h.shown[h.hero]; return '<option value="' + i + '">' + (i + 1) + '. ' + (c ? c.join(' ') + ' · ' : '') + esc(h.title) + (h.won[h.hero] ? ' · gana' : '') + '</option>'; }).join('');
     $('r-view').hidden = false; hi = 0; go(0);
