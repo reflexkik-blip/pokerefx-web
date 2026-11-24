@@ -15,8 +15,10 @@
     const L = raw.split('\n').map(l => l.trim()).filter(Boolean);
     const h = { title: '', seats: [], btn: 0, sb: 0, bb: 0, hero: null, acts: [], board: { flop: [], turn: [], river: [] }, shown: {}, won: {} };
     const head = L[0];
-    let m = head.match(/\((\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)(?:\/\d+(?:\.\d+)?)?\)/) || head.match(/\(([\d.€$]+)\/([\d.€$]+)/);
-    if (m) { h.sb = num(m[1]); h.bb = num(m[2]); }
+    // Winamax writes (ante/small blind/big blind); PokerStars and others (small blind/big blind).
+    let m = head.match(/\((\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)\)/);
+    if (m) { h.ante = num(m[1]); h.sb = num(m[2]); h.bb = num(m[3]); }
+    else if ((m = head.match(/\(([\d.€$]+)\/([\d.€$]+)/))) { h.sb = num(m[1]); h.bb = num(m[2]); }
     m = head.match(/Tournament "([^"]+)"/) || head.match(/Tournament #(\d+)/) || head.match(/- ([^-]+?) - /); h.title = m ? m[1] : 'Hand';
     const dt = head.match(/(\d{4}\/\d{2}\/\d{2} \d{1,2}:\d{2}(?::\d{2})?)/); h.date = dt ? dt[1] : '';
     let street = 'pre';
@@ -42,7 +44,11 @@
       if ((m = l.match(/^(.+?) checks/))) { h.acts.push({ p: m[1], a: 'check' }); continue; }
       if ((m = l.match(/^(.+?) folds/))) { h.acts.push({ p: m[1], a: 'fold' }); continue; }
     }
-    if (!h.bb) { const b = h.acts.find(a => a.a === 'bb'); h.bb = b ? b.v : 1; }
+    // The posted blinds win over the header (a short stack can post less, so take the largest post).
+    const posted = k => h.acts.filter(a => a.a === k).reduce((x, a) => Math.max(x, a.v), 0);
+    if (posted('bb')) h.bb = Math.max(h.bb && h.bb >= posted('bb') ? h.bb : 0, posted('bb'));
+    if (posted('sb') && !h.sb) h.sb = posted('sb');
+    if (!h.bb) h.bb = 1;
     return h.seats.length >= 2 ? h : null;
   }
 
@@ -103,8 +109,8 @@
     });
     $('r-table').innerHTML = '<div class="felt"></div><div class="mid"><div class="bd">' + st.board.map(cardHTML).join('') + '</div><div class="pot">Pot ' + fmt(st.pot, h) + '</div></div>' + seats;
     $('r-line').textContent = (step ? step + '/' + h.acts.length + ' · ' : '') + st.line;
-    $('r-prog').value = step; $('r-prog').max = h.acts.length;
-    $('r-info').textContent = h.title + (h.date ? ' · ' + h.date : '') + ' · blinds ' + fmt(h.sb, h) + '/' + fmt(h.bb, h);
+    $('r-prog').max = h.acts.length; $('r-prog').value = step;
+    $('r-info').textContent = h.title + (h.date ? ' · ' + h.date : '') + ' · blinds ' + (h.sb || 0).toLocaleString('en-US') + '/' + h.bb.toLocaleString('en-US') + (h.ante ? ' · ante ' + h.ante.toLocaleString('en-US') : '') + (inBB ? ' (1 bb = ' + h.bb.toLocaleString('en-US') + ' chips)' : '');
   }
   function go(s) { const h = H[hi]; step = Math.max(0, Math.min(h.acts.length, s)); draw(); }
   // Moving past the end of a hand opens the next one; moving back from its start opens the previous one at its end.
@@ -136,7 +142,7 @@
   $('r-unit').addEventListener('change', e => { inBB = e.target.value === 'bb'; draw(); });
   document.addEventListener('keydown', e => { if ($('r-view').hidden || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return; if (e.key === 'ArrowRight') fwd(); if (e.key === 'ArrowLeft') back(); if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); hand(hi + 1, 0); } if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); hand(hi - 1, 0); } });
 
-  const DEMO = `Winamax Poker - Tournament "Demo MTT" buyIn: 9€ + 1€ level: 12 - HandId: #1-1-1 - Holdem no limit (250/500/60) - 2026/11/16 21:30:00 UTC
+  const DEMO = `Winamax Poker - Tournament "Demo MTT" buyIn: 9€ + 1€ level: 12 - HandId: #1-1-1 - Holdem no limit (500/250/500) - 2026/11/16 21:30:00 UTC
 Table: 'Demo MTT(1)#3' 6-max (real money) Seat #4 is the button
 Seat 1: Rival_UTG (14200)
 Seat 2: Rival_HJ (9800)
